@@ -17,5 +17,12 @@ export default async function SetupPage({
   const test = listeningTests.find((item) => attemptId.startsWith(item.id));
   if (!test) notFound();
   const mode = query.mode === "practice" ? "practice" : "mock";
-  return <PreTestScreen test={test} attemptId={attemptId} mode={mode} />;
+  return (
+    <PreTestScreen
+      test={test}
+      attemptId={attemptId}
+      mode={mode}
+      demoEnabled={query.demo === "true"}
+    />
+  );
 }

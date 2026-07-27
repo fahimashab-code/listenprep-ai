@@ -146,16 +146,15 @@ export default function PracticePage() {
       <Card className="mt-8 flex flex-col justify-between gap-4 border-dashed p-5 sm:flex-row sm:items-center">
         <div>
           <div className="flex items-center gap-2">
-            <h3 className="font-bold">Custom AI Practice</h3>
-            <Badge variant="amber">Preview · Coming soon</Badge>
+            <h3 className="font-bold">Create Custom Practice</h3>
+            <Badge variant="amber">Preview</Badge>
           </div>
           <p className="mt-1 text-sm text-muted">
-            Preview a future topic-led practice workflow using simulated local
-            states.
+            Choose a topic and preview a practice created with local demo data.
           </p>
         </div>
         <ButtonLink href="/generate" variant="secondary">
-          Open preview <ArrowRight className="size-4" />
+          Create practice <ArrowRight className="size-4" />
         </ButtonLink>
       </Card>
     </>

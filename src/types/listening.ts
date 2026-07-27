@@ -13,6 +13,12 @@ export type QuestionType =
 
 export type Difficulty = "standard" | "challenging";
 export type UserAnswer = string | string[];
+export type ExamPhase =
+  | "part_preview"
+  | "part_playing"
+  | "part_transition"
+  | "final_review"
+  | "submitted";
 
 export interface QuestionOption {
   id: string;
@@ -82,9 +88,12 @@ export interface TestAttempt {
   testId: string;
   userId: string;
   mode: "mock" | "practice";
-  status: "not_started" | "in_progress" | "completed";
+  status: "not_started" | "in_progress" | "final_review" | "completed";
+  phase: ExamPhase;
   answers: Record<string, UserAnswer>;
+  markedForReview: string[];
   currentPart: number;
+  reviewEndsAt?: string;
   startedAt?: string;
   completedAt?: string;
   rawScore?: number;

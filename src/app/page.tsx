@@ -58,21 +58,22 @@ export default function Home() {
           <div className="mx-auto grid max-w-[1180px] items-center gap-12 px-5 py-16 sm:px-8 md:py-24 lg:grid-cols-[1.08fr_.92fr] lg:py-28">
             <div>
               <Badge variant="green" className="mb-5">
-                Focused IELTS Listening preparation
+                Full IELTS Listening practice
               </Badge>
               <h1 className="type-display max-w-2xl text-ink">
-                Improve your IELTS Listening through realistic practice.
+                Take a Full IELTS Listening Mock.
               </h1>
               <p className="type-lead mt-6 max-w-xl text-muted">
-                Take full mock tests, practise individual question types,
-                understand your mistakes and track your improvement.
+                Complete all 4 Parts and 40 questions in a focused,
+                real-test-style experience. Then review your mistakes and know
+                exactly what to practise next.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <ButtonLink href="/login" size="lg">
-                  Start practising <ArrowRight className="size-4" />
+                  Start Full Mock <ArrowRight className="size-4" />
                 </ButtonLink>
                 <ButtonLink href="/tests/mock-01" variant="secondary" size="lg">
-                  <Play className="size-4" /> Try a free listening test
+                  <Play className="size-4" /> View Listening Mock 01
                 </ButtonLink>
               </div>
               <p className="mt-5 flex items-center gap-2 text-sm text-muted">
@@ -88,7 +89,7 @@ export default function Home() {
                 <div className="flex items-start justify-between border-b pb-5">
                   <div>
                     <p className="text-sm font-semibold text-muted">
-                      Latest practice result
+                      Full mock result
                     </p>
                     <h2 className="mt-1 text-xl font-bold">
                       Listening Mock 05
@@ -255,7 +256,7 @@ export default function Home() {
         <section className="bg-primary-strong px-5 py-16 text-white">
           <div className="mx-auto flex max-w-[920px] flex-col items-center text-center">
             <h2 className="type-marketing-title">
-              Start your first listening test
+              Take your first full Listening mock
             </h2>
             <p className="mt-3 max-w-xl text-white/75">
               Discover what you already do well and what to practise next.

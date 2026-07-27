@@ -9,6 +9,8 @@ import {
   Home,
   LogOut,
   Menu,
+  PanelLeftClose,
+  PanelLeftOpen,
   UserRound,
   X,
 } from "lucide-react";
@@ -19,21 +21,20 @@ import { Brand } from "@/components/brand";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/dashboard", label: "Home", icon: Home },
   { href: "/tests", label: "Mock Tests", icon: ClipboardList },
   { href: "/practice", label: "Practice", icon: BookOpenCheck },
-  { href: "/progress", label: "Progress", icon: BarChart3 },
   { href: "/history", label: "History", icon: History },
 ];
 
 const titles: Record<string, string> = {
-  "/dashboard": "Dashboard",
+  "/dashboard": "Home",
   "/tests": "Mock Tests",
   "/practice": "Practice",
   "/progress": "Progress",
   "/history": "History",
   "/profile": "Profile",
-  "/generate": "Custom Practice",
+  "/generate": "Create Custom Practice",
 };
 
 function NavLink({
@@ -42,12 +43,14 @@ function NavLink({
   icon: Icon,
   pathname,
   onClick,
+  collapsed = false,
 }: {
   href: string;
   label: string;
   icon: typeof Home;
   pathname: string;
   onClick?: () => void;
+  collapsed?: boolean;
 }) {
   const active = pathname === href || pathname.startsWith(`${href}/`);
   return (
@@ -56,14 +59,17 @@ function NavLink({
       onClick={onClick}
       className={cn(
         "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold",
+        collapsed && "justify-center px-0",
         active
           ? "bg-primary-soft text-primary"
           : "text-muted hover:bg-[#f0f3f1] hover:text-ink",
       )}
       aria-current={active ? "page" : undefined}
+      aria-label={collapsed ? label : undefined}
+      title={collapsed ? label : undefined}
     >
-      <Icon className="size-[18px]" aria-hidden="true" />
-      {label}
+      <Icon className="size-[18px] shrink-0" aria-hidden="true" />
+      {!collapsed && <span>{label}</span>}
     </Link>
   );
 }
@@ -71,6 +77,8 @@ function NavLink({
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const rootPath = `/${pathname.split("/")[1]}`;
   const title =
     titles[rootPath] ??
@@ -78,27 +86,60 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-[248px] border-r bg-white px-4 py-6 lg:flex lg:flex-col">
-        <Brand href="/dashboard" className="px-2" />
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-30 hidden border-r bg-white py-6 transition-[width] duration-200 lg:flex lg:flex-col",
+          sidebarCollapsed ? "w-20 px-3" : "w-[248px] px-4",
+        )}
+      >
+        <div className={cn("flex", sidebarCollapsed ? "justify-center" : "px-2")}>
+          <Brand href="/dashboard" compact={sidebarCollapsed} />
+        </div>
+        <button
+          type="button"
+          onClick={() => setSidebarCollapsed((value) => !value)}
+          className="absolute -right-4 top-7 grid size-8 place-items-center rounded-full border bg-white text-muted shadow-sm hover:bg-surface-subtle hover:text-ink"
+          aria-label={
+            sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
+          }
+          title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {sidebarCollapsed ? (
+            <PanelLeftOpen className="size-4" />
+          ) : (
+            <PanelLeftClose className="size-4" />
+          )}
+        </button>
         <nav className="mt-9 space-y-1" aria-label="Main navigation">
           {navItems.map((item) => (
-            <NavLink key={item.href} {...item} pathname={pathname} />
+            <NavLink
+              key={item.href}
+              {...item}
+              pathname={pathname}
+              collapsed={sidebarCollapsed}
+            />
           ))}
         </nav>
 
-        <div className="mt-auto space-y-1 border-t pt-4">
-          <NavLink
-            href="/profile"
-            label="Profile"
-            icon={UserRound}
-            pathname={pathname}
-          />
-          <NavLink
-            href="/"
-            label="Sign out"
-            icon={LogOut}
-            pathname={pathname}
-          />
+        <div
+          className={cn(
+            "mt-auto rounded-xl bg-surface-subtle",
+            sidebarCollapsed ? "grid place-items-center p-2" : "p-4",
+          )}
+          title={sidebarCollapsed ? "Alex · Target Listening band 8.0" : undefined}
+        >
+          {sidebarCollapsed ? (
+            <span className="grid size-9 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
+              A
+            </span>
+          ) : (
+            <>
+              <p className="text-sm font-bold">Alex</p>
+              <p className="mt-1 text-xs text-muted">
+                Target Listening band 8.0
+              </p>
+            </>
+          )}
         </div>
       </aside>
 
@@ -130,11 +171,39 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 />
               ))}
             </nav>
+            <div className="mt-6 space-y-1 border-t pt-4">
+              <NavLink
+                href="/progress"
+                label="Progress"
+                icon={BarChart3}
+                pathname={pathname}
+                onClick={() => setMobileOpen(false)}
+              />
+              <NavLink
+                href="/profile"
+                label="Profile"
+                icon={UserRound}
+                pathname={pathname}
+                onClick={() => setMobileOpen(false)}
+              />
+              <NavLink
+                href="/"
+                label="Sign out"
+                icon={LogOut}
+                pathname={pathname}
+                onClick={() => setMobileOpen(false)}
+              />
+            </div>
           </aside>
         </div>
       )}
 
-      <div className="lg:pl-[248px]">
+      <div
+        className={cn(
+          "transition-[padding] duration-200",
+          sidebarCollapsed ? "lg:pl-20" : "lg:pl-[248px]",
+        )}
+      >
         <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <button
@@ -146,20 +215,48 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
             <h1 className="text-lg font-bold sm:text-xl">{title}</h1>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary sm:flex">
-              Target band 8.0
-            </div>
-            <Link
-              href="/profile"
+          <div className="relative">
+            <button
+              type="button"
               className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100"
+              onClick={() => setUserOpen((value) => !value)}
+              aria-expanded={userOpen}
+              aria-haspopup="menu"
             >
               <span className="grid size-8 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
                 A
               </span>
               <span className="hidden text-sm font-semibold md:inline">Alex</span>
-              <ChevronDown className="hidden size-4 text-gray-500 md:inline" />
-            </Link>
+              <ChevronDown
+                className={cn(
+                  "hidden size-4 text-gray-500 transition-transform md:inline",
+                  userOpen && "rotate-180",
+                )}
+              />
+            </button>
+            {userOpen && (
+              <div
+                className="absolute right-0 mt-2 w-48 rounded-xl border bg-white p-1.5 shadow-lg"
+                role="menu"
+              >
+                {[
+                  { href: "/progress", label: "Progress", icon: BarChart3 },
+                  { href: "/profile", label: "Profile", icon: UserRound },
+                  { href: "/", label: "Sign out", icon: LogOut },
+                ].map(({ href, label, icon: Icon }) => (
+                  <Link
+                    key={label}
+                    href={href}
+                    role="menuitem"
+                    onClick={() => setUserOpen(false)}
+                    className="flex h-10 items-center gap-3 rounded-lg px-3 text-sm font-semibold text-muted hover:bg-surface-subtle hover:text-ink"
+                  >
+                    <Icon className="size-4" aria-hidden="true" />
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </header>
         <main className="mx-auto max-w-[1280px] px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8">
@@ -168,7 +265,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-white px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-white px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
         aria-label="Mobile navigation"
       >
         {navItems.map(({ href, label, icon: Icon }) => {

@@ -20,10 +20,12 @@ export function PreTestScreen({
   test,
   attemptId,
   mode,
+  demoEnabled,
 }: {
   test: ListeningTest;
   attemptId: string;
   mode: "mock" | "practice";
+  demoEnabled: boolean;
 }) {
   const router = useRouter();
   const [checking, setChecking] = useState(false);
@@ -48,11 +50,15 @@ export function PreTestScreen({
       userId: "demo-alex",
       mode,
       status: "in_progress",
+      phase: "part_preview",
       answers: {},
+      markedForReview: [],
       currentPart: 1,
       startedAt: new Date().toISOString(),
     });
-    router.push(`/test/${attemptId}?mode=${mode}`);
+    const query = new URLSearchParams({ mode });
+    if (demoEnabled) query.set("demo", "true");
+    router.push(`/test/${attemptId}?${query.toString()}`);
   }
 
   return (
@@ -66,7 +72,7 @@ export function PreTestScreen({
             <span className="font-bold">{test.title}</span>
           </div>
           <Badge variant={mode === "mock" ? "green" : "gray"}>
-            {mode === "mock" ? "Mock Exam" : "Practice Mode"}
+            {mode === "mock" ? "Mock Test" : "Practice"}
           </Badge>
         </div>
       </header>
@@ -178,11 +184,18 @@ export function PreTestScreen({
               </p>
             )}
             <div className="mt-6 border-t pt-5">
-              <Button size="lg" className="w-full" onClick={start}>
+              <Button
+                size="lg"
+                className="w-full"
+                onClick={start}
+                disabled={!checked}
+              >
                 <ShieldCheck className="size-4" /> Start Listening Test
               </Button>
               <p className="mt-3 text-center text-xs leading-5 text-subtle">
-                Starting confirms that you understand the instructions.
+                {checked
+                  ? "Starting confirms that you understand the instructions."
+                  : "Play the test sound before starting."}
               </p>
             </div>
           </Card>

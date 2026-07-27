@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { ButtonLink } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -25,7 +25,10 @@ import {
 } from "@/lib/scoring";
 import { loadAttempt } from "@/lib/storage";
 import { cn, formatQuestionType, formatSkill } from "@/lib/utils";
-import { demoSubmittedAnswers } from "@/mock-data/listening-tests";
+import {
+  demoSubmittedAnswers,
+  mockTestOne,
+} from "@/mock-data/listening-tests";
 import type {
   ListeningQuestion,
   ListeningTest,
@@ -109,7 +112,7 @@ function ReviewCard({
           <div className="mt-5">
             <div className="flex items-center gap-2">
               <Lightbulb className="size-4 text-amber-700" />
-              <h3 className="font-bold">Why?</h3>
+              <h3 className="font-bold">Why was this wrong?</h3>
             </div>
             <p className="mt-2 type-body-sm text-muted">
               {question.distractor?.explanation ??
@@ -118,10 +121,7 @@ function ReviewCard({
             {question.distractor && (
               <div className="mt-3 flex flex-wrap gap-2">
                 <Badge variant="amber">
-                  Distractor: {question.distractor.value}
-                </Badge>
-                <Badge variant="amber">
-                  Type: {formatSkill(question.distractor.type)}
+                  Listening issue: {formatSkill(question.distractor.type)}
                 </Badge>
               </div>
             )}
@@ -156,11 +156,11 @@ function ReviewCard({
 
         {question.paraphrase && (
           <div className="mt-5 rounded-lg bg-surface-subtle p-4">
-            <h3 className="text-sm font-bold">Paraphrase explanation</h3>
+            <h3 className="text-sm font-bold">Words with the same meaning</h3>
             <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-xs font-semibold text-muted">
-                  Question wording
+                  Question
                 </dt>
                 <dd className="mt-1 font-semibold">
                   “{question.paraphrase.questionPhrase}”
@@ -168,7 +168,7 @@ function ReviewCard({
               </div>
               <div>
                 <dt className="text-xs font-semibold text-muted">
-                  Audio wording
+                  Recording
                 </dt>
                 <dd className="mt-1 font-semibold">
                   “{question.paraphrase.audioPhrase}”
@@ -176,7 +176,7 @@ function ReviewCard({
               </div>
             </dl>
             <p className="mt-3 text-sm text-muted">
-              The question paraphrases the expression used in the recording.
+              The recording used different words to express the same idea.
             </p>
           </div>
         )}
@@ -198,8 +198,25 @@ export function ResultView({
   test: ListeningTest;
   attemptId: string;
 }) {
-  const [answers, setAnswers] =
-    useState<Record<string, UserAnswer>>(demoSubmittedAnswers);
+  const [answers, setAnswers] = useState<Record<string, UserAnswer>>(() => {
+    const demoAnswersByNumber = new Map(
+      mockTestOne.parts.flatMap((part) =>
+        part.questions.map((question) => [
+          question.number,
+          demoSubmittedAnswers[question.id],
+        ]),
+      ),
+    );
+    return Object.fromEntries(
+      test.parts.flatMap((part) =>
+        part.questions.map((question) => [
+          question.id,
+          demoAnswersByNumber.get(question.number) ??
+            question.acceptedAnswers[0],
+        ]),
+      ),
+    );
+  });
   const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
@@ -213,6 +230,22 @@ export function ResultView({
   const score = calculateRawScore(test, answers);
   const band = estimateListeningBand(score);
   const breakdown = getResultBreakdown(test, answers);
+  const weakestPart = breakdown.byPart.reduce((weakest, item) =>
+    item.score / item.total < weakest.score / weakest.total ? item : weakest,
+  );
+  const weakestPartNumber = Number(weakestPart.label.replace("Part ", ""));
+  const weaknessTitle =
+    weakestPartNumber === 3
+      ? "Part 3 — Speaker opinions"
+      : `${weakestPart.label} — ${
+          [
+            "Everyday details",
+            "Directions and main ideas",
+            "Speaker opinions",
+            "Academic information",
+          ][weakestPartNumber - 1]
+        }`;
+  const weaknessHref = `/practice/part-${weakestPartNumber}`;
   const questions = test.parts.flatMap((part) => part.questions);
   const visibleQuestions = useMemo(
     () =>
@@ -250,7 +283,7 @@ export function ResultView({
       <header className="border-b bg-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <ButtonLink href="/dashboard" variant="ghost" size="sm">
-            <ArrowLeft className="size-4" /> Dashboard
+            <ArrowLeft className="size-4" /> Home
           </ButtonLink>
           <span className="hidden items-center gap-2 text-sm font-bold sm:flex">
             <Headphones className="size-4 text-primary" />
@@ -296,15 +329,14 @@ export function ResultView({
               <p className="text-sm font-semibold text-white/70">
                 Result insight
               </p>
-              <h2 className="mt-3 text-xl font-bold">
-                Your strongest performance was Part 1.
-              </h2>
+              <h2 className="mt-3 text-xl font-bold">Focus next</h2>
+              <p className="mt-2 text-lg font-bold">{weaknessTitle}</p>
               <p className="mt-3 type-body-sm text-white/75">
-                You lost most marks in Part 3 multiple-choice questions,
-                especially when a speaker corrected an earlier opinion.
+                This Part cost you the most marks in this test. Review the
+                mistakes, then practise similar questions.
               </p>
               <ButtonLink
-                href="/practice/part-3"
+                href={weaknessHref}
                 variant="secondary"
                 className="mt-6 w-full"
               >
@@ -337,12 +369,32 @@ export function ResultView({
               </Card>
             ))}
           </div>
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+            <Button
+              onClick={() => {
+                setFilter("incorrect");
+                document
+                  .getElementById("question-review")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Review mistakes <ArrowRight className="size-4" />
+            </Button>
+            <ButtonLink href={weaknessHref} variant="secondary">
+              Practice weakness
+            </ButtonLink>
+          </div>
         </section>
 
-        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <details className="group mt-6 rounded-xl border bg-white">
+          <summary className="flex cursor-pointer list-none items-center justify-between p-5 font-bold sm:p-6">
+            View detailed analysis
+            <ChevronDown className="size-5 text-subtle transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="grid gap-6 border-t p-5 sm:p-6 lg:grid-cols-2">
           <Card className="p-5 sm:p-6">
             <p className="text-sm font-semibold text-muted">
-              Performance breakdown
+              Detailed breakdown
             </p>
             <h2 className="mt-1 text-xl font-bold">By question type</h2>
             <div className="mt-5 space-y-4">
@@ -405,7 +457,8 @@ export function ResultView({
               ))}
             </div>
           </Card>
-        </div>
+          </div>
+        </details>
 
         <Card className="mt-6 border-[#bddbc5] p-5 sm:p-6">
           <div className="flex gap-4">
@@ -417,12 +470,15 @@ export function ResultView({
                 Recommended next practice
               </p>
               <h2 className="mt-1 text-xl font-bold">
-                Part 3 — Speaker Opinions
+                {weaknessTitle}
               </h2>
               <p className="mt-2 type-body-sm text-muted">
-                Focus on final decisions and signals such as “actually” or “on
-                reflection”. These often introduce a correction.
+                Practise the Part that caused the most difficulty before taking
+                your next full Listening mock.
               </p>
+              <ButtonLink href={weaknessHref} className="mt-4" size="sm">
+                Start recommended practice <ArrowRight className="size-4" />
+              </ButtonLink>
             </div>
           </div>
         </Card>

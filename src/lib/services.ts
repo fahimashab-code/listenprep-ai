@@ -53,7 +53,9 @@ export const mockAttemptService: AttemptService = {
       userId: "demo-alex",
       mode,
       status: "in_progress",
+      phase: "part_preview",
       answers: {},
+      markedForReview: [],
       currentPart: 1,
       startedAt: new Date().toISOString(),
     };

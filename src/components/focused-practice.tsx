@@ -102,7 +102,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
                 <RotateCcw className="size-4" /> Practice again
               </Button>
               <ButtonLink href="/dashboard" variant="secondary" size="lg">
-                Return to Dashboard
+                Return Home
               </ButtonLink>
             </div>
           </div>

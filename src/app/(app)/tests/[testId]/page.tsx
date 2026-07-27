@@ -35,7 +35,6 @@ export default async function TestDetailsPage({
           <Card className="p-6 sm:p-8">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="green">IELTS Listening mock</Badge>
-              <Badge>{test.difficulty}</Badge>
             </div>
             <h2 className="type-page-title mt-5">
               {test.title}
@@ -50,13 +49,21 @@ export default async function TestDetailsPage({
                 <Clock3 className="size-4" /> Approximately{" "}
                 {test.estimatedDurationMinutes} minutes
               </span>
+              <span>+ final review time</span>
             </div>
           </Card>
 
           <Card className="p-6">
             <h3 className="text-lg font-bold">Test structure</h3>
             <div className="mt-5 divide-y">
-              {test.parts.map((part) => (
+              {test.parts.map((part) => {
+                const partLabels = [
+                  "Everyday conversation",
+                  "Everyday monologue",
+                  "Educational discussion",
+                  "Academic monologue",
+                ];
+                return (
                 <div
                   key={part.partNumber}
                   className="grid gap-1 py-4 first:pt-0 last:pb-0 sm:grid-cols-[90px_1fr_auto] sm:items-center"
@@ -65,18 +72,19 @@ export default async function TestDetailsPage({
                     Part {part.partNumber}
                   </span>
                   <div>
-                    <p className="font-semibold">{part.context}</p>
+                    <p className="font-semibold">
+                      {partLabels[part.partNumber - 1]}
+                    </p>
                     <p className="mt-1 text-sm text-muted">
-                      {part.speakerCount === 1
-                        ? "One speaker"
-                        : `${part.speakerCount} speakers`}
+                      {part.context}
                     </p>
                   </div>
                   <span className="text-sm font-semibold text-muted">
                     10 questions
                   </span>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </Card>
         </div>
@@ -86,10 +94,10 @@ export default async function TestDetailsPage({
             <span className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary">
               <LockKeyhole className="size-5" />
             </span>
-            <h3 className="mt-4 text-lg font-bold">Mock Exam</h3>
+            <h3 className="mt-4 text-lg font-bold">Mock Test</h3>
             <p className="mt-2 type-body-sm text-muted">
-              Strict exam behaviour. Audio plays once; no pause, rewind,
-              transcript, or explanations until submission.
+              Practise under real-test-style conditions. Audio plays once with
+              no pause, replay, transcript, or feedback before submission.
             </p>
             <ul className="mt-4 space-y-2 text-sm text-muted">
               {["Audio plays once", "Answers remain editable", "Results after submission"].map(
@@ -105,16 +113,16 @@ export default async function TestDetailsPage({
               href={`/test/${attemptId}/setup?mode=mock`}
               className="mt-5 w-full"
             >
-              <PlayCircle className="size-4" /> Start Mock Exam
+              <PlayCircle className="size-4" /> Start Mock Test
             </ButtonLink>
           </Card>
           <Card className="p-5">
             <span className="grid size-10 place-items-center rounded-lg bg-blue-50 text-blue-700">
               <BookOpenCheck className="size-5" />
             </span>
-            <h3 className="mt-4 text-lg font-bold">Practice Mode</h3>
+            <h3 className="mt-4 text-lg font-bold">Practice</h3>
             <p className="mt-2 type-body-sm text-muted">
-              Pause, replay a block, and review explanations after you attempt
+              Learn at your own pace and review your answers after attempting
               the questions.
             </p>
             <ButtonLink
@@ -122,7 +130,7 @@ export default async function TestDetailsPage({
               variant="secondary"
               className="mt-5 w-full"
             >
-              <Headphones className="size-4" /> Practice This Test
+              <Headphones className="size-4" /> Start Practice
             </ButtonLink>
           </Card>
         </div>
