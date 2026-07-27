@@ -37,13 +37,13 @@ export default async function TestDetailsPage({
               <Badge variant="green">IELTS Listening mock</Badge>
               <Badge>{test.difficulty}</Badge>
             </div>
-            <h2 className="mt-5 text-3xl font-bold tracking-tight">
+            <h2 className="type-page-title mt-5">
               {test.title}
             </h2>
-            <p className="mt-3 max-w-2xl leading-7 text-[#69746d]">
+            <p className="mt-3 max-w-2xl leading-7 text-muted">
               {test.description}
             </p>
-            <div className="mt-6 flex flex-wrap gap-5 border-t pt-5 text-sm font-semibold text-[#566159]">
+            <div className="mt-6 flex flex-wrap gap-5 border-t pt-5 text-sm font-semibold text-muted">
               <span>40 questions</span>
               <span>4 Parts</span>
               <span className="flex items-center gap-2">
@@ -61,18 +61,18 @@ export default async function TestDetailsPage({
                   key={part.partNumber}
                   className="grid gap-1 py-4 first:pt-0 last:pb-0 sm:grid-cols-[90px_1fr_auto] sm:items-center"
                 >
-                  <span className="font-bold text-[#176b3a]">
+                  <span className="font-bold text-primary">
                     Part {part.partNumber}
                   </span>
                   <div>
                     <p className="font-semibold">{part.context}</p>
-                    <p className="mt-1 text-sm text-[#69746d]">
+                    <p className="mt-1 text-sm text-muted">
                       {part.speakerCount === 1
                         ? "One speaker"
                         : `${part.speakerCount} speakers`}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-[#69746d]">
+                  <span className="text-sm font-semibold text-muted">
                     10 questions
                   </span>
                 </div>
@@ -83,19 +83,19 @@ export default async function TestDetailsPage({
 
         <div className="space-y-4">
           <Card className="p-5">
-            <span className="grid size-10 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+            <span className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary">
               <LockKeyhole className="size-5" />
             </span>
             <h3 className="mt-4 text-lg font-bold">Mock Exam</h3>
-            <p className="mt-2 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 type-body-sm text-muted">
               Strict exam behaviour. Audio plays once; no pause, rewind,
               transcript, or explanations until submission.
             </p>
-            <ul className="mt-4 space-y-2 text-sm text-[#566159]">
+            <ul className="mt-4 space-y-2 text-sm text-muted">
               {["Audio plays once", "Answers remain editable", "Results after submission"].map(
                 (item) => (
                   <li key={item} className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-[#176b3a]" />
+                    <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
                     {item}
                   </li>
                 ),
@@ -113,7 +113,7 @@ export default async function TestDetailsPage({
               <BookOpenCheck className="size-5" />
             </span>
             <h3 className="mt-4 text-lg font-bold">Practice Mode</h3>
-            <p className="mt-2 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 type-body-sm text-muted">
               Pause, replay a block, and review explanations after you attempt
               the questions.
             </p>

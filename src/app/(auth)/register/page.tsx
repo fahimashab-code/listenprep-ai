@@ -8,13 +8,13 @@ export default function RegisterPage() {
       <h1 className="text-2xl font-bold tracking-tight">
         Start your listening practice
       </h1>
-      <p className="mt-2 text-sm leading-6 text-[#69746d]">
+      <p className="mt-2 type-body-sm text-muted">
         Create a demo account. No payment details are needed.
       </p>
       <AuthForm mode="register" />
-      <p className="mt-5 text-center text-sm text-[#69746d]">
+      <p className="mt-5 text-center text-sm text-muted">
         Already have an account?{" "}
-        <Link href="/login" className="font-bold text-[#176b3a]">
+        <Link href="/login" className="font-bold text-primary">
           Sign in
         </Link>
       </p>

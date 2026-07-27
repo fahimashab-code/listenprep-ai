@@ -15,12 +15,12 @@ export function Brand({
     <Link
       href={href}
       className={cn(
-        "inline-flex items-center gap-2.5 font-bold tracking-tight text-[#17201a]",
+        "inline-flex items-center gap-2.5 font-bold tracking-tight text-ink",
         className,
       )}
       aria-label="Listenly home"
     >
-      <span className="grid size-9 place-items-center rounded-lg bg-[#176b3a] text-white">
+      <span className="grid size-9 place-items-center rounded-lg bg-primary text-white">
         <Headphones className="size-5" aria-hidden="true" />
       </span>
       {!compact && <span className="text-xl">Listenly</span>}

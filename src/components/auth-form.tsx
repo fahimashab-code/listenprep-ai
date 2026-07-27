@@ -55,7 +55,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   }
 
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border border-[#cfd8d1] bg-white px-3 text-sm outline-none placeholder:text-[#98a29b] focus:border-[#176b3a] focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border border-[#cfd8d1] bg-white px-3 text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100";
 
   return (
     <form className="mt-7 space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -139,7 +139,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         <div className="text-right">
           <a
             href="/forgot-password"
-            className="text-sm font-semibold text-[#176b3a] hover:underline"
+            className="text-sm font-semibold text-primary hover:underline"
           >
             Forgot password?
           </a>
@@ -153,7 +153,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             : "Create account"}
         {!isSubmitting && <ArrowRight className="size-4" />}
       </Button>
-      <div className="flex items-center gap-3 py-1 text-xs text-[#89938c]">
+      <div className="flex items-center gap-3 py-1 text-xs text-subtle">
         <span className="h-px flex-1 bg-[#e0e5e1]" />
         or
         <span className="h-px flex-1 bg-[#e0e5e1]" />
@@ -164,7 +164,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
       <button
         type="button"
         onClick={demoLogin}
-        className="w-full rounded-lg py-2 text-sm font-bold text-[#176b3a] hover:bg-[#edf6ef]"
+        className="w-full rounded-lg py-2 text-sm font-bold text-primary hover:bg-primary-soft"
       >
         Continue with demo account
       </button>

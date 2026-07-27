@@ -42,13 +42,13 @@ export function FocusedPractice({ slug }: { slug: string }) {
           <ArrowLeft className="size-4" /> Practice home
         </ButtonLink>
         <Card className="mt-4 overflow-hidden">
-          <div className="bg-[#174f30] p-7 text-white sm:p-9">
+          <div className="bg-primary-strong p-7 text-white sm:p-9">
             <Badge className="border-white/20 bg-white/10 text-white">
               Focused practice complete
             </Badge>
             <p className="mt-6 text-sm text-white/70">Your score</p>
             <p className="mt-1 text-5xl font-bold">
-              {score} <span className="text-2xl text-white/65">/ {questions.length}</span>
+              {score} <span className="text-2xl text-white/70">/ {questions.length}</span>
             </p>
           </div>
           <div className="p-6 sm:p-8">
@@ -62,7 +62,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
                   <h3 className="mt-1 font-bold text-amber-950">
                     Change-of-mind distractors
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-amber-900">
+                  <p className="mt-2 type-body-sm text-amber-900">
                     Listen for the speaker’s final decision after words such as
                     “actually”, “on reflection”, and “instead”.
                   </p>
@@ -79,11 +79,11 @@ export function FocusedPractice({ slug }: { slug: string }) {
                 .map((question) => (
                   <div key={question.id} className="rounded-lg border p-4 text-sm">
                     <p className="font-bold">Question {question.number}</p>
-                    <p className="mt-1 text-[#69746d]">
+                    <p className="mt-1 text-muted">
                       Correct answer: {question.acceptedAnswers[0]}
                     </p>
                     {question.distractor && (
-                      <p className="mt-2 leading-6 text-[#566159]">
+                      <p className="mt-2 leading-6 text-muted">
                         {question.distractor.explanation}
                       </p>
                     )}
@@ -119,16 +119,16 @@ export function FocusedPractice({ slug }: { slug: string }) {
       <div className="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <Badge variant="green">{exercise.category.replace("_", " ")}</Badge>
-          <h2 className="mt-3 text-3xl font-bold tracking-tight">
+          <h2 className="type-page-title mt-3">
             {exercise.title}
           </h2>
-          <p className="mt-2 max-w-2xl leading-7 text-[#69746d]">
+          <p className="mt-2 max-w-2xl leading-7 text-muted">
             {exercise.description}
           </p>
         </div>
         <div className="shrink-0 text-sm">
           <p className="font-semibold">Your current accuracy</p>
-          <p className="mt-1 text-2xl font-bold text-[#176b3a]">
+          <p className="mt-1 text-2xl font-bold text-primary">
             {exercise.accuracy}%
           </p>
         </div>
@@ -136,7 +136,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
 
       <Card className="mt-6 border-blue-200 bg-blue-50/40 p-5">
         <h3 className="font-bold text-blue-950">Before you start</h3>
-        <p className="mt-1 text-sm leading-6 text-blue-900">
+        <p className="mt-1 type-body-sm text-blue-900">
           Multiple-choice questions often mention several possible answers.
           Focus on the speaker’s final or intended meaning, not just the first
           familiar word you hear.
@@ -154,7 +154,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
             {Object.keys(answers).filter((key) => answers[key] !== "").length} of{" "}
             {questions.length} answered
           </span>
-          <span className="text-[#69746d]">Answers saved in this session</span>
+          <span className="text-muted">Answers saved in this session</span>
         </div>
         <Progress
           value={
@@ -170,7 +170,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
         {questions.map((question, index) => (
           <Card key={question.id} className="p-5 sm:p-6">
             <div className="flex gap-4">
-              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#e8f5ec] text-sm font-bold text-[#176b3a]">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
                 {index + 1}
               </span>
               <div className="min-w-0 flex-1">
@@ -194,10 +194,10 @@ export function FocusedPractice({ slug }: { slug: string }) {
       </div>
       <Card className="mt-6 flex flex-col items-start justify-between gap-4 p-5 sm:flex-row sm:items-center">
         <div className="flex gap-3">
-          <CheckCircle2 className="size-5 text-[#176b3a]" />
+          <CheckCircle2 className="size-5 text-primary" />
           <div>
             <p className="font-bold">Ready to check your answers?</p>
-            <p className="mt-1 text-sm text-[#69746d]">
+            <p className="mt-1 text-sm text-muted">
               You can review explanations after submitting this practice.
             </p>
           </div>

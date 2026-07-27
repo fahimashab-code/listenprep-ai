@@ -148,10 +148,10 @@ export function ExamInterface({
 
   if (!hydrated) {
     return (
-      <div className="grid min-h-screen place-items-center bg-[#f5f8f5]">
+      <div className="grid min-h-screen place-items-center bg-surface-subtle">
         <div className="text-center">
-          <Headphones className="mx-auto size-8 animate-pulse text-[#176b3a]" />
-          <p className="mt-3 text-sm font-semibold text-[#69746d]">
+          <Headphones className="mx-auto size-8 animate-pulse text-primary" />
+          <p className="mt-3 text-sm font-semibold text-muted">
             Restoring your test…
           </p>
         </div>
@@ -162,12 +162,12 @@ export function ExamInterface({
   if (transitionTo !== null) {
     const nextPart = test.parts[transitionTo - 1];
     return (
-      <div className="grid min-h-screen place-items-center bg-[#174f30] px-5 text-white">
+      <div className="grid min-h-screen place-items-center bg-primary-strong px-5 text-white">
         <div className="max-w-xl text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-full bg-white/10">
             <Check className="size-7" />
           </span>
-          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-white/65">
+          <p className="mt-6 text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
             Part {transitionTo - 1} complete
           </p>
           <h1 className="mt-3 text-3xl font-bold">
@@ -191,7 +191,7 @@ export function ExamInterface({
   }
 
   return (
-    <div className="min-h-screen bg-[#f4f7f5]">
+    <div className="min-h-screen bg-surface-subtle">
       <header className="sticky top-0 z-30 border-b bg-white">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
           <div className="flex h-16 items-center justify-between gap-4">
@@ -202,19 +202,19 @@ export function ExamInterface({
                   {attempt.mode === "mock" ? "Mock Exam" : "Practice"}
                 </Badge>
               </div>
-              <p className="mt-0.5 text-xs text-[#69746d]">
+              <p className="mt-0.5 text-xs text-muted">
                 Questions {currentPart.questions[0].number}–
                 {currentPart.questions.at(-1)?.number}
               </p>
             </div>
             <div className="hidden min-w-[280px] items-center gap-3 md:flex">
-              <Volume2 className="size-4 text-[#176b3a]" />
+              <Volume2 className="size-4 text-primary" />
               <div className="flex-1">
                 <div className="mb-1 flex justify-between text-xs">
                   <span className="font-semibold">
                     {paused ? "Audio paused" : "Audio playing"}
                   </span>
-                  <span className="text-[#7a857e]">
+                  <span className="text-subtle">
                     {Math.floor(audioSeconds / 60)}:
                     {String(audioSeconds % 60).padStart(2, "0")}
                   </span>
@@ -227,7 +227,7 @@ export function ExamInterface({
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="hidden items-center gap-1.5 text-xs text-[#69746d] sm:flex">
+              <span className="hidden items-center gap-1.5 text-xs text-muted sm:flex">
                 <Save className="size-3.5" />
                 {saved ? "Saved" : "Saving…"}
               </span>
@@ -248,7 +248,7 @@ export function ExamInterface({
                 </Button>
               )}
               <button
-                className="grid size-9 place-items-center rounded-lg border text-[#69746d] hover:bg-gray-50"
+                className="grid size-9 place-items-center rounded-lg border text-muted hover:bg-gray-50"
                 onClick={() => setExitOpen(true)}
                 aria-label="Exit test"
               >
@@ -257,7 +257,7 @@ export function ExamInterface({
             </div>
           </div>
           <div className="flex items-center gap-2 pb-3 md:hidden">
-            <Volume2 className="size-4 text-[#176b3a]" />
+            <Volume2 className="size-4 text-primary" />
             <Progress
               value={(audioSeconds / DEMO_PART_SECONDS) * 100}
               className="flex-1"
@@ -273,13 +273,13 @@ export function ExamInterface({
       <main className="mx-auto grid max-w-[1440px] gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_260px]">
         <div className="min-w-0">
           <Card className="p-5 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#176b3a]">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
               Part {currentPart.partNumber}
             </p>
             <h1 className="mt-2 text-xl font-bold sm:text-2xl">
               {currentPart.title}
             </h1>
-            <p className="mt-2 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 type-body-sm text-muted">
               {currentPart.context}
             </p>
           </Card>
@@ -314,7 +314,7 @@ export function ExamInterface({
                   {index === 0 ||
                   currentPart.questions[index - 1].instruction !==
                     question.instruction ? (
-                    <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4 text-sm leading-6 text-blue-950">
+                    <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4 type-body-sm text-blue-950">
                       <strong>Questions {question.number}–
                       {currentPart.questions
                         .slice(index)
@@ -326,7 +326,7 @@ export function ExamInterface({
                     </div>
                   ) : null}
                   <div className="flex gap-4">
-                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#edf3ee] text-sm font-bold text-[#2d4234]">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#edf3ee] text-sm font-bold text-ink">
                       {question.number}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -372,7 +372,7 @@ export function ExamInterface({
                 }{" "}
                 of 10 answered
               </p>
-              <p className="mt-1 text-sm text-[#69746d]">
+              <p className="mt-1 text-sm text-muted">
                 Review your answers while the test remains active.
               </p>
             </div>
@@ -406,7 +406,7 @@ export function ExamInterface({
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold">Question navigator</h2>
-              <span className="text-xs text-[#69746d]">
+              <span className="text-xs text-muted">
                 {answeredCount}/40
               </span>
             </div>
@@ -431,10 +431,10 @@ export function ExamInterface({
                     }
                     className={cn(
                       "grid aspect-square place-items-center rounded-md border text-xs font-bold",
-                      answered && "border-[#b9d8c1] bg-[#e8f5ec] text-[#176b3a]",
+                      answered && "border-[#b9d8c1] bg-primary-soft text-primary",
                       isCurrentPart &&
                         !answered &&
-                        "border-[#789881] bg-white text-[#17201a]",
+                        "border-[#789881] bg-white text-ink",
                       !isCurrentPart && "bg-gray-50 text-gray-400",
                     )}
                     aria-label={`Question ${question.number}${answered ? ", answered" : ", unanswered"}`}
@@ -444,9 +444,9 @@ export function ExamInterface({
                 );
               })}
             </div>
-            <div className="mt-4 space-y-2 border-t pt-4 text-xs text-[#69746d]">
+            <div className="mt-4 space-y-2 border-t pt-4 text-xs text-muted">
               <p className="flex items-center gap-2">
-                <span className="size-3 rounded-sm bg-[#e8f5ec] ring-1 ring-[#b9d8c1]" />
+                <span className="size-3 rounded-sm bg-primary-soft ring-1 ring-[#b9d8c1]" />
                 Answered
               </p>
               <p className="flex items-center gap-2">
@@ -465,7 +465,7 @@ export function ExamInterface({
               <LogOut className="size-5" />
             </span>
             <h2 className="mt-4 text-xl font-bold">Leave this test?</h2>
-            <p className="mt-2 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 type-body-sm text-muted">
               Your answers and current Part are saved. In this frontend demo,
               simulated audio progress within the Part will restart.
             </p>
@@ -488,7 +488,7 @@ export function ExamInterface({
       {submitOpen && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-[#17201a]/45 px-5">
           <Card className="w-full max-w-lg p-6 shadow-2xl">
-            <span className="grid size-11 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+            <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
               {unanswered ? (
                 <AlertTriangle className="size-5 text-amber-700" />
               ) : (
@@ -499,8 +499,8 @@ export function ExamInterface({
               Listening test complete
             </h2>
             <div className="mt-5 grid grid-cols-2 gap-3">
-              <div className="rounded-lg bg-[#f3f6f4] p-4">
-                <p className="text-xs text-[#69746d]">Answered</p>
+              <div className="rounded-lg bg-surface-subtle p-4">
+                <p className="text-xs text-muted">Answered</p>
                 <p className="mt-1 text-2xl font-bold">{answeredCount} / 40</p>
               </div>
               <div className="rounded-lg bg-amber-50 p-4">
@@ -511,7 +511,7 @@ export function ExamInterface({
               </div>
             </div>
             {unanswered > 0 && (
-              <p className="mt-4 text-sm leading-6 text-[#69746d]">
+              <p className="mt-4 type-body-sm text-muted">
                 You have {unanswered} unanswered question
                 {unanswered === 1 ? "" : "s"}. Submit anyway?
               </p>
@@ -551,7 +551,7 @@ export function ExamInterface({
             </div>
             <button
               onClick={() => setSubmitOpen(false)}
-              className="mt-4 flex w-full items-center justify-center gap-1 text-sm font-semibold text-[#69746d]"
+              className="mt-4 flex w-full items-center justify-center gap-1 text-sm font-semibold text-muted"
             >
               Return to test <ChevronDown className="size-4 rotate-180" />
             </button>

@@ -30,14 +30,14 @@ export default function Home() {
       <header className="border-b border-[#edf0ed]">
         <div className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-8">
           <Brand />
-          <nav className="hidden items-center gap-7 text-sm font-semibold text-[#566159] md:flex">
-            <a href="#practice" className="hover:text-[#176b3a]">
+          <nav className="hidden items-center gap-7 text-sm font-semibold text-muted md:flex">
+            <a href="#practice" className="hover:text-primary">
               Practice
             </a>
-            <a href="#how-it-works" className="hover:text-[#176b3a]">
+            <a href="#how-it-works" className="hover:text-primary">
               How it works
             </a>
-            <a href="#structure" className="hover:text-[#176b3a]">
+            <a href="#structure" className="hover:text-primary">
               Test structure
             </a>
             <ButtonLink href="/login" variant="ghost" size="sm">
@@ -60,10 +60,10 @@ export default function Home() {
               <Badge variant="green" className="mb-5">
                 Focused IELTS Listening preparation
               </Badge>
-              <h1 className="max-w-2xl text-4xl font-bold leading-[1.12] tracking-[-0.035em] text-[#17201a] sm:text-5xl lg:text-[58px]">
+              <h1 className="type-display max-w-2xl text-ink">
                 Improve your IELTS Listening through realistic practice.
               </h1>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-[#5d6961]">
+              <p className="type-lead mt-6 max-w-xl text-muted">
                 Take full mock tests, practise individual question types,
                 understand your mistakes and track your improvement.
               </p>
@@ -75,8 +75,8 @@ export default function Home() {
                   <Play className="size-4" /> Try a free listening test
                 </ButtonLink>
               </div>
-              <p className="mt-5 flex items-center gap-2 text-sm text-[#69746d]">
-                <Check className="size-4 text-[#176b3a]" />
+              <p className="mt-5 flex items-center gap-2 text-sm text-muted">
+                <Check className="size-4 text-primary" />
                 Original IELTS-style practice content. No card required.
               </p>
             </div>
@@ -87,31 +87,31 @@ export default function Home() {
               <Card className="relative overflow-hidden p-6 shadow-[0_24px_80px_rgba(31,66,42,0.12)] sm:p-8">
                 <div className="flex items-start justify-between border-b pb-5">
                   <div>
-                    <p className="text-sm font-semibold text-[#69746d]">
+                    <p className="text-sm font-semibold text-muted">
                       Latest practice result
                     </p>
                     <h2 className="mt-1 text-xl font-bold">
                       Listening Mock 05
                     </h2>
                   </div>
-                  <span className="grid size-11 place-items-center rounded-xl bg-[#e8f5ec] text-[#176b3a]">
+                  <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
                     <Headphones className="size-5" />
                   </span>
                 </div>
                 <div className="grid grid-cols-2 gap-6 py-6">
                   <div>
-                    <p className="text-sm text-[#69746d]">Listening score</p>
+                    <p className="text-sm text-muted">Listening score</p>
                     <p className="mt-1 text-3xl font-bold">31 / 40</p>
                   </div>
                   <div>
-                    <p className="text-sm text-[#69746d]">Estimated band</p>
-                    <p className="mt-1 text-3xl font-bold text-[#176b3a]">7.0</p>
+                    <p className="text-sm text-muted">Estimated band</p>
+                    <p className="mt-1 text-3xl font-bold text-primary">7.0</p>
                   </div>
                 </div>
-                <div className="rounded-xl bg-[#f5f8f5] p-4">
+                <div className="rounded-xl bg-surface-subtle p-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-semibold">Recent progress</span>
-                    <span className="font-bold text-[#176b3a]">+4 questions</span>
+                    <span className="font-bold text-primary">+4 questions</span>
                   </div>
                   <div className="mt-4 flex h-16 items-end gap-2">
                     {[44, 54, 62, 74, 84].map((height, index) => (
@@ -138,10 +138,10 @@ export default function Home() {
           className="mx-auto max-w-[1180px] px-5 py-20 sm:px-8"
         >
           <div className="max-w-xl">
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#176b3a]">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">
               A simple improvement loop
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight">
+            <h2 className="type-marketing-title mt-3">
               Practise. Understand. Improve.
             </h2>
           </div>
@@ -152,26 +152,26 @@ export default function Home() {
               ["03", "Improve", "Practise your weak question types and track progress over time."],
             ].map(([number, title, text]) => (
               <div key={title} className="border-t-2 border-[#badfc5] pt-5">
-                <span className="text-sm font-bold text-[#176b3a]">{number}</span>
+                <span className="text-sm font-bold text-primary">{number}</span>
                 <h3 className="mt-4 text-xl font-bold">{title}</h3>
-                <p className="mt-2 leading-7 text-[#69746d]">{text}</p>
+                <p className="mt-2 leading-7 text-muted">{text}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <section id="practice" className="bg-[#f5f8f5] py-20">
+        <section id="practice" className="bg-surface-subtle py-20">
           <div className="mx-auto max-w-[1180px] px-5 sm:px-8">
             <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
               <div>
-                <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#176b3a]">
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">
                   What you can practise
                 </p>
-                <h2 className="mt-3 text-3xl font-bold tracking-tight">
+                <h2 className="type-marketing-title mt-3">
                   Every Part. Every common question format.
                 </h2>
               </div>
-              <p className="max-w-md text-sm leading-6 text-[#69746d]">
+              <p className="type-body-sm max-w-md text-muted">
                 Start with a realistic mock or use a short focused session when
                 you have less time.
               </p>
@@ -182,18 +182,18 @@ export default function Home() {
                   key={String(title)}
                   className="group flex items-center gap-4 p-5 hover:-translate-y-0.5 hover:border-[#a9c8b1] hover:shadow-md"
                 >
-                  <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+                  <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
                     <Icon className="size-5" />
                   </span>
                   <div>
                     <h3 className="font-bold">{String(title)}</h3>
-                    <p className="mt-1 text-sm text-[#69746d]">{String(text)}</p>
+                    <p className="mt-1 text-sm text-muted">{String(text)}</p>
                   </div>
-                  <ArrowRight className="ml-auto size-4 text-[#91a198] group-hover:translate-x-1 group-hover:text-[#176b3a]" />
+                  <ArrowRight className="ml-auto size-4 text-subtle group-hover:translate-x-1 group-hover:text-primary" />
                 </Card>
               ))}
               <Card className="flex items-center gap-4 border-dashed p-5">
-                <span className="grid size-11 place-items-center rounded-lg bg-[#eef0ee] text-[#647067]">
+                <span className="grid size-11 place-items-center rounded-lg bg-[#eef0ee] text-subtle">
                   <Map className="size-5" />
                 </span>
                 <div>
@@ -201,7 +201,7 @@ export default function Home() {
                     <h3 className="font-bold">Custom Practice</h3>
                     <Badge>Coming soon</Badge>
                   </div>
-                  <p className="mt-1 text-sm text-[#69746d]">
+                  <p className="mt-1 text-sm text-muted">
                     Topic-led listening practice
                   </p>
                 </div>
@@ -215,13 +215,13 @@ export default function Home() {
           className="mx-auto grid max-w-[1180px] gap-12 px-5 py-20 sm:px-8 lg:grid-cols-[.75fr_1.25fr]"
         >
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#176b3a]">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">
               IELTS Listening structure
             </p>
-            <h2 className="mt-3 text-3xl font-bold tracking-tight">
+            <h2 className="type-marketing-title mt-3">
               Build confidence across all four Parts.
             </h2>
-            <p className="mt-4 leading-7 text-[#69746d]">
+            <p className="mt-4 leading-7 text-muted">
               Difficulty generally increases from an everyday conversation to
               an academic monologue.
             </p>
@@ -244,17 +244,17 @@ export default function Home() {
               ["Part 4", "Academic monologue", "Lecture-style presentation"],
             ].map(([part, title, text]) => (
               <Card key={part} className="p-5">
-                <span className="text-sm font-bold text-[#176b3a]">{part}</span>
+                <span className="text-sm font-bold text-primary">{part}</span>
                 <h3 className="mt-3 text-lg font-bold">{title}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#69746d]">{text}</p>
+                <p className="type-body-sm mt-2 text-muted">{text}</p>
               </Card>
             ))}
           </div>
         </section>
 
-        <section className="bg-[#174f30] px-5 py-16 text-white">
+        <section className="bg-primary-strong px-5 py-16 text-white">
           <div className="mx-auto flex max-w-[920px] flex-col items-center text-center">
-            <h2 className="text-3xl font-bold tracking-tight">
+            <h2 className="type-marketing-title">
               Start your first listening test
             </h2>
             <p className="mt-3 max-w-xl text-white/75">
@@ -273,7 +273,7 @@ export default function Home() {
       </main>
 
       <footer className="border-t bg-white">
-        <div className="mx-auto flex max-w-[1180px] flex-col gap-4 px-5 py-8 text-sm text-[#69746d] sm:px-8 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-[1180px] flex-col gap-4 px-5 py-8 text-sm text-muted sm:px-8 md:flex-row md:items-center md:justify-between">
           <Brand compact />
           <p>
             IELTS-style practice. Not affiliated with IELTS, Cambridge, British

@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card";
 export function ProfileForm() {
   const [saved, setSaved] = useState(false);
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-sm outline-none focus:border-[#176b3a] focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
 
   return (
     <form
@@ -46,7 +46,7 @@ export function ProfileForm() {
             </select>
           </label>
           <label className="block text-sm font-semibold">
-            Exam date <span className="font-normal text-[#7a857e]">(optional)</span>
+            Exam date <span className="font-normal text-subtle">(optional)</span>
             <input className={fieldClass} type="date" defaultValue="2026-10-17" />
           </label>
         </div>
@@ -54,7 +54,7 @@ export function ProfileForm() {
 
       <Card className="p-5 sm:p-6">
         <h3 className="text-lg font-bold">Practice preference</h3>
-        <p className="mt-2 text-sm leading-6 text-[#69746d]">
+        <p className="mt-2 type-body-sm text-muted">
           Used to tailor your dashboard recommendation.
         </p>
         <div className="mt-5 space-y-3">
@@ -67,7 +67,7 @@ export function ProfileForm() {
                 type="radio"
                 name="preference"
                 defaultChecked={index === 0}
-                className="accent-[#176b3a]"
+                className="accent-primary"
               />
               {label}
             </label>
@@ -79,7 +79,7 @@ export function ProfileForm() {
           <Save className="size-4" /> Save profile
         </Button>
         {saved && (
-          <span className="text-sm font-semibold text-[#176b3a]">
+          <span className="text-sm font-semibold text-primary">
             Profile saved
           </span>
         )}

@@ -22,7 +22,7 @@ export function Progress({
     >
       <div
         className={cn(
-          "h-full rounded-full bg-[#1b7a43] transition-[width]",
+          "h-full rounded-full bg-primary transition-[width]",
           indicatorClassName,
         )}
         style={{ width: `${Math.max(0, Math.min(100, value))}%` }}

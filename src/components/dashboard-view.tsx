@@ -38,11 +38,11 @@ export function DashboardView() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-sm font-semibold text-[#69746d]">Monday, 27 July</p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+        <p className="text-sm font-semibold text-muted">Monday, 27 July</p>
+        <h2 className="type-page-title mt-1">
           Good morning, Alex
         </h2>
-        <p className="mt-2 text-[#69746d]">
+        <p className="mt-2 text-muted">
           Your next useful step is ready.
         </p>
       </div>
@@ -62,19 +62,21 @@ export function DashboardView() {
           <div className="p-6 sm:p-7">
             <div className="flex items-center gap-2">
               <Badge variant="green">Continue your preparation</Badge>
-              <span className="text-xs font-semibold text-[#7a857e]">
+              <span className="text-xs font-semibold text-subtle">
                 Saved
               </span>
             </div>
-            <h3 className="mt-4 text-2xl font-bold">Continue Listening Mock 04</h3>
-            <p className="mt-2 max-w-xl leading-7 text-[#69746d]">
+            <h3 className="type-section-title mt-4">
+              Continue Listening Mock 04
+            </h3>
+            <p className="mt-2 max-w-xl leading-7 text-muted">
               You stopped during Part 3. Your answers and place in the test have
               been saved.
             </p>
             <div className="mt-5 max-w-xl">
               <div className="mb-2 flex justify-between text-sm">
                 <span className="font-semibold">22 of 40 questions</span>
-                <span className="text-[#69746d]">55%</span>
+                <span className="text-muted">55%</span>
               </div>
               <Progress value={55} className="h-2.5" label="Test progress" />
             </div>
@@ -86,7 +88,7 @@ export function DashboardView() {
               Continue test <ArrowRight className="size-4" />
             </ButtonLink>
           </div>
-          <div className="relative hidden overflow-hidden bg-[#174f30] p-7 text-white lg:block">
+          <div className="relative hidden overflow-hidden bg-primary-strong p-7 text-white lg:block">
             <div className="absolute -right-12 -top-12 size-44 rounded-full border-[32px] border-white/5" />
             <Headphones className="size-8 text-[#a8dab7]" />
             <p className="mt-8 text-sm text-white/70">Current position</p>
@@ -102,7 +104,7 @@ export function DashboardView() {
       <section>
         <div className="mb-4 flex items-center justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#176b3a]">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
               Recommended next action
             </p>
             <h3 className="mt-1 text-xl font-bold">Recommended for you</h3>
@@ -120,12 +122,12 @@ export function DashboardView() {
               <Badge variant="amber">Highest priority</Badge>
             </div>
             <h4 className="mt-5 text-lg font-bold">Change-of-mind distractors</h4>
-            <p className="mt-2 flex-1 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 flex-1 type-body-sm text-muted">
               You missed 4 recent questions where a speaker corrected their
               first answer.
             </p>
             <div className="mt-5 flex items-center justify-between border-t pt-4">
-              <span className="text-sm text-[#69746d]">
+              <span className="text-sm text-muted">
                 10 questions · ~8 min
               </span>
               <ButtonLink href="/practice/multiple-choice" size="sm">
@@ -135,18 +137,18 @@ export function DashboardView() {
           </Card>
           <Card className="flex flex-col p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
-              <span className="grid size-11 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+              <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
                 <BookOpenCheck className="size-5" />
               </span>
               <Badge variant="green">Part focus</Badge>
             </div>
             <h4 className="mt-5 text-lg font-bold">Part 3 — Speaker opinions</h4>
-            <p className="mt-2 flex-1 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 flex-1 type-body-sm text-muted">
               Your Part 3 accuracy is currently 62%, with speaker opinion
               questions needing the most attention.
             </p>
             <div className="mt-5 flex items-center justify-between border-t pt-4">
-              <span className="text-sm text-[#69746d]">
+              <span className="text-sm text-muted">
                 10 questions · ~8 min
               </span>
               <ButtonLink href="/practice/part-3" variant="secondary" size="sm">
@@ -162,13 +164,13 @@ export function DashboardView() {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <Card className="p-5">
             <div className="flex items-start justify-between">
-              <span className="text-sm font-semibold text-[#69746d]">
+              <span className="text-sm font-semibold text-muted">
                 Estimated Listening Band
               </span>
-              <Target className="size-5 text-[#176b3a]" />
+              <Target className="size-5 text-primary" />
             </div>
-            <p className="mt-4 text-4xl font-bold text-[#176b3a]">7.0</p>
-            <p className="mt-2 text-xs leading-5 text-[#7a857e]">
+            <p className="mt-4 text-4xl font-bold text-primary">7.0</p>
+            <p className="mt-2 text-xs leading-5 text-subtle">
               Practice estimate, based on recent performance.
             </p>
           </Card>
@@ -179,13 +181,13 @@ export function DashboardView() {
           ].map(([label, value, Icon]) => (
             <Card key={String(label)} className="p-5">
               <div className="flex items-start justify-between">
-                <span className="text-sm font-semibold text-[#69746d]">
+                <span className="text-sm font-semibold text-muted">
                   {String(label)}
                 </span>
-                <Icon className="size-5 text-[#7a857e]" />
+                <Icon className="size-5 text-subtle" />
               </div>
               <p className="mt-4 text-3xl font-bold">{String(value)}</p>
-              <p className="mt-3 text-xs text-[#7a857e]">
+              <p className="mt-3 text-xs text-subtle">
                 Across full Listening mocks
               </p>
             </Card>
@@ -197,7 +199,7 @@ export function DashboardView() {
         <Card className="p-5 sm:p-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#69746d]">
+              <p className="text-sm font-semibold text-muted">
                 Last five full mocks
               </p>
               <h3 className="mt-1 text-xl font-bold">Your improvement</h3>
@@ -207,7 +209,7 @@ export function DashboardView() {
           <div className="mt-4">
             <ScoreChart scores={[25, 27, 28, 30, 31]} compact />
           </div>
-          <p className="mt-2 text-sm text-[#69746d]">
+          <p className="mt-2 text-sm text-muted">
             You have improved by 6 questions over your last five tests.
           </p>
         </Card>
@@ -215,12 +217,12 @@ export function DashboardView() {
         <Card className="p-5 sm:p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#69746d]">
+              <p className="text-sm font-semibold text-muted">
                 Based on recent answers
               </p>
               <h3 className="mt-1 text-xl font-bold">Your weakest areas</h3>
             </div>
-            <Target className="size-5 text-[#176b3a]" />
+            <Target className="size-5 text-primary" />
           </div>
           <div className="mt-5 space-y-5">
             {weakAreas.map((area) => (
@@ -228,10 +230,10 @@ export function DashboardView() {
                 <div className="mb-2 flex items-center justify-between gap-3 text-sm">
                   <span className="font-semibold">{area.label}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-[#69746d]">{area.value}%</span>
+                    <span className="text-muted">{area.value}%</span>
                     <a
                       href={area.href}
-                      className="font-bold text-[#176b3a] hover:underline"
+                      className="font-bold text-primary hover:underline"
                     >
                       Practice →
                     </a>
@@ -240,7 +242,7 @@ export function DashboardView() {
                 <Progress
                   value={area.value}
                   indicatorClassName={
-                    area.value < 65 ? "bg-amber-500" : "bg-[#176b3a]"
+                    area.value < 65 ? "bg-amber-500" : "bg-primary"
                   }
                 />
               </div>

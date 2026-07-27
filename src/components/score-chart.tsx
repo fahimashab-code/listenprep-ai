@@ -29,24 +29,28 @@ export function ScoreChart({
           data={data}
           margin={{ top: 10, right: 12, bottom: 0, left: -20 }}
         >
-          <CartesianGrid stroke="#e8ede9" strokeDasharray="4 4" vertical={false} />
+          <CartesianGrid
+            stroke="var(--border)"
+            strokeDasharray="4 4"
+            vertical={false}
+          />
           <XAxis
             dataKey="test"
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "#718078", fontSize: 12 }}
+            tick={{ fill: "var(--text-subtle)", fontSize: 13 }}
           />
           <YAxis
             domain={[20, 40]}
             ticks={[20, 25, 30, 35, 40]}
             axisLine={false}
             tickLine={false}
-            tick={{ fill: "#718078", fontSize: 12 }}
+            tick={{ fill: "var(--text-subtle)", fontSize: 13 }}
           />
           <Tooltip
             cursor={{ stroke: "#a7c7b0", strokeDasharray: "4 4" }}
             contentStyle={{
-              border: "1px solid #dfe5e0",
+              border: "1px solid var(--border)",
               borderRadius: "10px",
               boxShadow: "0 8px 24px rgba(23,32,26,.08)",
             }}
@@ -55,10 +59,10 @@ export function ScoreChart({
           <Line
             type="monotone"
             dataKey="score"
-            stroke="#176b3a"
+            stroke="var(--primary)"
             strokeWidth={3}
-            dot={{ fill: "#fff", stroke: "#176b3a", strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 6, fill: "#176b3a" }}
+            dot={{ fill: "#fff", stroke: "var(--primary)", strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, fill: "var(--primary)" }}
           />
         </LineChart>
       </ResponsiveContainer>

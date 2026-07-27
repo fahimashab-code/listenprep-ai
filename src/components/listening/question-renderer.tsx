@@ -35,8 +35,8 @@ function OptionLabel({
       disabled={disabled}
       onClick={onSelect}
       className={cn(
-        "flex w-full items-start gap-3 rounded-lg border p-3 text-left text-sm hover:border-[#90ad98] hover:bg-[#f8fbf9]",
-        selected && "border-[#176b3a] bg-[#edf7f0]",
+        "type-body-sm flex w-full items-start gap-3 rounded-lg border p-3 text-left hover:border-[#90ad98] hover:bg-[#f8fbf9]",
+        selected && "border-primary bg-primary-soft",
       )}
     >
       <span
@@ -44,8 +44,8 @@ function OptionLabel({
           "mt-0.5 grid size-5 shrink-0 place-items-center border text-[11px] font-bold",
           checkbox ? "rounded" : "rounded-full",
           selected
-            ? "border-[#176b3a] bg-[#176b3a] text-white"
-            : "border-[#aeb9b1] bg-white text-[#69746d]",
+            ? "border-primary bg-primary text-white"
+            : "border-[#aeb9b1] bg-white text-muted",
         )}
       >
         {selected ? <Check className="size-3.5" /> : id}
@@ -74,7 +74,7 @@ export function QuestionRenderer({
       <fieldset disabled={disabled}>
         <legend className="sr-only">{question.prompt}</legend>
         {isMultiple && (
-          <p className="mb-3 text-xs font-semibold text-[#69746d]">
+          <p className="mb-3 text-xs font-semibold text-muted">
             Choose {question.maxSelections} answers · {selected.length} /{" "}
             {question.maxSelections} selected
           </p>
@@ -116,7 +116,7 @@ export function QuestionRenderer({
         <span className="sr-only">Answer for question {question.number}</span>
         <select
           disabled={disabled}
-          className="h-11 w-full rounded-lg border bg-white px-3 text-sm font-semibold outline-none focus:border-[#176b3a] focus:ring-3 focus:ring-green-100"
+          className="h-11 w-full rounded-lg border bg-white px-3 text-base font-semibold leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100"
           value={typeof answer === "string" ? answer : ""}
           onChange={(event) => onChange(event.target.value)}
         >
@@ -139,12 +139,12 @@ export function QuestionRenderer({
           disabled={disabled}
           value={typeof answer === "string" ? answer : ""}
           onChange={(event) => onChange(event.target.value)}
-          className="h-11 w-full max-w-md rounded-lg border bg-white px-3 text-sm outline-none placeholder:text-[#98a29b] focus:border-[#176b3a] focus:ring-3 focus:ring-green-100 disabled:bg-gray-50"
+          className="h-11 w-full max-w-md rounded-lg border bg-white px-3 text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100 disabled:bg-gray-50"
           placeholder="Type your answer"
           autoComplete="off"
         />
         {question.wordLimit && (
-          <span className="hidden whitespace-nowrap text-xs text-[#7a857e] sm:inline">
+          <span className="hidden whitespace-nowrap text-xs text-subtle sm:inline">
             Max {question.wordLimit} words
           </span>
         )}
@@ -156,7 +156,7 @@ export function QuestionRenderer({
 export function CentreMap() {
   return (
     <div
-      className="relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-[#cfd8d1] bg-[#f3f6f3] p-4 text-xs font-semibold text-[#566159]"
+      className="relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-[#cfd8d1] bg-[#f3f6f3] p-4 text-xs font-semibold text-muted"
       role="img"
       aria-label="Plan of the community centre showing the main hall, reception, café, garden, corridors and entrances"
     >
@@ -166,7 +166,7 @@ export function CentreMap() {
       <div className="absolute left-4 top-1/3 w-1/4 rounded border bg-white p-3 text-center">
         Reception
       </div>
-      <div className="absolute left-[38%] top-[30%] grid h-[36%] w-[35%] place-items-center rounded border-2 border-[#93b59c] bg-[#e5f2e8] text-sm text-[#176b3a]">
+      <div className="absolute left-[38%] top-[30%] grid h-[36%] w-[35%] place-items-center rounded border-2 border-[#93b59c] bg-[#e5f2e8] text-sm text-primary">
         Main hall
       </div>
       <div className="absolute right-4 top-1/3 w-1/5 rounded border bg-white p-3 text-center">
@@ -181,7 +181,7 @@ export function CentreMap() {
       {["A", "B", "C", "D", "E", "F"].map((label, index) => (
         <span
           key={label}
-          className="absolute grid size-6 place-items-center rounded-full bg-[#176b3a] text-[10px] font-bold text-white"
+          className="absolute grid size-6 place-items-center rounded-full bg-primary text-[10px] font-bold text-white"
           style={{
             left: `${[49, 29, 79, 55, 18, 79][index]}%`,
             top: `${[17, 42, 55, 72, 77, 82][index]}%`,

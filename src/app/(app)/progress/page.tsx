@@ -16,12 +16,12 @@ export default function ProgressPage() {
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Card className="border-[#bddbc5] bg-[#174f30] p-5 text-white">
+        <Card className="border-[#bddbc5] bg-primary-strong p-5 text-white">
           <p className="text-sm font-semibold text-white/70">
             Current estimated performance
           </p>
           <p className="mt-3 text-4xl font-bold">7.0</p>
-          <p className="mt-3 text-xs text-white/65">
+          <p className="mt-3 text-xs text-white/70">
             Practice estimate, not an official result
           </p>
         </Card>
@@ -31,9 +31,9 @@ export default function ProgressPage() {
           ["Tests completed", "12"],
         ].map(([label, value]) => (
           <Card key={label} className="p-5">
-            <p className="text-sm font-semibold text-[#69746d]">{label}</p>
+            <p className="text-sm font-semibold text-muted">{label}</p>
             <p className="mt-3 text-3xl font-bold">{value}</p>
-            <p className="mt-3 text-xs text-[#7a857e]">Full Listening mocks</p>
+            <p className="mt-3 text-xs text-subtle">Full Listening mocks</p>
           </Card>
         ))}
       </div>
@@ -41,7 +41,7 @@ export default function ProgressPage() {
       <Card className="mt-6 p-5 sm:p-6">
         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
           <div>
-            <p className="text-sm font-semibold text-[#69746d]">
+            <p className="text-sm font-semibold text-muted">
               Last 7 full mocks
             </p>
             <h3 className="mt-1 text-xl font-bold">Score trend</h3>
@@ -53,7 +53,7 @@ export default function ProgressPage() {
         <div className="mt-4">
           <ScoreChart scores={progressData.recentScores} />
         </div>
-        <p className="mt-3 text-sm text-[#69746d]">
+        <p className="mt-3 text-sm text-muted">
           Your recent average has increased from 26 to 31 questions. Day-to-day
           variation is normal; the overall direction is positive.
         </p>
@@ -63,12 +63,12 @@ export default function ProgressPage() {
         <Card className="p-5 sm:p-6">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-sm font-semibold text-[#69746d]">
+              <p className="text-sm font-semibold text-muted">
                 Accuracy by section
               </p>
               <h3 className="mt-1 text-xl font-bold">Part performance</h3>
             </div>
-            <Target className="size-5 text-[#176b3a]" />
+            <Target className="size-5 text-primary" />
           </div>
           <div className="mt-6 space-y-5">
             {progressData.partPerformance.map((item) => (
@@ -79,7 +79,7 @@ export default function ProgressPage() {
                     className={
                       item.value === 62
                         ? "font-bold text-amber-700"
-                        : "text-[#69746d]"
+                        : "text-muted"
                     }
                   >
                     {item.value}%
@@ -106,7 +106,7 @@ export default function ProgressPage() {
         </Card>
 
         <Card className="p-5 sm:p-6">
-          <p className="text-sm font-semibold text-[#69746d]">
+          <p className="text-sm font-semibold text-muted">
             Accuracy by format
           </p>
           <h3 className="mt-1 text-xl font-bold">Question-type performance</h3>
@@ -123,7 +123,7 @@ export default function ProgressPage() {
                     item.value < 65 ? "bg-amber-500" : undefined
                   }
                 />
-                <span className="text-right text-[#69746d]">{item.value}%</span>
+                <span className="text-right text-muted">{item.value}%</span>
               </div>
             ))}
           </div>
@@ -138,11 +138,11 @@ export default function ProgressPage() {
       </div>
 
       <Card className="mt-6 p-5 sm:p-6">
-        <p className="text-sm font-semibold text-[#69746d]">
+        <p className="text-sm font-semibold text-muted">
           Learning analytics
         </p>
         <h3 className="mt-1 text-xl font-bold">Skill progress</h3>
-        <p className="mt-2 text-sm text-[#69746d]">
+        <p className="mt-2 text-sm text-muted">
           These are learning categories, not official IELTS scoring criteria.
         </p>
         <div className="mt-5 grid gap-4 sm:grid-cols-2">

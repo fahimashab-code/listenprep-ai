@@ -33,7 +33,7 @@ export function GenerationPreview() {
     return (
       <Card className="mx-auto max-w-2xl p-6 sm:p-8">
         <div className="text-center">
-          <span className="mx-auto grid size-14 place-items-center rounded-xl bg-[#e8f5ec] text-[#176b3a]">
+          <span className="mx-auto grid size-14 place-items-center rounded-xl bg-primary-soft text-primary">
             {done ? (
               <CheckCircle2 className="size-7" />
             ) : (
@@ -43,7 +43,7 @@ export function GenerationPreview() {
           <h3 className="mt-5 text-xl font-bold">
             {done ? "Your demo practice is ready" : steps[active]}
           </h3>
-          <p className="mt-2 text-sm leading-6 text-[#69746d]">
+          <p className="mt-2 type-body-sm text-muted">
             {done
               ? "This preview loaded a pre-existing local test. No AI service or real API was called."
               : "Simulating the future generation workflow with local frontend states."}
@@ -58,14 +58,14 @@ export function GenerationPreview() {
           {steps.slice(0, -1).map((step, index) => (
             <div
               key={step}
-              className="flex items-center gap-3 rounded-lg bg-[#f5f8f5] px-4 py-3 text-sm"
+              className="flex items-center gap-3 rounded-lg bg-surface-subtle px-4 py-3 text-sm"
             >
               {index <= active ? (
-                <CheckCircle2 className="size-4 text-[#176b3a]" />
+                <CheckCircle2 className="size-4 text-primary" />
               ) : (
                 <span className="size-4 rounded-full border" />
               )}
-              <span className={index <= active ? "font-semibold" : "text-[#7a857e]"}>
+              <span className={index <= active ? "font-semibold" : "text-subtle"}>
                 {step}
               </span>
             </div>
@@ -90,7 +90,7 @@ export function GenerationPreview() {
   }
 
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-sm outline-none focus:border-[#176b3a] focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
   return (
     <Card className="mx-auto max-w-3xl p-6 sm:p-8">
       <div className="flex items-start gap-4">
@@ -102,7 +102,7 @@ export function GenerationPreview() {
             <h3 className="text-xl font-bold">Custom AI Practice</h3>
             <Badge variant="amber">Preview · Coming soon</Badge>
           </div>
-          <p className="mt-2 text-sm leading-6 text-[#69746d]">
+          <p className="mt-2 type-body-sm text-muted">
             Explore how topic-led practice could work. The demo uses simulated
             progress and loads existing local content.
           </p>
@@ -118,8 +118,8 @@ export function GenerationPreview() {
             onClick={() => setSource(value as "topic" | "text")}
             className={`rounded-md px-3 py-2 text-sm font-semibold ${
               source === value
-                ? "bg-[#e8f5ec] text-[#176b3a]"
-                : "text-[#69746d]"
+                ? "bg-primary-soft text-primary"
+                : "text-muted"
             }`}
           >
             {label}
@@ -139,7 +139,7 @@ export function GenerationPreview() {
           <label className="block text-sm font-semibold">
             Source text
             <textarea
-              className="mt-1.5 min-h-32 w-full rounded-lg border p-3 text-sm outline-none focus:border-[#176b3a] focus:ring-3 focus:ring-green-100"
+              className="mt-1.5 min-h-32 w-full rounded-lg border p-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100"
               placeholder="Paste your source text here…"
             />
           </label>
@@ -167,7 +167,7 @@ export function GenerationPreview() {
       <Button className="mt-7 w-full" size="lg" onClick={simulate}>
         <Sparkles className="size-4" /> Generate Practice
       </Button>
-      <p className="mt-3 text-center text-xs text-[#7a857e]">
+      <p className="mt-3 text-center text-xs text-subtle">
         Frontend simulation only. No content is sent to an external service.
       </p>
     </Card>

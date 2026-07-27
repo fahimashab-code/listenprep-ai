@@ -57,8 +57,8 @@ function NavLink({
       className={cn(
         "flex h-11 items-center gap-3 rounded-lg px-3 text-sm font-semibold",
         active
-          ? "bg-[#e8f5ec] text-[#145c32]"
-          : "text-[#5d6961] hover:bg-[#f0f3f1] hover:text-[#17201a]",
+          ? "bg-primary-soft text-primary"
+          : "text-muted hover:bg-[#f0f3f1] hover:text-ink",
       )}
       aria-current={active ? "page" : undefined}
     >
@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     (pathname.includes("/practice/") ? "Focused Practice" : "Listenly");
 
   return (
-    <div className="min-h-screen bg-[#f7f9f7]">
+    <div className="min-h-screen bg-background">
       <aside className="fixed inset-y-0 left-0 z-30 hidden w-[248px] border-r bg-white px-4 py-6 lg:flex lg:flex-col">
         <Brand href="/dashboard" className="px-2" />
         <nav className="mt-9 space-y-1" aria-label="Main navigation">
@@ -147,14 +147,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <h1 className="text-lg font-bold sm:text-xl">{title}</h1>
           </div>
           <div className="flex items-center gap-2">
-            <div className="hidden items-center gap-2 rounded-full bg-[#edf6ef] px-3 py-1.5 text-xs font-semibold text-[#176b3a] sm:flex">
+            <div className="hidden items-center gap-2 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary sm:flex">
               Target band 8.0
             </div>
             <Link
               href="/profile"
               className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100"
             >
-              <span className="grid size-8 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-[#176b3a]">
+              <span className="grid size-8 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
                 A
               </span>
               <span className="hidden text-sm font-semibold md:inline">Alex</span>
@@ -178,8 +178,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               href={href}
               key={href}
               className={cn(
-                "flex flex-col items-center gap-1 rounded-md py-2 text-[10px] font-semibold",
-                active ? "text-[#176b3a]" : "text-[#69746d]",
+                "flex flex-col items-center gap-1 rounded-md py-2 text-[11px] font-semibold leading-4",
+                active ? "text-primary" : "text-muted",
               )}
             >
               <Icon className="size-5" aria-hidden="true" />

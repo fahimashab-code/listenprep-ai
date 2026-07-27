@@ -29,8 +29,8 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
             className={cn(
               "whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold",
               filter === value
-                ? "bg-[#e8f5ec] text-[#176b3a]"
-                : "text-[#69746d] hover:bg-gray-50",
+                ? "bg-primary-soft text-primary"
+                : "text-muted hover:bg-gray-50",
             )}
             onClick={() => setFilter(value)}
           >
@@ -43,7 +43,7 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
         {visible.map((test) => (
           <Card key={test.id} className="p-5 sm:p-6">
             <div className="flex items-start justify-between gap-4">
-              <span className="grid size-11 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+              <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
                 <Headphones className="size-5" />
               </span>
               <Badge
@@ -63,10 +63,10 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
               </Badge>
             </div>
             <h3 className="mt-5 text-xl font-bold">{test.title}</h3>
-            <p className="mt-2 text-sm leading-6 text-[#69746d]">
+            <p className="mt-2 type-body-sm text-muted">
               {test.description}
             </p>
-            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-y py-4 text-sm text-[#5f6b63]">
+            <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 border-y py-4 text-sm text-muted">
               <span className="flex items-center gap-2">
                 <FileCheck2 className="size-4" /> 40 questions
               </span>
@@ -80,21 +80,21 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
             <div className="mt-5 flex items-center justify-between gap-4">
               {test.status === "completed" ? (
                 <div>
-                  <p className="text-sm text-[#69746d]">Previous score</p>
+                  <p className="text-sm text-muted">Previous score</p>
                   <p className="mt-0.5 font-bold">
                     {test.previousScore} / 40{" "}
-                    <span className="font-normal text-[#69746d]">
+                    <span className="font-normal text-muted">
                       · Est. 6.5
                     </span>
                   </p>
                 </div>
               ) : test.status === "in_progress" ? (
                 <div>
-                  <p className="text-sm text-[#69746d]">Current progress</p>
+                  <p className="text-sm text-muted">Current progress</p>
                   <p className="mt-0.5 font-bold">22 / 40 questions</p>
                 </div>
               ) : (
-                <span className="text-sm text-[#69746d]">
+                <span className="text-sm text-muted">
                   Ready when you are
                 </span>
               )}

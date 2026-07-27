@@ -54,11 +54,11 @@ export default function PracticePage() {
             <h3 className="mt-4 text-2xl font-bold">
               Part 3 — Speaker Opinions
             </h3>
-            <p className="mt-2 max-w-xl leading-7 text-[#69746d]">
+            <p className="mt-2 max-w-xl leading-7 text-muted">
               Based on recent mistakes. Your Part 3 accuracy is 62%, and
               changes of opinion are the main issue.
             </p>
-            <div className="mt-5 flex items-center gap-4 text-sm text-[#69746d]">
+            <div className="mt-5 flex items-center gap-4 text-sm text-muted">
               <span className="flex items-center gap-2">
                 <CalendarClock className="size-4" /> 8 minutes
               </span>
@@ -68,7 +68,7 @@ export default function PracticePage() {
               Start practice <ArrowRight className="size-4" />
             </ButtonLink>
           </div>
-          <div className="hidden place-items-center bg-[#174f30] lg:grid">
+          <div className="hidden place-items-center bg-primary-strong lg:grid">
             <div className="grid size-28 place-items-center rounded-full border border-white/15 bg-white/5 text-white">
               <Headphones className="size-12" />
             </div>
@@ -88,7 +88,7 @@ export default function PracticePage() {
             >
               <span>
                 <strong className="block">{title}</strong>
-                <span className="mt-1 block text-xs font-normal text-[#69746d]">
+                <span className="mt-1 block text-xs font-normal text-muted">
                   {text}
                 </span>
               </span>
@@ -103,12 +103,12 @@ export default function PracticePage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {questionTypes.map(([title, accuracy, href, Icon]) => (
             <Card key={String(title)} className="flex items-center gap-4 p-5">
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-[#eef6f0] text-[#176b3a]">
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
                 <Icon className="size-5" />
               </span>
               <div>
                 <h4 className="font-bold">{String(title)}</h4>
-                <p className="mt-1 text-xs text-[#69746d]">{String(accuracy)}</p>
+                <p className="mt-1 text-xs text-muted">{String(accuracy)}</p>
               </div>
               <ButtonLink
                 href={String(href)}
@@ -149,7 +149,7 @@ export default function PracticePage() {
             <h3 className="font-bold">Custom AI Practice</h3>
             <Badge variant="amber">Preview · Coming soon</Badge>
           </div>
-          <p className="mt-1 text-sm text-[#69746d]">
+          <p className="mt-1 text-sm text-muted">
             Preview a future topic-led practice workflow using simulated local
             states.
           </p>

@@ -56,11 +56,11 @@ export function PreTestScreen({
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f8f5]">
+    <div className="min-h-screen bg-surface-subtle">
       <header className="border-b bg-white">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-lg bg-[#176b3a] text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-primary text-white">
               <Headphones className="size-5" />
             </span>
             <span className="font-bold">{test.title}</span>
@@ -72,13 +72,13 @@ export function PreTestScreen({
       </header>
       <main className="mx-auto max-w-4xl px-5 py-8 sm:py-12">
         <div className="text-center">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#176b3a]">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-primary">
             Before you begin
           </p>
-          <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          <h1 className="type-page-title mt-3">
             Settle in and check your audio
           </h1>
-          <p className="mx-auto mt-3 max-w-xl leading-7 text-[#69746d]">
+          <p className="mx-auto mt-3 max-w-xl leading-7 text-muted">
             Headphones are recommended. Once the test starts, the screen will
             switch to a distraction-free listening environment.
           </p>
@@ -100,10 +100,10 @@ export function PreTestScreen({
                 ["Respect word limits", "For example: NO MORE THAN TWO WORDS AND/OR A NUMBER."],
               ].map(([title, text]) => (
                 <li key={title} className="flex gap-3">
-                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-[#176b3a]" />
+                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
                   <div>
                     <p className="font-semibold">{title}</p>
-                    <p className="mt-1 text-sm leading-6 text-[#69746d]">
+                    <p className="mt-1 type-body-sm text-muted">
                       {text}
                     </p>
                   </div>
@@ -111,7 +111,7 @@ export function PreTestScreen({
               ))}
             </ul>
             {mode === "mock" && (
-              <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+              <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 type-body-sm text-amber-900">
                 <strong>Demo restore limitation:</strong> answers and the
                 current Part are restored after refresh. Because there is no
                 real audio file in this prototype, the simulated progress for
@@ -122,12 +122,12 @@ export function PreTestScreen({
 
           <Card className="p-6">
             <div className="flex items-center gap-3">
-              <span className="grid size-10 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+              <span className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary">
                 <Volume2 className="size-5" />
               </span>
               <div>
                 <h2 className="font-bold">Check your audio</h2>
-                <p className="mt-0.5 text-xs text-[#69746d]">
+                <p className="mt-0.5 text-xs text-muted">
                   Simulated test sound
                 </p>
               </div>
@@ -143,7 +143,7 @@ export function PreTestScreen({
                 max="100"
                 value={volume}
                 onChange={(event) => setVolume(Number(event.target.value))}
-                className="mt-3 w-full accent-[#176b3a]"
+                className="mt-3 w-full accent-primary"
               />
             </div>
             {checking && (
@@ -164,7 +164,7 @@ export function PreTestScreen({
                 </>
               ) : checked ? (
                 <>
-                  <CheckCircle2 className="size-4 text-[#176b3a]" /> Play again
+                  <CheckCircle2 className="size-4 text-primary" /> Play again
                 </>
               ) : (
                 <>
@@ -173,7 +173,7 @@ export function PreTestScreen({
               )}
             </Button>
             {checked && (
-              <p className="mt-3 text-center text-xs font-semibold text-[#176b3a]">
+              <p className="mt-3 text-center text-xs font-semibold text-primary">
                 Audio check complete
               </p>
             )}
@@ -181,7 +181,7 @@ export function PreTestScreen({
               <Button size="lg" className="w-full" onClick={start}>
                 <ShieldCheck className="size-4" /> Start Listening Test
               </Button>
-              <p className="mt-3 text-center text-xs leading-5 text-[#7a857e]">
+              <p className="mt-3 text-center text-xs leading-5 text-subtle">
                 Starting confirms that you understand the instructions.
               </p>
             </div>

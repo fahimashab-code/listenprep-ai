@@ -8,18 +8,18 @@ import { cn } from "@/lib/utils";
 
 const variants = {
   primary:
-    "bg-[#176b3a] text-white shadow-sm hover:bg-[#0d562d] active:bg-[#0a4725]",
+    "bg-primary text-white shadow-sm hover:bg-primary-hover active:bg-primary-active",
   secondary:
-    "border border-[#cfd8d1] bg-white text-[#243129] hover:border-[#8fa394] hover:bg-[#f7faf8]",
-  ghost: "text-[#44524a] hover:bg-[#edf2ee] hover:text-[#17201a]",
+    "border border-[#cfd8d1] bg-white text-ink hover:border-[#8fa394] hover:bg-[#f7faf8]",
+  ghost: "text-muted hover:bg-[#edf2ee] hover:text-ink",
   danger:
     "border border-red-200 bg-white text-red-700 hover:bg-red-50",
 };
 
 const sizes = {
-  sm: "h-9 px-3 text-sm",
-  md: "h-11 px-4 text-sm",
-  lg: "h-12 px-5 text-base",
+  sm: "h-10 px-3.5 text-sm leading-5",
+  md: "h-11 px-4 text-sm leading-5",
+  lg: "h-12 px-5 text-base leading-6",
 };
 
 export function Button({

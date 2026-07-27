@@ -76,17 +76,17 @@ function ReviewCard({
             >
               {status}
             </Badge>
-            <span className="text-[#69746d]">
+            <span className="text-muted">
               {formatQuestionType(question.type)}
             </span>
           </div>
         </div>
-        <ChevronDown className="size-5 shrink-0 text-[#7a857e] transition-transform group-open:rotate-180" />
+        <ChevronDown className="size-5 shrink-0 text-subtle transition-transform group-open:rotate-180" />
       </summary>
       <div className="border-t px-5 pb-6 pt-5 sm:px-6">
         <div className="grid gap-3 sm:grid-cols-2">
           <div className="rounded-lg bg-[#f4f6f4] p-4">
-            <p className="text-xs font-semibold text-[#69746d]">Your answer</p>
+            <p className="text-xs font-semibold text-muted">Your answer</p>
             <p className="mt-1 font-bold">
               {unanswered
                 ? "No answer"
@@ -111,7 +111,7 @@ function ReviewCard({
               <Lightbulb className="size-4 text-amber-700" />
               <h3 className="font-bold">Why?</h3>
             </div>
-            <p className="mt-2 text-sm leading-6 text-[#566159]">
+            <p className="mt-2 type-body-sm text-muted">
               {question.distractor?.explanation ??
                 "The recording gives the required detail using different wording. Compare the answer with the transcript evidence below."}
             </p>
@@ -135,12 +135,12 @@ function ReviewCard({
               Relevant transcript segment
             </h3>
           </div>
-          <p className="mt-2 text-sm leading-6 text-blue-950">
+          <p className="mt-2 type-body-sm text-blue-950">
             {question.transcriptEvidence?.text ??
               "The relevant transcript segment is not available for this demo question."}
           </p>
           {fullTranscript && (
-            <p className="mt-3 border-t border-blue-200 pt-3 text-sm leading-6 text-blue-900">
+            <p className="mt-3 border-t border-blue-200 pt-3 type-body-sm text-blue-900">
               The full transcript would continue here with the surrounding
               context. This demo keeps the relevant evidence first so the
               explanation stays focused.
@@ -155,11 +155,11 @@ function ReviewCard({
         </div>
 
         {question.paraphrase && (
-          <div className="mt-5 rounded-lg bg-[#f5f8f5] p-4">
+          <div className="mt-5 rounded-lg bg-surface-subtle p-4">
             <h3 className="text-sm font-bold">Paraphrase explanation</h3>
             <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="text-xs font-semibold text-[#69746d]">
+                <dt className="text-xs font-semibold text-muted">
                   Question wording
                 </dt>
                 <dd className="mt-1 font-semibold">
@@ -167,7 +167,7 @@ function ReviewCard({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-semibold text-[#69746d]">
+                <dt className="text-xs font-semibold text-muted">
                   Audio wording
                 </dt>
                 <dd className="mt-1 font-semibold">
@@ -175,7 +175,7 @@ function ReviewCard({
                 </dd>
               </div>
             </dl>
-            <p className="mt-3 text-sm text-[#566159]">
+            <p className="mt-3 text-sm text-muted">
               The question paraphrases the expression used in the recording.
             </p>
           </div>
@@ -246,14 +246,14 @@ export function ResultView({
   }).length;
 
   return (
-    <div className="min-h-screen bg-[#f5f8f5]">
+    <div className="min-h-screen bg-surface-subtle">
       <header className="border-b bg-white">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <ButtonLink href="/dashboard" variant="ghost" size="sm">
             <ArrowLeft className="size-4" /> Dashboard
           </ButtonLink>
           <span className="hidden items-center gap-2 text-sm font-bold sm:flex">
-            <Headphones className="size-4 text-[#176b3a]" />
+            <Headphones className="size-4 text-primary" />
             Listenly results
           </span>
           <ButtonLink href="/tests" variant="secondary" size="sm">
@@ -266,40 +266,40 @@ export function ResultView({
           <div className="grid lg:grid-cols-[1fr_330px]">
             <div className="p-6 sm:p-8">
               <Badge variant="green">Practice estimate</Badge>
-              <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
+              <h1 className="type-page-title mt-4">
                 {test.title}
               </h1>
               <div className="mt-6 flex flex-wrap items-end gap-x-12 gap-y-5">
                 <div>
-                  <p className="text-sm font-semibold text-[#69746d]">
+                  <p className="text-sm font-semibold text-muted">
                     Listening score
                   </p>
                   <p className="mt-1 text-5xl font-bold">
-                    {score} <span className="text-2xl text-[#7a857e]">/ 40</span>
+                    {score} <span className="text-2xl text-subtle">/ 40</span>
                   </p>
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[#69746d]">
+                  <p className="text-sm font-semibold text-muted">
                     Estimated band
                   </p>
-                  <p className="mt-1 text-5xl font-bold text-[#176b3a]">
+                  <p className="mt-1 text-5xl font-bold text-primary">
                     {band.toFixed(1)}
                   </p>
                 </div>
               </div>
-              <p className="mt-6 max-w-2xl text-sm leading-6 text-[#69746d]">
+              <p className="mt-6 max-w-2xl type-body-sm text-muted">
                 This is an estimated Listening band based on practice
                 performance. It is not an official IELTS result.
               </p>
             </div>
-            <div className="bg-[#174f30] p-6 text-white sm:p-8">
-              <p className="text-sm font-semibold text-white/65">
+            <div className="bg-primary-strong p-6 text-white sm:p-8">
+              <p className="text-sm font-semibold text-white/70">
                 Result insight
               </p>
               <h2 className="mt-3 text-xl font-bold">
                 Your strongest performance was Part 1.
               </h2>
-              <p className="mt-3 text-sm leading-6 text-white/75">
+              <p className="mt-3 type-body-sm text-white/75">
                 You lost most marks in Part 3 multiple-choice questions,
                 especially when a speaker corrected an earlier opinion.
               </p>
@@ -316,7 +316,7 @@ export function ResultView({
 
         <section className="mt-6">
           <div className="mb-4">
-            <p className="text-sm font-semibold text-[#69746d]">
+            <p className="text-sm font-semibold text-muted">
               Where marks were gained and lost
             </p>
             <h2 className="mt-1 text-xl font-bold">Part breakdown</h2>
@@ -331,7 +331,7 @@ export function ResultView({
                   </span>
                 </div>
                 <Progress value={(item.score / item.total) * 100} className="mt-4" />
-                <p className="mt-3 text-xs text-[#69746d]">
+                <p className="mt-3 text-xs text-muted">
                   {Math.round((item.score / item.total) * 100)}% accuracy
                 </p>
               </Card>
@@ -341,7 +341,7 @@ export function ResultView({
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           <Card className="p-5 sm:p-6">
-            <p className="text-sm font-semibold text-[#69746d]">
+            <p className="text-sm font-semibold text-muted">
               Performance breakdown
             </p>
             <h2 className="mt-1 text-xl font-bold">By question type</h2>
@@ -352,7 +352,7 @@ export function ResultView({
                     <span className="font-semibold">
                       {formatQuestionType(item.label)}
                     </span>
-                    <span className="text-[#69746d]">
+                    <span className="text-muted">
                       {item.score}/{item.total} ·{" "}
                       {Math.round((item.score / item.total) * 100)}%
                     </span>
@@ -369,11 +369,11 @@ export function ResultView({
           </Card>
 
           <Card className="p-5 sm:p-6">
-            <p className="text-sm font-semibold text-[#69746d]">
+            <p className="text-sm font-semibold text-muted">
               Learning analytics
             </p>
             <h2 className="mt-1 text-xl font-bold">Skill analysis</h2>
-            <p className="mt-2 text-xs leading-5 text-[#7a857e]">
+            <p className="mt-2 text-xs leading-5 text-subtle">
               These categories support learning and are not official IELTS
               scoring criteria.
             </p>
@@ -381,7 +381,7 @@ export function ResultView({
               {breakdown.bySkill.slice(0, 6).map((item, index) => (
                 <div
                   key={item.label}
-                  className="flex items-center justify-between rounded-lg bg-[#f5f8f5] px-4 py-3 text-sm"
+                  className="flex items-center justify-between rounded-lg bg-surface-subtle px-4 py-3 text-sm"
                 >
                   <div className="flex items-center gap-3">
                     <span
@@ -409,17 +409,17 @@ export function ResultView({
 
         <Card className="mt-6 border-[#bddbc5] p-5 sm:p-6">
           <div className="flex gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
               <BookOpenCheck className="size-5" />
             </span>
             <div>
-              <p className="text-sm font-semibold text-[#176b3a]">
+              <p className="text-sm font-semibold text-primary">
                 Recommended next practice
               </p>
               <h2 className="mt-1 text-xl font-bold">
                 Part 3 — Speaker Opinions
               </h2>
-              <p className="mt-2 text-sm leading-6 text-[#69746d]">
+              <p className="mt-2 type-body-sm text-muted">
                 Focus on final decisions and signals such as “actually” or “on
                 reflection”. These often introduce a correction.
               </p>
@@ -430,10 +430,10 @@ export function ResultView({
         <section className="mt-8" id="question-review">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
-              <p className="text-sm font-semibold text-[#69746d]">
+              <p className="text-sm font-semibold text-muted">
                 Understand every mistake
               </p>
-              <h2 className="mt-1 text-2xl font-bold">Question review</h2>
+              <h2 className="type-section-title mt-1">Question review</h2>
             </div>
             <div className="flex gap-1 overflow-x-auto rounded-lg border bg-white p-1">
               {[
@@ -448,8 +448,8 @@ export function ResultView({
                   className={cn(
                     "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold",
                     filter === value
-                      ? "bg-[#e8f5ec] text-[#176b3a]"
-                      : "text-[#69746d] hover:bg-gray-50",
+                      ? "bg-primary-soft text-primary"
+                      : "text-muted hover:bg-gray-50",
                   )}
                 >
                   {label}
@@ -470,9 +470,9 @@ export function ResultView({
           {visibleQuestions.length === 0 && (
             <Card className="mt-5 p-8 text-center">
               {filter === "unanswered" ? (
-                <CheckCircle2 className="mx-auto size-8 text-[#176b3a]" />
+                <CheckCircle2 className="mx-auto size-8 text-primary" />
               ) : (
-                <XCircle className="mx-auto size-8 text-[#69746d]" />
+                <XCircle className="mx-auto size-8 text-muted" />
               )}
               <h3 className="mt-3 font-bold">No questions in this filter</h3>
             </Card>
