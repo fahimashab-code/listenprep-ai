@@ -1,0 +1,484 @@
+"use client";
+
+import {
+  ArrowLeft,
+  ArrowRight,
+  BookOpenCheck,
+  CheckCircle2,
+  ChevronDown,
+  FileText,
+  Headphones,
+  Lightbulb,
+  Target,
+  XCircle,
+} from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { ButtonLink } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  calculateRawScore,
+  estimateListeningBand,
+  getResultBreakdown,
+  isAnswerCorrect,
+} from "@/lib/scoring";
+import { loadAttempt } from "@/lib/storage";
+import { cn, formatQuestionType, formatSkill } from "@/lib/utils";
+import { demoSubmittedAnswers } from "@/mock-data/listening-tests";
+import type {
+  ListeningQuestion,
+  ListeningTest,
+  UserAnswer,
+} from "@/types/listening";
+
+type Filter = "all" | "incorrect" | "correct" | "unanswered";
+
+function ReviewCard({
+  question,
+  answer,
+  defaultOpen,
+}: {
+  question: ListeningQuestion;
+  answer?: UserAnswer;
+  defaultOpen?: boolean;
+}) {
+  const [fullTranscript, setFullTranscript] = useState(false);
+  const unanswered =
+    answer === undefined ||
+    (Array.isArray(answer) ? answer.length === 0 : String(answer).trim() === "");
+  const correct = !unanswered && isAnswerCorrect(question, answer);
+  const status = unanswered ? "Unanswered" : correct ? "Correct" : "Incorrect";
+
+  return (
+    <details
+      className="group rounded-xl border bg-white shadow-[0_1px_2px_rgba(23,32,26,.04)]"
+      open={defaultOpen}
+    >
+      <summary className="flex cursor-pointer list-none items-center gap-4 p-5 sm:p-6">
+        <span
+          className={cn(
+            "grid size-9 shrink-0 place-items-center rounded-full text-sm font-bold",
+            correct
+              ? "bg-green-50 text-green-700"
+              : unanswered
+                ? "bg-gray-100 text-gray-600"
+                : "bg-red-50 text-red-700",
+          )}
+        >
+          {question.number}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="line-clamp-2 font-semibold">{question.prompt}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs">
+            <Badge
+              variant={correct ? "green" : unanswered ? "gray" : "red"}
+            >
+              {status}
+            </Badge>
+            <span className="text-[#69746d]">
+              {formatQuestionType(question.type)}
+            </span>
+          </div>
+        </div>
+        <ChevronDown className="size-5 shrink-0 text-[#7a857e] transition-transform group-open:rotate-180" />
+      </summary>
+      <div className="border-t px-5 pb-6 pt-5 sm:px-6">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-lg bg-[#f4f6f4] p-4">
+            <p className="text-xs font-semibold text-[#69746d]">Your answer</p>
+            <p className="mt-1 font-bold">
+              {unanswered
+                ? "No answer"
+                : Array.isArray(answer)
+                  ? answer.join(", ")
+                  : answer}
+            </p>
+          </div>
+          <div className="rounded-lg bg-green-50 p-4">
+            <p className="text-xs font-semibold text-green-800">
+              Correct answer
+            </p>
+            <p className="mt-1 font-bold text-green-950">
+              {question.acceptedAnswers[0]}
+            </p>
+          </div>
+        </div>
+
+        {!correct && (
+          <div className="mt-5">
+            <div className="flex items-center gap-2">
+              <Lightbulb className="size-4 text-amber-700" />
+              <h3 className="font-bold">Why?</h3>
+            </div>
+            <p className="mt-2 text-sm leading-6 text-[#566159]">
+              {question.distractor?.explanation ??
+                "The recording gives the required detail using different wording. Compare the answer with the transcript evidence below."}
+            </p>
+            {question.distractor && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Badge variant="amber">
+                  Distractor: {question.distractor.value}
+                </Badge>
+                <Badge variant="amber">
+                  Type: {formatSkill(question.distractor.type)}
+                </Badge>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+          <div className="flex items-center gap-2">
+            <FileText className="size-4 text-blue-700" />
+            <h3 className="text-sm font-bold text-blue-950">
+              Relevant transcript segment
+            </h3>
+          </div>
+          <p className="mt-2 text-sm leading-6 text-blue-950">
+            {question.transcriptEvidence?.text ??
+              "The relevant transcript segment is not available for this demo question."}
+          </p>
+          {fullTranscript && (
+            <p className="mt-3 border-t border-blue-200 pt-3 text-sm leading-6 text-blue-900">
+              The full transcript would continue here with the surrounding
+              context. This demo keeps the relevant evidence first so the
+              explanation stays focused.
+            </p>
+          )}
+          <button
+            className="mt-3 text-xs font-bold text-blue-800 hover:underline"
+            onClick={() => setFullTranscript((value) => !value)}
+          >
+            {fullTranscript ? "Hide full transcript" : "View full transcript"}
+          </button>
+        </div>
+
+        {question.paraphrase && (
+          <div className="mt-5 rounded-lg bg-[#f5f8f5] p-4">
+            <h3 className="text-sm font-bold">Paraphrase explanation</h3>
+            <dl className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-semibold text-[#69746d]">
+                  Question wording
+                </dt>
+                <dd className="mt-1 font-semibold">
+                  “{question.paraphrase.questionPhrase}”
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs font-semibold text-[#69746d]">
+                  Audio wording
+                </dt>
+                <dd className="mt-1 font-semibold">
+                  “{question.paraphrase.audioPhrase}”
+                </dd>
+              </div>
+            </dl>
+            <p className="mt-3 text-sm text-[#566159]">
+              The question paraphrases the expression used in the recording.
+            </p>
+          </div>
+        )}
+
+        <div className="mt-5 flex flex-wrap gap-2">
+          {question.skillTags.map((skill) => (
+            <Badge key={skill}>{formatSkill(skill)}</Badge>
+          ))}
+        </div>
+      </div>
+    </details>
+  );
+}
+
+export function ResultView({
+  test,
+  attemptId,
+}: {
+  test: ListeningTest;
+  attemptId: string;
+}) {
+  const [answers, setAnswers] =
+    useState<Record<string, UserAnswer>>(demoSubmittedAnswers);
+  const [filter, setFilter] = useState<Filter>("all");
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      const attempt = loadAttempt(attemptId);
+      if (attempt?.status === "completed") setAnswers(attempt.answers);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [attemptId]);
+
+  const score = calculateRawScore(test, answers);
+  const band = estimateListeningBand(score);
+  const breakdown = getResultBreakdown(test, answers);
+  const questions = test.parts.flatMap((part) => part.questions);
+  const visibleQuestions = useMemo(
+    () =>
+      questions.filter((question) => {
+        const answer = answers[question.id];
+        const unanswered =
+          answer === undefined ||
+          (Array.isArray(answer)
+            ? answer.length === 0
+            : String(answer).trim() === "");
+        const correct = !unanswered && isAnswerCorrect(question, answer);
+        if (filter === "incorrect") return !unanswered && !correct;
+        if (filter === "correct") return correct;
+        if (filter === "unanswered") return unanswered;
+        return true;
+      }),
+    [answers, filter, questions],
+  );
+
+  const incorrectCount = questions.filter((question) => {
+    const answer = answers[question.id];
+    return (
+      answer !== undefined &&
+      String(answer).trim() !== "" &&
+      !isAnswerCorrect(question, answer)
+    );
+  }).length;
+  const unansweredCount = questions.filter((question) => {
+    const answer = answers[question.id];
+    return answer === undefined || String(answer).trim() === "";
+  }).length;
+
+  return (
+    <div className="min-h-screen bg-[#f5f8f5]">
+      <header className="border-b bg-white">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+          <ButtonLink href="/dashboard" variant="ghost" size="sm">
+            <ArrowLeft className="size-4" /> Dashboard
+          </ButtonLink>
+          <span className="hidden items-center gap-2 text-sm font-bold sm:flex">
+            <Headphones className="size-4 text-[#176b3a]" />
+            Listenly results
+          </span>
+          <ButtonLink href="/tests" variant="secondary" size="sm">
+            Mock Tests
+          </ButtonLink>
+        </div>
+      </header>
+      <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
+        <Card className="overflow-hidden">
+          <div className="grid lg:grid-cols-[1fr_330px]">
+            <div className="p-6 sm:p-8">
+              <Badge variant="green">Practice estimate</Badge>
+              <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl">
+                {test.title}
+              </h1>
+              <div className="mt-6 flex flex-wrap items-end gap-x-12 gap-y-5">
+                <div>
+                  <p className="text-sm font-semibold text-[#69746d]">
+                    Listening score
+                  </p>
+                  <p className="mt-1 text-5xl font-bold">
+                    {score} <span className="text-2xl text-[#7a857e]">/ 40</span>
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-[#69746d]">
+                    Estimated band
+                  </p>
+                  <p className="mt-1 text-5xl font-bold text-[#176b3a]">
+                    {band.toFixed(1)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-6 max-w-2xl text-sm leading-6 text-[#69746d]">
+                This is an estimated Listening band based on practice
+                performance. It is not an official IELTS result.
+              </p>
+            </div>
+            <div className="bg-[#174f30] p-6 text-white sm:p-8">
+              <p className="text-sm font-semibold text-white/65">
+                Result insight
+              </p>
+              <h2 className="mt-3 text-xl font-bold">
+                Your strongest performance was Part 1.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-white/75">
+                You lost most marks in Part 3 multiple-choice questions,
+                especially when a speaker corrected an earlier opinion.
+              </p>
+              <ButtonLink
+                href="/practice/part-3"
+                variant="secondary"
+                className="mt-6 w-full"
+              >
+                Practice this weakness <ArrowRight className="size-4" />
+              </ButtonLink>
+            </div>
+          </div>
+        </Card>
+
+        <section className="mt-6">
+          <div className="mb-4">
+            <p className="text-sm font-semibold text-[#69746d]">
+              Where marks were gained and lost
+            </p>
+            <h2 className="mt-1 text-xl font-bold">Part breakdown</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {breakdown.byPart.map((item) => (
+              <Card key={item.label} className="p-5">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold">{item.label}</h3>
+                  <span className="text-lg font-bold">
+                    {item.score}/{item.total}
+                  </span>
+                </div>
+                <Progress value={(item.score / item.total) * 100} className="mt-4" />
+                <p className="mt-3 text-xs text-[#69746d]">
+                  {Math.round((item.score / item.total) * 100)}% accuracy
+                </p>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-2">
+          <Card className="p-5 sm:p-6">
+            <p className="text-sm font-semibold text-[#69746d]">
+              Performance breakdown
+            </p>
+            <h2 className="mt-1 text-xl font-bold">By question type</h2>
+            <div className="mt-5 space-y-4">
+              {breakdown.byType.map((item) => (
+                <div key={item.label}>
+                  <div className="mb-2 flex justify-between text-sm">
+                    <span className="font-semibold">
+                      {formatQuestionType(item.label)}
+                    </span>
+                    <span className="text-[#69746d]">
+                      {item.score}/{item.total} ·{" "}
+                      {Math.round((item.score / item.total) * 100)}%
+                    </span>
+                  </div>
+                  <Progress
+                    value={(item.score / item.total) * 100}
+                    indicatorClassName={
+                      item.score / item.total < 0.65 ? "bg-amber-500" : undefined
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          <Card className="p-5 sm:p-6">
+            <p className="text-sm font-semibold text-[#69746d]">
+              Learning analytics
+            </p>
+            <h2 className="mt-1 text-xl font-bold">Skill analysis</h2>
+            <p className="mt-2 text-xs leading-5 text-[#7a857e]">
+              These categories support learning and are not official IELTS
+              scoring criteria.
+            </p>
+            <div className="mt-5 space-y-3">
+              {breakdown.bySkill.slice(0, 6).map((item, index) => (
+                <div
+                  key={item.label}
+                  className="flex items-center justify-between rounded-lg bg-[#f5f8f5] px-4 py-3 text-sm"
+                >
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={cn(
+                        "grid size-7 place-items-center rounded-full",
+                        index < 2
+                          ? "bg-amber-100 text-amber-800"
+                          : "bg-green-100 text-green-800",
+                      )}
+                    >
+                      <Target className="size-3.5" />
+                    </span>
+                    <span className="font-semibold">
+                      {formatSkill(item.label)}
+                    </span>
+                  </div>
+                  <span className="font-bold">
+                    {Math.round((item.score / item.total) * 100)}%
+                  </span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+
+        <Card className="mt-6 border-[#bddbc5] p-5 sm:p-6">
+          <div className="flex gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-[#e8f5ec] text-[#176b3a]">
+              <BookOpenCheck className="size-5" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-[#176b3a]">
+                Recommended next practice
+              </p>
+              <h2 className="mt-1 text-xl font-bold">
+                Part 3 — Speaker Opinions
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#69746d]">
+                Focus on final decisions and signals such as “actually” or “on
+                reflection”. These often introduce a correction.
+              </p>
+            </div>
+          </div>
+        </Card>
+
+        <section className="mt-8" id="question-review">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div>
+              <p className="text-sm font-semibold text-[#69746d]">
+                Understand every mistake
+              </p>
+              <h2 className="mt-1 text-2xl font-bold">Question review</h2>
+            </div>
+            <div className="flex gap-1 overflow-x-auto rounded-lg border bg-white p-1">
+              {[
+                ["all", `All · 40`],
+                ["incorrect", `Incorrect · ${incorrectCount}`],
+                ["correct", `Correct · ${score}`],
+                ["unanswered", `Unanswered · ${unansweredCount}`],
+              ].map(([value, label]) => (
+                <button
+                  key={value}
+                  onClick={() => setFilter(value as Filter)}
+                  className={cn(
+                    "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold",
+                    filter === value
+                      ? "bg-[#e8f5ec] text-[#176b3a]"
+                      : "text-[#69746d] hover:bg-gray-50",
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="mt-5 space-y-3">
+            {visibleQuestions.map((question, index) => (
+              <ReviewCard
+                key={question.id}
+                question={question}
+                answer={answers[question.id]}
+                defaultOpen={filter === "incorrect" && index === 0}
+              />
+            ))}
+          </div>
+          {visibleQuestions.length === 0 && (
+            <Card className="mt-5 p-8 text-center">
+              {filter === "unanswered" ? (
+                <CheckCircle2 className="mx-auto size-8 text-[#176b3a]" />
+              ) : (
+                <XCircle className="mx-auto size-8 text-[#69746d]" />
+              )}
+              <h3 className="mt-3 font-bold">No questions in this filter</h3>
+            </Card>
+          )}
+        </section>
+      </main>
+    </div>
+  );
+}
