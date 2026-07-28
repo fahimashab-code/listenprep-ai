@@ -4,10 +4,13 @@ import {
   BookOpenCheck,
   Check,
   ClipboardCheck,
+  Clock3,
+  FileCheck2,
   Headphones,
   Map,
   MessageSquareText,
   Play,
+  ShieldCheck,
   Target,
 } from "lucide-react";
 import { Brand } from "@/components/brand";
@@ -27,7 +30,7 @@ const practiceCards = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-white">
-      <header className="border-b border-[#edf0ed]">
+      <header className="sticky top-0 z-40 border-b border-[#edf0ed] bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-8">
           <Brand />
           <nav className="hidden items-center gap-7 text-sm font-semibold text-muted md:flex">
@@ -44,7 +47,7 @@ export default function Home() {
               Sign in
             </ButtonLink>
             <ButtonLink href="/register" size="sm">
-              Start practising
+              Start Full Mock
             </ButtonLink>
           </nav>
           <ButtonLink href="/login" size="sm" className="md:hidden">
@@ -54,14 +57,15 @@ export default function Home() {
       </header>
 
       <main>
-        <section className="surface-grid overflow-hidden border-b bg-[#fbfcfb]">
+        <section className="landing-hero surface-grid overflow-hidden border-b">
           <div className="mx-auto grid max-w-[1180px] items-center gap-12 px-5 py-16 sm:px-8 md:py-24 lg:grid-cols-[1.08fr_.92fr] lg:py-28">
             <div>
               <Badge variant="green" className="mb-5">
                 Full IELTS Listening practice
               </Badge>
               <h1 className="type-display max-w-2xl text-ink">
-                Take a Full IELTS Listening Mock.
+                Take a Full{" "}
+                <span className="text-primary">IELTS Listening Mock.</span>
               </h1>
               <p className="type-lead mt-6 max-w-xl text-muted">
                 Complete all 4 Parts and 40 questions in a focused,
@@ -80,22 +84,42 @@ export default function Home() {
                 <Check className="size-4 text-primary" />
                 Original IELTS-style practice content. No card required.
               </p>
+              <div className="mt-7 grid max-w-xl grid-cols-3 gap-3">
+                {[
+                  { label: "4 Parts", text: "Complete format", icon: ClipboardCheck },
+                  { label: "40 Questions", text: "Full mock", icon: FileCheck2 },
+                  { label: "~30 min", text: "Realistic timing", icon: Clock3 },
+                ].map(({ label, text, icon: Icon }) => (
+                  <div
+                    key={label}
+                    className="rounded-xl border border-white/80 bg-white/70 p-3 shadow-sm backdrop-blur"
+                  >
+                    <Icon className="size-4 text-primary" aria-hidden="true" />
+                    <p className="mt-2 text-sm font-bold">{label}</p>
+                    <p className="text-[11px] text-muted">{text}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="relative mx-auto w-full max-w-[470px]">
-              <div className="absolute -left-8 -top-8 size-44 rounded-full bg-[#e0f3e5]" />
-              <div className="absolute -bottom-8 -right-8 size-36 rounded-full bg-[#f1f4ef]" />
-              <Card className="relative overflow-hidden p-6 shadow-[0_24px_80px_rgba(31,66,42,0.12)] sm:p-8">
+              <div className="absolute -left-8 -top-8 size-44 rounded-full bg-[#d7eddd] blur-sm" />
+              <div className="absolute -bottom-8 -right-8 size-36 rounded-full bg-[#e8f2e9]" />
+              <Card className="relative overflow-hidden border-white/80 p-6 shadow-[var(--shadow-elevated)] sm:p-8">
+                <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-[#67ae79] to-[#c6e6cf]" />
                 <div className="flex items-start justify-between border-b pb-5">
                   <div>
-                    <p className="text-sm font-semibold text-muted">
-                      Full mock result
-                    </p>
+                    <div className="mb-2 flex items-center gap-2">
+                      <span className="size-2 rounded-full bg-primary" />
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">
+                        Full mock complete
+                      </p>
+                    </div>
                     <h2 className="mt-1 text-xl font-bold">
                       Listening Mock 05
                     </h2>
                   </div>
-                  <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
+                  <span className="grid size-11 place-items-center rounded-xl border border-[#cae5d1] bg-primary-soft text-primary shadow-sm">
                     <Headphones className="size-5" />
                   </span>
                 </div>
@@ -109,7 +133,7 @@ export default function Home() {
                     <p className="mt-1 text-3xl font-bold text-primary">7.0</p>
                   </div>
                 </div>
-                <div className="rounded-xl bg-surface-subtle p-4">
+                <div className="rounded-xl border border-[#e6ece7] bg-surface-subtle p-4">
                   <div className="flex items-center justify-between text-sm">
                     <span className="font-semibold">Recent progress</span>
                     <span className="font-bold text-primary">+4 questions</span>
@@ -118,7 +142,7 @@ export default function Home() {
                     {[44, 54, 62, 74, 84].map((height, index) => (
                       <div
                         key={height}
-                        className="flex-1 rounded-t bg-[#b8ddc3]"
+                        className="flex-1 rounded-t bg-gradient-to-t from-primary to-[#9bd1a9]"
                         style={{ height: `${height}%` }}
                         aria-label={`Test ${index + 1} score trend`}
                       />
@@ -152,11 +176,17 @@ export default function Home() {
               ["02", "Understand", "See exactly which questions you missed, with transcript evidence and explanations."],
               ["03", "Improve", "Practise your weak question types and track progress over time."],
             ].map(([number, title, text]) => (
-              <div key={title} className="border-t-2 border-[#badfc5] pt-5">
-                <span className="text-sm font-bold text-primary">{number}</span>
+              <Card
+                key={title}
+                className="group relative overflow-hidden p-6 hover:-translate-y-1 hover:border-[#b4d4bc] hover:shadow-lg"
+              >
+                <span className="grid size-9 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
+                  {number}
+                </span>
                 <h3 className="mt-4 text-xl font-bold">{title}</h3>
                 <p className="mt-2 leading-7 text-muted">{text}</p>
-              </div>
+                <ArrowRight className="absolute bottom-6 right-6 size-4 text-subtle opacity-0 transition-all group-hover:translate-x-1 group-hover:text-primary group-hover:opacity-100" />
+              </Card>
             ))}
           </div>
         </section>
@@ -181,7 +211,7 @@ export default function Home() {
               {practiceCards.map(([title, text, Icon]) => (
                 <Card
                   key={String(title)}
-                  className="group flex items-center gap-4 p-5 hover:-translate-y-0.5 hover:border-[#a9c8b1] hover:shadow-md"
+                  className="group flex items-center gap-4 p-5 hover:-translate-y-1 hover:border-[#a9c8b1] hover:shadow-lg"
                 >
                   <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
                     <Icon className="size-5" />
@@ -244,7 +274,13 @@ export default function Home() {
               ["Part 3", "Educational discussion", "Students, tutors, training"],
               ["Part 4", "Academic monologue", "Lecture-style presentation"],
             ].map(([part, title, text]) => (
-              <Card key={part} className="p-5">
+              <Card
+                key={part}
+                className="group relative overflow-hidden p-5 hover:-translate-y-0.5 hover:border-[#a9c8b1] hover:shadow-md"
+              >
+                <span className="absolute -right-1 -top-5 text-7xl font-black text-primary/[0.045]">
+                  {part.replace("Part ", "")}
+                </span>
                 <span className="text-sm font-bold text-primary">{part}</span>
                 <h3 className="mt-3 text-lg font-bold">{title}</h3>
                 <p className="type-body-sm mt-2 text-muted">{text}</p>
@@ -253,7 +289,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-primary-strong px-5 py-16 text-white">
+        <section className="dark-green-panel px-5 py-16 text-white">
           <div className="mx-auto flex max-w-[920px] flex-col items-center text-center">
             <h2 className="type-marketing-title">
               Take your first full Listening mock
@@ -261,6 +297,10 @@ export default function Home() {
             <p className="mt-3 max-w-xl text-white/75">
               Discover what you already do well and what to practise next.
             </p>
+            <div className="mt-5 flex items-center gap-2 text-sm text-white/70">
+              <ShieldCheck className="size-4 text-[#a8dab7]" />
+              Focused practice · Clear feedback · No distractions
+            </div>
             <ButtonLink
               href="/login"
               variant="secondary"

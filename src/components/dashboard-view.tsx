@@ -42,15 +42,23 @@ export function DashboardView() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-sm font-semibold text-muted">Your IELTS Listening</p>
-        <h2 className="type-page-title mt-1">What should you do now?</h2>
-        <p className="mt-2 text-muted">
-          Continue your test or start a complete four-Part mock.
-        </p>
+      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
+            Your IELTS Listening
+          </p>
+          <h2 className="type-page-title mt-2">What should you do now?</h2>
+          <p className="mt-2 text-muted">
+            Continue your test or start a complete four-Part mock.
+          </p>
+        </div>
+        <div className="w-fit rounded-full border bg-white px-4 py-2 text-sm shadow-sm">
+          <span className="text-muted">Target band</span>{" "}
+          <strong className="text-primary">8.0</strong>
+        </div>
       </div>
 
-      <Card className="overflow-hidden border-[#a9ceb3]">
+      <Card className="overflow-hidden border-[#9fc8aa] shadow-[0_16px_42px_rgba(23,79,48,.09)]">
         <div className="grid lg:grid-cols-[1fr_320px]">
           <div className="p-6 sm:p-8">
             <Badge variant="green">
@@ -107,7 +115,7 @@ export function DashboardView() {
             </ButtonLink>
           </div>
 
-          <div className="relative hidden overflow-hidden bg-primary-strong p-8 text-white lg:block">
+          <div className="dark-green-panel relative hidden overflow-hidden p-8 text-white lg:block">
             <div className="absolute -right-12 -top-12 size-44 rounded-full border-[32px] border-white/5" />
             <Headphones className="size-9 text-[#a8dab7]" />
             <p className="mt-9 text-sm text-white/70">
@@ -129,7 +137,7 @@ export function DashboardView() {
       </Card>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card className="p-5 sm:p-6">
+        <Card className="group p-5 hover:-translate-y-0.5 hover:border-[#b9d4c0] hover:shadow-lg sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-muted">
@@ -137,7 +145,9 @@ export function DashboardView() {
               </p>
               <h3 className="mt-1 text-xl font-bold">Listening Mock 07</h3>
             </div>
-            <TrendingUp className="size-5 text-primary" />
+            <span className="grid size-10 place-items-center rounded-xl bg-primary-soft text-primary">
+              <TrendingUp className="size-5" />
+            </span>
           </div>
           <div className="mt-6 grid grid-cols-2 gap-4">
             <div>
@@ -154,7 +164,7 @@ export function DashboardView() {
           </p>
         </Card>
 
-        <Card className="p-5 sm:p-6">
+        <Card className="group border-amber-200 bg-gradient-to-br from-white to-amber-50/60 p-5 hover:-translate-y-0.5 hover:shadow-lg sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <span className="grid size-11 place-items-center rounded-lg bg-amber-50 text-amber-700">
               <Lightbulb className="size-5" />
@@ -174,7 +184,7 @@ export function DashboardView() {
         </Card>
       </section>
 
-      <Card className="p-5 sm:p-6">
+      <Card className="overflow-hidden p-5 hover:border-[#b9d4c0] hover:shadow-md sm:p-6">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm font-semibold text-muted">Recent scores</p>

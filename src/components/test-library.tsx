@@ -35,7 +35,7 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      {tests.map((test) => {
+      {tests.map((test, index) => {
         const attempt = attempts[test.id];
         const status =
           attempt?.status === "completed"
@@ -47,29 +47,45 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
         const answered = attempt ? countAnswers(attempt) : 0;
 
         return (
-          <Card key={test.id} className="p-5 sm:p-6">
+          <Card
+            key={test.id}
+            className={`group relative overflow-hidden p-5 hover:-translate-y-1 hover:shadow-lg sm:p-6 ${
+              index === 0
+                ? "border-[#9fc8aa] shadow-[0_10px_30px_rgba(23,79,48,.07)]"
+                : "hover:border-[#b9d4c0]"
+            }`}
+          >
+            {index === 0 && (
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-[#8ac69a]" />
+            )}
             <div className="flex items-start justify-between gap-4">
-              <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
+              <span className="grid size-11 place-items-center rounded-xl border border-[#d4e8d9] bg-primary-soft text-primary transition-transform group-hover:scale-105">
                 <Headphones className="size-5" />
               </span>
-              <Badge
-                variant={
-                  status === "completed"
-                    ? "green"
+              <div className="flex flex-wrap justify-end gap-2">
+                {index === 0 && <Badge variant="green">Recommended</Badge>}
+                <Badge
+                  variant={
+                    status === "completed"
+                      ? "green"
+                      : status === "in_progress"
+                        ? "amber"
+                        : "gray"
+                  }
+                >
+                  {status === "completed"
+                    ? "Completed"
                     : status === "in_progress"
-                      ? "amber"
-                      : "gray"
-                }
-              >
-                {status === "completed"
-                  ? "Completed"
-                  : status === "in_progress"
-                    ? "In progress"
-                    : "Not started"}
-              </Badge>
+                      ? "In progress"
+                      : "Not started"}
+                </Badge>
+              </div>
             </div>
 
-            <h3 className="mt-5 text-xl font-bold">{test.title}</h3>
+            <p className="mt-5 text-xs font-bold uppercase tracking-[0.12em] text-primary">
+              Full mock {String(index + 1).padStart(2, "0")}
+            </p>
+            <h3 className="mt-1 text-xl font-bold">{test.title}</h3>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
               <span className="flex items-center gap-2">
                 <FileCheck2 className="size-4" /> 40 questions

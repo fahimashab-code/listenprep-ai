@@ -8,9 +8,9 @@ import { cn } from "@/lib/utils";
 
 const variants = {
   primary:
-    "bg-primary text-white shadow-sm hover:bg-primary-hover active:bg-primary-active",
+    "bg-primary text-white shadow-[0_5px_14px_rgba(23,107,58,.18)] hover:-translate-y-px hover:bg-primary-hover hover:shadow-[0_7px_18px_rgba(23,107,58,.22)] active:translate-y-0 active:bg-primary-active",
   secondary:
-    "border border-[#cfd8d1] bg-white text-ink hover:border-[#8fa394] hover:bg-[#f7faf8]",
+    "border border-[#cfd8d1] bg-white text-ink shadow-sm hover:-translate-y-px hover:border-[#8fa394] hover:bg-[#f7faf8] hover:shadow-md active:translate-y-0",
   ghost: "text-muted hover:bg-[#edf2ee] hover:text-ink",
   danger:
     "border border-red-200 bg-white text-red-700 hover:bg-red-50",
@@ -34,7 +34,7 @@ export function Button({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-[color,background-color,border-color,box-shadow,transform] disabled:pointer-events-none disabled:opacity-50",
         variants[variant],
         sizes[size],
         className,
@@ -58,7 +58,7 @@ export function ButtonLink({
   return (
     <Link
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold",
+        "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-[color,background-color,border-color,box-shadow,transform]",
         variants[variant],
         sizes[size],
         className,

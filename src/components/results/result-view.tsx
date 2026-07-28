@@ -55,7 +55,7 @@ function ReviewCard({
 
   return (
     <details
-      className="group rounded-xl border bg-white shadow-[0_1px_2px_rgba(23,32,26,.04)]"
+      className="group rounded-xl border bg-white shadow-[var(--shadow-card)] transition-[border-color,box-shadow] hover:border-[#bdd5c3] hover:shadow-md"
       open={defaultOpen}
     >
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5 sm:p-6">
@@ -280,7 +280,7 @@ export function ResultView({
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <header className="border-b bg-white">
+      <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <ButtonLink href="/dashboard" variant="ghost" size="sm">
             <ArrowLeft className="size-4" /> Home
@@ -295,10 +295,15 @@ export function ResultView({
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-        <Card className="overflow-hidden">
+        <Card className="overflow-hidden border-[#a8cdb1] shadow-[0_18px_48px_rgba(23,79,48,.1)]">
           <div className="grid lg:grid-cols-[1fr_330px]">
             <div className="p-6 sm:p-8">
-              <Badge variant="green">Practice estimate</Badge>
+              <div className="flex items-center gap-3">
+                <Badge variant="green">Practice estimate</Badge>
+                <span className="text-xs font-semibold text-muted">
+                  Full mock complete
+                </span>
+              </div>
               <h1 className="type-page-title mt-4">
                 {test.title}
               </h1>
@@ -325,7 +330,7 @@ export function ResultView({
                 performance. It is not an official IELTS result.
               </p>
             </div>
-            <div className="bg-primary-strong p-6 text-white sm:p-8">
+            <div className="dark-green-panel p-6 text-white sm:p-8">
               <p className="text-sm font-semibold text-white/70">
                 Result insight
               </p>
@@ -355,7 +360,10 @@ export function ResultView({
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {breakdown.byPart.map((item) => (
-              <Card key={item.label} className="p-5">
+              <Card
+                key={item.label}
+                className="group p-5 hover:-translate-y-0.5 hover:border-[#b5d2bc] hover:shadow-md"
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold">{item.label}</h3>
                   <span className="text-lg font-bold">
@@ -386,7 +394,7 @@ export function ResultView({
           </div>
         </section>
 
-        <details className="group mt-6 rounded-xl border bg-white">
+        <details className="group mt-6 rounded-xl border bg-white shadow-[var(--shadow-card)] open:border-[#b7d2be]">
           <summary className="flex cursor-pointer list-none items-center justify-between p-5 font-bold sm:p-6">
             View detailed analysis
             <ChevronDown className="size-5 text-subtle transition-transform group-open:rotate-180" />
@@ -460,7 +468,7 @@ export function ResultView({
           </div>
         </details>
 
-        <Card className="mt-6 border-[#bddbc5] p-5 sm:p-6">
+        <Card className="mt-6 border-[#a9ceb3] bg-gradient-to-br from-white to-primary-soft/60 p-5 shadow-md sm:p-6">
           <div className="flex gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
               <BookOpenCheck className="size-5" />
