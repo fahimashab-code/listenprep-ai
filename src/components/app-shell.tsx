@@ -15,9 +15,10 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Brand } from "@/components/brand";
+import { logoutUser } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -74,15 +75,38 @@ function NavLink({
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  userName,
+  userEmail,
+}: {
+  children: React.ReactNode;
+  userName: string;
+  userEmail: string;
+}) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const rootPath = `/${pathname.split("/")[1]}`;
   const title =
     titles[rootPath] ??
     (pathname.includes("/practice/") ? "Focused Practice" : "Listenly");
+  const displayName = userName || userEmail;
+  const initial = displayName.trim().charAt(0).toUpperCase() || "U";
+
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      await logoutUser();
+    } finally {
+      localStorage.removeItem("listenly-demo-auth");
+      router.replace("/login");
+      router.refresh();
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,18 +150,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             "mt-auto rounded-xl bg-surface-subtle",
             sidebarCollapsed ? "grid place-items-center p-2" : "p-4",
           )}
-          title={sidebarCollapsed ? "Alex · Target Listening band 8.0" : undefined}
+          title={sidebarCollapsed ? `${displayName} · ${userEmail}` : undefined}
         >
           {sidebarCollapsed ? (
             <span className="grid size-9 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
-              A
+              {initial}
             </span>
           ) : (
             <>
-              <p className="text-sm font-bold">Alex</p>
-              <p className="mt-1 text-xs text-muted">
-                Target Listening band 8.0
-              </p>
+              <p className="truncate text-sm font-bold">{displayName}</p>
+              <p className="mt-1 truncate text-xs text-muted">{userEmail}</p>
             </>
           )}
         </div>
@@ -186,13 +208,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 pathname={pathname}
                 onClick={() => setMobileOpen(false)}
               />
-              <NavLink
-                href="/"
-                label="Sign out"
-                icon={LogOut}
-                pathname={pathname}
-                onClick={() => setMobileOpen(false)}
-              />
+              <button
+                type="button"
+                onClick={handleSignOut}
+                disabled={signingOut}
+                className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-muted hover:bg-[#f0f3f1] hover:text-ink disabled:opacity-50"
+              >
+                <LogOut className="size-[18px]" aria-hidden="true" />
+                {signingOut ? "Signing out…" : "Sign out"}
+              </button>
             </div>
           </aside>
         </div>
@@ -224,9 +248,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               aria-haspopup="menu"
             >
               <span className="grid size-8 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
-                A
+                {initial}
               </span>
-              <span className="hidden text-sm font-semibold md:inline">Alex</span>
+              <span className="hidden max-w-36 truncate text-sm font-semibold md:inline">
+                {displayName}
+              </span>
               <ChevronDown
                 className={cn(
                   "hidden size-4 text-gray-500 transition-transform md:inline",
@@ -242,7 +268,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {[
                   { href: "/progress", label: "Progress", icon: BarChart3 },
                   { href: "/profile", label: "Profile", icon: UserRound },
-                  { href: "/", label: "Sign out", icon: LogOut },
                 ].map(({ href, label, icon: Icon }) => (
                   <Link
                     key={label}
@@ -255,6 +280,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     {label}
                   </Link>
                 ))}
+                <button
+                  type="button"
+                  role="menuitem"
+                  disabled={signingOut}
+                  onClick={handleSignOut}
+                  className="flex h-10 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-muted hover:bg-surface-subtle hover:text-ink disabled:opacity-50"
+                >
+                  <LogOut className="size-4" aria-hidden="true" />
+                  {signingOut ? "Signing out…" : "Sign out"}
+                </button>
               </div>
             )}
           </div>

@@ -1,10 +1,9 @@
-import { AppShell } from "@/components/app-shell";
 import { redirect } from "next/navigation";
 import { getServerAuthUser } from "@/lib/auth/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoggedInLayout({
+export default async function ProtectedResultsLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,9 +13,5 @@ export default async function LoggedInLayout({
     redirect("/login");
   }
 
-  return (
-    <AppShell userName={user.name} userEmail={user.email}>
-      {children}
-    </AppShell>
-  );
+  return children;
 }

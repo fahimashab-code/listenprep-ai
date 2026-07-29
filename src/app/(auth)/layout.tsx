@@ -1,10 +1,19 @@
 import { Brand } from "@/components/brand";
+import { redirect } from "next/navigation";
+import { getServerAuthUser } from "@/lib/auth/server";
 
-export default function AuthLayout({
+export const dynamic = "force-dynamic";
+
+export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = await getServerAuthUser();
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <div className="min-h-screen bg-[#f8faf8]">
       <header className="px-5 py-5 sm:px-8">
