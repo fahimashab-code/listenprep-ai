@@ -15,6 +15,7 @@ import {
 } from "@/lib/auth/client";
 import { getAuthErrorMessage } from "@/lib/auth/errors";
 import { safeRedirectPath } from "@/lib/auth/routes";
+import { cn } from "@/lib/utils";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address."),
@@ -135,8 +136,12 @@ export function AuthForm({
     }
   }
 
-  const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border border-[#cfd8d1] bg-white px-3 text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100";
+  const fieldClass = cn(
+    "mt-1.5 w-full border border-[#cfd8d1] bg-white text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100",
+    mode === "login"
+      ? "h-14 rounded-2xl px-4"
+      : "h-11 rounded-lg px-3",
+  );
 
   return (
     <form className="mt-7 space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -224,18 +229,8 @@ export function AuthForm({
           )}
         </label>
       )}
-      {mode === "login" && (
-        <div className="text-right">
-          <a
-            href="/forgot-password"
-            className="text-sm font-semibold text-primary hover:underline"
-          >
-            Forgot password?
-          </a>
-        </div>
-      )}
       <Button
-        className="w-full"
+        className={cn("w-full", mode === "login" && "h-14 rounded-xl")}
         size="lg"
         disabled={isSubmitting || googleLoading}
       >
@@ -246,6 +241,16 @@ export function AuthForm({
             : "Create account"}
         {!isSubmitting && <ArrowRight className="size-4" />}
       </Button>
+      {mode === "login" && (
+        <div className="text-center">
+          <a
+            href="/forgot-password"
+            className="text-sm font-semibold text-primary hover:underline"
+          >
+            Forgot your password?
+          </a>
+        </div>
+      )}
       {authEnv.googleEnabled && (
         <>
           <div className="flex items-center gap-3 py-1 text-xs text-subtle">
@@ -256,7 +261,7 @@ export function AuthForm({
           <Button
             type="button"
             variant="secondary"
-            className="w-full"
+            className={cn("w-full", mode === "login" && "h-14 rounded-xl")}
             size="lg"
             disabled={isSubmitting || googleLoading}
             onClick={handleGoogleLogin}

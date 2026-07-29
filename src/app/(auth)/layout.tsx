@@ -16,8 +16,9 @@ export default async function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(440px,46%)_1fr]">
-      <section className="flex min-h-screen flex-col bg-white">
+    <div className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(440px,0.92fr)]">
+      <AuthShowcase />
+      <section className="flex min-h-screen flex-col border-l bg-white">
         <header className="flex h-20 items-center px-5 sm:px-8 lg:px-10 xl:px-14">
           <Brand />
         </header>
@@ -28,7 +29,6 @@ export default async function AuthLayout({
           IELTS-style practice by Listenly. Not affiliated with IELTS.
         </footer>
       </section>
-      <AuthShowcase />
     </div>
   );
 }

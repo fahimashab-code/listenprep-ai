@@ -5,7 +5,13 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export function ProfileForm() {
+export function ProfileForm({
+  userName,
+  userEmail,
+}: {
+  userName: string;
+  userEmail: string;
+}) {
   const [saved, setSaved] = useState(false);
   const fieldClass =
     "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
@@ -25,14 +31,19 @@ export function ProfileForm() {
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <label className="block text-sm font-semibold">
             Name
-            <input className={fieldClass} defaultValue="Alex Morgan" />
+            <input
+              className={`${fieldClass} bg-surface-subtle text-muted`}
+              value={userName}
+              readOnly
+            />
           </label>
           <label className="block text-sm font-semibold">
             Email
             <input
-              className={fieldClass}
+              className={`${fieldClass} bg-surface-subtle text-muted`}
               type="email"
-              defaultValue="alex@example.com"
+              value={userEmail}
+              readOnly
             />
           </label>
           <label className="block text-sm font-semibold">
