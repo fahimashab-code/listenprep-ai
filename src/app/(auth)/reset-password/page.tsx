@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
+import { ResetPasswordForm } from "@/components/auth/reset-password-form";
 import { Card } from "@/components/ui/card";
 
-export default async function ForgotPasswordPage({
+export default async function ResetPasswordPage({
   searchParams,
 }: {
   searchParams: Promise<{ email?: string }>;
@@ -11,16 +11,18 @@ export default async function ForgotPasswordPage({
 
   return (
     <Card className="p-6 shadow-[0_16px_45px_rgba(23,32,26,0.07)] sm:p-8">
-      <h1 className="text-2xl font-bold tracking-tight">Reset your password</h1>
+      <h1 className="text-2xl font-bold tracking-tight">
+        Choose a new password
+      </h1>
       <p className="mt-2 type-body-sm text-muted">
-        Enter your account email and we will send a confirmation code.
+        Enter the code from your email and your new password.
       </p>
-      <ForgotPasswordForm initialEmail={email} />
+      <ResetPasswordForm initialEmail={email} />
       <Link
-        href="/login"
+        href="/forgot-password"
         className="mt-5 block text-center text-sm font-bold text-primary"
       >
-        Back to sign in
+        Request another code
       </Link>
     </Card>
   );

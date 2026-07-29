@@ -7,16 +7,24 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { authEnv } from "@/lib/auth/env";
+import {
+  loginUser,
+  loginWithGoogle,
+  registerUser,
+} from "@/lib/auth/client";
+import { getAuthErrorMessage } from "@/lib/auth/errors";
+import { safeRedirectPath } from "@/lib/auth/routes";
 
 const loginSchema = z.object({
   email: z.email("Enter a valid email address."),
-  password: z.string().min(6, "Password must be at least 6 characters."),
+  password: z.string().min(8, "Password must be at least 8 characters."),
 });
 
 const registerSchema = loginSchema
   .extend({
-    name: z.string().min(2, "Enter your name."),
-    confirmPassword: z.string().min(6),
+    name: z.string().trim().min(2, "Enter your name."),
+    confirmPassword: z.string().min(8, "Confirm your password."),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match.",
@@ -30,9 +38,17 @@ type AuthValues = {
   confirmPassword?: string;
 };
 
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
+export function AuthForm({
+  mode,
+  nextPath,
+}: {
+  mode: "login" | "register";
+  nextPath?: string;
+}) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [googleLoading, setGoogleLoading] = useState(false);
   const schema = mode === "register" ? registerSchema : loginSchema;
   const {
     register,
@@ -40,18 +56,83 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     formState: { errors, isSubmitting },
   } = useForm<AuthValues>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
   });
 
-  async function onSubmit() {
-    await new Promise((resolve) => setTimeout(resolve, 400));
-    localStorage.setItem("listenly-demo-auth", "true");
-    router.push("/dashboard");
+  async function onSubmit(values: AuthValues) {
+    setFormError("");
+
+    try {
+      if (mode === "register") {
+        const nextStep = await registerUser({
+          name: values.name ?? "",
+          email: values.email,
+          password: values.password,
+        });
+
+        if (nextStep === "CONFIRM_SIGN_UP") {
+          router.push(
+            `/confirm-signup?email=${encodeURIComponent(values.email)}`,
+          );
+          return;
+        }
+
+        router.replace("/login");
+        return;
+      }
+
+      const result = await loginUser(values.email, values.password);
+      if (result.status === "signed-in") {
+        router.replace(safeRedirectPath(nextPath));
+        router.refresh();
+      } else if (result.status === "confirm-sign-up") {
+        router.push(
+          `/confirm-signup?email=${encodeURIComponent(result.email)}`,
+        );
+      } else if (result.status === "reset-password") {
+        router.push(
+          `/forgot-password?email=${encodeURIComponent(result.email)}`,
+        );
+      } else {
+        setFormError(result.message);
+      }
+    } catch (error) {
+      if (
+        mode === "login" &&
+        error instanceof Error &&
+        error.name === "UserNotConfirmedException"
+      ) {
+        router.push(
+          `/confirm-signup?email=${encodeURIComponent(values.email)}`,
+        );
+        return;
+      }
+
+      if (
+        mode === "login" &&
+        error instanceof Error &&
+        error.name === "PasswordResetRequiredException"
+      ) {
+        router.push(
+          `/forgot-password?email=${encodeURIComponent(values.email)}`,
+        );
+        return;
+      }
+
+      setFormError(getAuthErrorMessage(error));
+    }
   }
 
-  function demoLogin() {
-    localStorage.setItem("listenly-demo-auth", "true");
-    router.push("/dashboard");
+  async function handleGoogleLogin() {
+    setFormError("");
+    setGoogleLoading(true);
+
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      setFormError(getAuthErrorMessage(error));
+      setGoogleLoading(false);
+    }
   }
 
   const fieldClass =
@@ -59,6 +140,14 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
 
   return (
     <form className="mt-7 space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      {formError && (
+        <div
+          role="alert"
+          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+        >
+          {formError}
+        </div>
+      )}
       {mode === "register" && (
         <label className="block text-sm font-semibold">
           Name
@@ -97,7 +186,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             className={`${fieldClass} pr-11`}
             type={showPassword ? "text" : "password"}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            placeholder="At least 6 characters"
+            placeholder="At least 8 characters"
             {...register("password")}
           />
           <button
@@ -145,7 +234,11 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           </a>
         </div>
       )}
-      <Button className="w-full" size="lg" disabled={isSubmitting}>
+      <Button
+        className="w-full"
+        size="lg"
+        disabled={isSubmitting || googleLoading}
+      >
         {isSubmitting
           ? "Please wait…"
           : mode === "login"
@@ -153,21 +246,26 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             : "Create account"}
         {!isSubmitting && <ArrowRight className="size-4" />}
       </Button>
-      <div className="flex items-center gap-3 py-1 text-xs text-subtle">
-        <span className="h-px flex-1 bg-[#e0e5e1]" />
-        or
-        <span className="h-px flex-1 bg-[#e0e5e1]" />
-      </div>
-      <Button type="button" variant="secondary" className="w-full" size="lg">
-        <span className="font-bold text-blue-600">G</span> Continue with Google
-      </Button>
-      <button
-        type="button"
-        onClick={demoLogin}
-        className="w-full rounded-lg py-2 text-sm font-bold text-primary hover:bg-primary-soft"
-      >
-        Continue with demo account
-      </button>
+      {authEnv.googleEnabled && (
+        <>
+          <div className="flex items-center gap-3 py-1 text-xs text-subtle">
+            <span className="h-px flex-1 bg-[#e0e5e1]" />
+            or
+            <span className="h-px flex-1 bg-[#e0e5e1]" />
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            className="w-full"
+            size="lg"
+            disabled={isSubmitting || googleLoading}
+            onClick={handleGoogleLogin}
+          >
+            <span className="font-bold text-blue-600">G</span>
+            {googleLoading ? "Redirecting…" : "Continue with Google"}
+          </Button>
+        </>
+      )}
     </form>
   );
 }
