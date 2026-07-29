@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { AuthPageHeader } from "@/components/auth/auth-page-header";
 import { ForgotPasswordForm } from "@/components/auth/forgot-password-form";
-import { Card } from "@/components/ui/card";
 
 export default async function ForgotPasswordPage({
   searchParams,
@@ -10,11 +10,12 @@ export default async function ForgotPasswordPage({
   const { email = "" } = await searchParams;
 
   return (
-    <Card className="p-6 shadow-[0_16px_45px_rgba(23,32,26,0.07)] sm:p-8">
-      <h1 className="text-2xl font-bold tracking-tight">Reset your password</h1>
-      <p className="mt-2 type-body-sm text-muted">
-        Enter your account email and we will send a confirmation code.
-      </p>
+    <div>
+      <AuthPageHeader
+        eyebrow="Account recovery"
+        title="Reset your password"
+        description="Enter your account email and we’ll send you a secure verification code."
+      />
       <ForgotPasswordForm initialEmail={email} />
       <Link
         href="/login"
@@ -22,6 +23,6 @@ export default async function ForgotPasswordPage({
       >
         Back to sign in
       </Link>
-    </Card>
+    </div>
   );
 }

@@ -150,11 +150,11 @@ export function AuthForm({
       )}
       {mode === "register" && (
         <label className="block text-sm font-semibold">
-          Name
+          Full name
           <input
             className={fieldClass}
             autoComplete="name"
-            placeholder="Alex Morgan"
+            placeholder="Your full name"
             {...register("name")}
           />
           {errors.name && (

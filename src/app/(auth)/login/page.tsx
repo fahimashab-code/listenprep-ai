@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { AuthPageHeader } from "@/components/auth/auth-page-header";
 import { AuthForm } from "@/components/auth-form";
-import { Card } from "@/components/ui/card";
 
 export default async function LoginPage({
   searchParams,
@@ -14,11 +14,12 @@ export default async function LoginPage({
   const { next, confirmed, reset } = await searchParams;
 
   return (
-    <Card className="p-6 shadow-[0_16px_45px_rgba(23,32,26,0.07)] sm:p-8">
-      <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
-      <p className="mt-2 type-body-sm text-muted">
-        Continue your IELTS Listening preparation.
-      </p>
+    <div>
+      <AuthPageHeader
+        eyebrow="Welcome back"
+        title="Sign in to continue"
+        description="Resume your listening practice and pick up where you left off."
+      />
       {(confirmed === "true" || reset === "true") && (
         <div
           role="status"
@@ -36,6 +37,6 @@ export default async function LoginPage({
           Create an account
         </Link>
       </p>
-    </Card>
+    </div>
   );
 }

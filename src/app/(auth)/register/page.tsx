@@ -1,16 +1,15 @@
 import Link from "next/link";
+import { AuthPageHeader } from "@/components/auth/auth-page-header";
 import { AuthForm } from "@/components/auth-form";
-import { Card } from "@/components/ui/card";
 
 export default function RegisterPage() {
   return (
-    <Card className="p-6 shadow-[0_16px_45px_rgba(23,32,26,0.07)] sm:p-8">
-      <h1 className="text-2xl font-bold tracking-tight">
-        Start your listening practice
-      </h1>
-      <p className="mt-2 type-body-sm text-muted">
-        Create your account. No payment details are needed.
-      </p>
+    <div>
+      <AuthPageHeader
+        eyebrow="Get started"
+        title="Create your Listenly account"
+        description="Start with a full listening mock, then improve through focused practice and review."
+      />
       <AuthForm mode="register" />
       <p className="mt-5 text-center text-sm text-muted">
         Already have an account?{" "}
@@ -18,6 +17,6 @@ export default function RegisterPage() {
           Sign in
         </Link>
       </p>
-    </Card>
+    </div>
   );
 }

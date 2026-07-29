@@ -1,4 +1,5 @@
 import { Brand } from "@/components/brand";
+import { AuthShowcase } from "@/components/auth/auth-showcase";
 import { redirect } from "next/navigation";
 import { getServerAuthUser } from "@/lib/auth/server";
 
@@ -15,13 +16,19 @@ export default async function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#f8faf8]">
-      <header className="px-5 py-5 sm:px-8">
-        <Brand />
-      </header>
-      <main className="mx-auto flex min-h-[calc(100vh-84px)] max-w-[440px] items-center px-5 pb-16">
-        <div className="w-full">{children}</div>
-      </main>
+    <div className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(440px,46%)_1fr]">
+      <section className="flex min-h-screen flex-col bg-white">
+        <header className="flex h-20 items-center px-5 sm:px-8 lg:px-10 xl:px-14">
+          <Brand />
+        </header>
+        <main className="flex flex-1 items-center px-5 py-8 sm:px-8 lg:px-10 xl:px-14">
+          <div className="mx-auto w-full max-w-[460px]">{children}</div>
+        </main>
+        <footer className="px-5 pb-6 text-center text-xs text-subtle sm:px-8 lg:px-10 lg:text-left xl:px-14">
+          IELTS-style practice by Listenly. Not affiliated with IELTS.
+        </footer>
+      </section>
+      <AuthShowcase />
     </div>
   );
 }

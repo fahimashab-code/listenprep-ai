@@ -167,6 +167,13 @@ a {
     linear-gradient(145deg, #174f30 0%, #0f3f26 100%);
 }
 
+.auth-showcase {
+  background:
+    radial-gradient(circle at 80% 18%, rgba(121, 199, 143, 0.2), transparent 30%),
+    radial-gradient(circle at 12% 88%, rgba(77, 151, 98, 0.2), transparent 28%),
+    linear-gradient(145deg, #174f30 0%, #0b3822 56%, #092e1d 100%);
+}
+
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
