@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { AuthPageHeader } from "@/components/auth/auth-page-header";
 import { AuthForm } from "@/components/auth-form";
+import { ButtonLink } from "@/components/ui/button";
 
 export default async function LoginPage({
   searchParams,
@@ -17,7 +17,7 @@ export default async function LoginPage({
     <div>
       <AuthPageHeader
         eyebrow="Welcome back"
-        title="Sign in to continue"
+        title="Log in to Listenly"
         description="Resume your listening practice and pick up where you left off."
       />
       {(confirmed === "true" || reset === "true") && (
@@ -31,12 +31,19 @@ export default async function LoginPage({
         </div>
       )}
       <AuthForm mode="login" nextPath={next} />
-      <p className="mt-5 text-center text-sm text-muted">
-        New to Listenly?{" "}
-        <Link href="/register" className="font-bold text-primary">
-          Create an account
-        </Link>
-      </p>
+      <div className="mt-8 border-t pt-6">
+        <p className="mb-3 text-center text-sm text-muted">
+          New to Listenly?
+        </p>
+        <ButtonLink
+          href="/register"
+          variant="secondary"
+          size="lg"
+          className="w-full rounded-xl border-primary text-primary"
+        >
+          Create a new account
+        </ButtonLink>
+      </div>
     </div>
   );
 }
