@@ -5,8 +5,9 @@ export default function GeneratePage() {
   return (
     <>
       <PageHeading
-        title="Custom Practice Preview"
-        description="A frontend-only preview of a future custom listening generation workflow."
+        eyebrow="Personalised practice"
+        title="Create Custom Listening Practice"
+        description="Choose a topic or bring your own source text, then preview how a tailored IELTS Listening practice will be created."
       />
       <GenerationPreview />
     </>

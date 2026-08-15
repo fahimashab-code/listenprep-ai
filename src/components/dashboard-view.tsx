@@ -5,6 +5,7 @@ import {
   Clock3,
   Headphones,
   Lightbulb,
+  Sparkles,
   Target,
   TrendingUp,
 } from "lucide-react";
@@ -52,9 +53,15 @@ export function DashboardView() {
             Continue your test or start a complete four-Part mock.
           </p>
         </div>
-        <div className="w-fit rounded-full border bg-white px-4 py-2 text-sm shadow-sm">
-          <span className="text-muted">Target band</span>{" "}
-          <strong className="text-primary">8.0</strong>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="w-fit rounded-full border bg-white px-4 py-2 text-sm shadow-sm">
+            <span className="text-muted">Target band</span>{" "}
+            <strong className="text-primary">8.0</strong>
+          </div>
+          <ButtonLink href="/generate" variant="secondary" size="sm">
+            <Sparkles className="size-4" />
+            Create practice
+          </ButtonLink>
         </div>
       </div>
 
