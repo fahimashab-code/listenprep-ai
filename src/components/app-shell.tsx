@@ -11,6 +11,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Sparkles,
   UserRound,
   X,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/tests", label: "Mock Tests", icon: ClipboardList },
   { href: "/practice", label: "Practice", icon: BookOpenCheck },
+  { href: "/generate", label: "Create Practice", icon: Sparkles },
   { href: "/history", label: "History", icon: History },
 ];
 
@@ -300,7 +302,7 @@ export function AppShell({
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t bg-white px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-white px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
         aria-label="Mobile navigation"
       >
         {navItems.map(({ href, label, icon: Icon }) => {
