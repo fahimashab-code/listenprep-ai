@@ -23,13 +23,44 @@ const steps = [
   "Ready",
 ];
 
+const practiceFormats = [
+  {
+    value: "Full Test",
+    label: "Full mock test",
+    detail: "All four parts · 40 questions",
+  },
+  {
+    value: "Part 1",
+    label: "Everyday conversation",
+    detail: "Part 1 · 10 questions",
+  },
+  {
+    value: "Part 2",
+    label: "Everyday talk",
+    detail: "Part 2 · 10 questions",
+  },
+  {
+    value: "Part 3",
+    label: "Academic conversation",
+    detail: "Part 3 · 10 questions",
+  },
+  {
+    value: "Part 4",
+    label: "Academic lecture",
+    detail: "Part 4 · 10 questions",
+  },
+] as const;
+
+type PracticeFormat = (typeof practiceFormats)[number]["value"];
+
 export function GenerationPreview() {
   const [active, setActive] = useState(-1);
   const [source, setSource] = useState<"topic" | "text">("topic");
   const [topic, setTopic] = useState("Artificial Intelligence in Healthcare");
   const [sourceText, setSourceText] = useState("");
   const [difficulty, setDifficulty] = useState("Standard");
-  const [format, setFormat] = useState("Full Test");
+  const [format, setFormat] = useState<PracticeFormat>("Full Test");
+  const selectedFormat = practiceFormats.find((item) => item.value === format)!;
   const hasEnoughContent =
     source === "topic"
       ? topic.trim().length >= 3
@@ -186,7 +217,7 @@ export function GenerationPreview() {
           </label>
         )}
       </div>
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="mt-5">
         <label className="block text-sm font-semibold">
           Difficulty
           <select
@@ -198,21 +229,35 @@ export function GenerationPreview() {
             <option>Challenging</option>
           </select>
         </label>
-        <label className="block text-sm font-semibold">
-          Practice format
-          <select
-            className={fieldClass}
-            value={format}
-            onChange={(event) => setFormat(event.target.value)}
-          >
-            <option>Full Test</option>
-            <option>Part 1</option>
-            <option>Part 2</option>
-            <option>Part 3</option>
-            <option>Part 4</option>
-          </select>
-        </label>
       </div>
+      <fieldset className="mt-6">
+        <legend className="text-sm font-semibold">
+          What do you want to practise?
+        </legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {practiceFormats.map((item) => {
+            const selected = format === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setFormat(item.value)}
+                className={`rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary-soft"
+                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                } ${item.value === "Full Test" ? "sm:col-span-2" : ""}`}
+              >
+                <span className="block text-sm font-bold">{item.label}</span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  {item.detail}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
       <Button
         className="mt-7 w-full"
         size="lg"
@@ -255,9 +300,9 @@ export function GenerationPreview() {
               </div>
               <div>
                 <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
-                  Format
+                  Practice
                 </dt>
-                <dd className="mt-1 font-semibold">{format}</dd>
+                <dd className="mt-1 font-semibold">{selectedFormat.label}</dd>
               </div>
             </div>
           </dl>
