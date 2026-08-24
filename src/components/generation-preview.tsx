@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   CheckCircle2,
   ClipboardList,
   FileText,
@@ -23,13 +24,64 @@ const steps = [
   "Ready",
 ];
 
+const practiceFormats = [
+  {
+    value: "Full Test",
+    label: "Full mock test",
+    detail: "All four parts · 40 questions",
+  },
+  {
+    value: "Part 1",
+    label: "Everyday conversation",
+    detail: "Part 1 · 10 questions",
+  },
+  {
+    value: "Part 2",
+    label: "Everyday talk",
+    detail: "Part 2 · 10 questions",
+  },
+  {
+    value: "Part 3",
+    label: "Academic conversation",
+    detail: "Part 3 · 10 questions",
+  },
+  {
+    value: "Part 4",
+    label: "Academic lecture",
+    detail: "Part 4 · 10 questions",
+  },
+] as const;
+
+type PracticeFormat = (typeof practiceFormats)[number]["value"];
+
+const listeningStyles = [
+  {
+    value: "Conversation",
+    label: "Conversation",
+    detail: "Two people speaking naturally",
+  },
+  {
+    value: "Solo talk",
+    label: "Solo talk",
+    detail: "One person explaining a topic",
+  },
+] as const;
+
+type ListeningStyle = (typeof listeningStyles)[number]["value"];
+
 export function GenerationPreview() {
   const [active, setActive] = useState(-1);
+  const [reviewing, setReviewing] = useState(false);
   const [source, setSource] = useState<"topic" | "text">("topic");
   const [topic, setTopic] = useState("Artificial Intelligence in Healthcare");
   const [sourceText, setSourceText] = useState("");
   const [difficulty, setDifficulty] = useState("Standard");
-  const [format, setFormat] = useState("Full Test");
+  const [format, setFormat] = useState<PracticeFormat>("Full Test");
+  const [listeningStyle, setListeningStyle] =
+    useState<ListeningStyle>("Conversation");
+  const [accent, setAccent] = useState("Mixed UK accents");
+  const [pace, setPace] = useState("Exam pace");
+  const selectedFormat = practiceFormats.find((item) => item.value === format)!;
   const hasEnoughContent =
     source === "topic"
       ? topic.trim().length >= 3
@@ -103,7 +155,10 @@ export function GenerationPreview() {
               <Button
                 variant="secondary"
                 className="flex-1"
-                onClick={() => setActive(-1)}
+                onClick={() => {
+                  setActive(-1);
+                  setReviewing(false);
+                }}
               >
                 Adjust setup
               </Button>
@@ -114,6 +169,88 @@ export function GenerationPreview() {
           </p>
         </div>
       </Card>
+    );
+  }
+
+  if (reviewing) {
+    return (
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <Card className="overflow-hidden">
+          <div className="border-b bg-gradient-to-br from-primary-soft to-white p-5 sm:p-7">
+            <span className="grid size-11 place-items-center rounded-lg bg-white text-primary shadow-sm">
+              <ClipboardList className="size-5" />
+            </span>
+            <h3 className="mt-4 text-xl font-bold">Review your practice</h3>
+            <p className="mt-2 type-body-sm text-muted">
+              Check the choices below before opening the creation preview.
+            </p>
+          </div>
+          <dl className="grid gap-5 p-5 text-sm sm:grid-cols-2 sm:p-7">
+            <div className="sm:col-span-2">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Content
+              </dt>
+              <dd className="mt-1 break-words font-semibold">{sourceSummary}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Practice
+              </dt>
+              <dd className="mt-1 font-semibold">{selectedFormat.label}</dd>
+              <dd className="mt-1 text-xs text-muted">{selectedFormat.detail}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Difficulty
+              </dt>
+              <dd className="mt-1 font-semibold">{difficulty}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Listening style
+              </dt>
+              <dd className="mt-1 font-semibold">{listeningStyle}</dd>
+              <dd className="mt-1 text-xs text-muted">{accent}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Speaking pace
+              </dt>
+              <dd className="mt-1 font-semibold">{pace}</dd>
+            </div>
+          </dl>
+          <div className="flex flex-col-reverse gap-3 border-t bg-surface-subtle p-5 sm:flex-row sm:justify-end sm:p-7">
+            <Button variant="secondary" onClick={() => setReviewing(false)}>
+              <ArrowLeft className="size-4" />
+              Edit setup
+            </Button>
+            <Button onClick={simulate}>
+              <Sparkles className="size-4" />
+              Start preview
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="p-5 lg:sticky lg:top-24">
+          <h3 className="font-bold">What the finished flow will include</h3>
+          <ul className="mt-4 space-y-3 text-sm text-muted">
+            {[
+              "A listening scenario based on your source",
+              "Questions matched to the selected practice part",
+              "Answers and score review after the attempt",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 border-t pt-4 text-xs leading-5 text-subtle">
+            This remains a frontend preview. It does not create audio, questions,
+            or backend records.
+          </p>
+        </Card>
+      </div>
     );
   }
 
@@ -186,7 +323,7 @@ export function GenerationPreview() {
           </label>
         )}
       </div>
-      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+      <div className="mt-5">
         <label className="block text-sm font-semibold">
           Difficulty
           <select
@@ -198,28 +335,95 @@ export function GenerationPreview() {
             <option>Challenging</option>
           </select>
         </label>
+      </div>
+      <fieldset className="mt-6">
+        <legend className="text-sm font-semibold">
+          What do you want to practise?
+        </legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {practiceFormats.map((item) => {
+            const selected = format === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setFormat(item.value)}
+                className={`rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary-soft"
+                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                } ${item.value === "Full Test" ? "sm:col-span-2" : ""}`}
+              >
+                <span className="block text-sm font-bold">{item.label}</span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  {item.detail}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+      <fieldset className="mt-6 border-t pt-6">
+        <legend className="text-sm font-semibold">Listening style</legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {listeningStyles.map((item) => {
+            const selected = listeningStyle === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setListeningStyle(item.value)}
+                className={`rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary-soft"
+                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                }`}
+              >
+                <span className="block text-sm font-bold">{item.label}</span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  {item.detail}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
         <label className="block text-sm font-semibold">
-          Practice format
+          Accent
           <select
             className={fieldClass}
-            value={format}
-            onChange={(event) => setFormat(event.target.value)}
+            value={accent}
+            onChange={(event) => setAccent(event.target.value)}
           >
-            <option>Full Test</option>
-            <option>Part 1</option>
-            <option>Part 2</option>
-            <option>Part 3</option>
-            <option>Part 4</option>
+            <option>Mixed UK accents</option>
+            <option>British</option>
+            <option>Australian</option>
+            <option>North American</option>
+          </select>
+        </label>
+        <label className="block text-sm font-semibold">
+          Speaking pace
+          <select
+            className={fieldClass}
+            value={pace}
+            onChange={(event) => setPace(event.target.value)}
+          >
+            <option>Comfortable pace</option>
+            <option>Exam pace</option>
+            <option>Fast challenge</option>
           </select>
         </label>
       </div>
       <Button
         className="mt-7 w-full"
         size="lg"
-        onClick={simulate}
+        onClick={() => setReviewing(true)}
         disabled={!hasEnoughContent}
       >
-        <Sparkles className="size-4" /> Preview creation flow
+        <ClipboardList className="size-4" /> Review practice setup
       </Button>
       {!hasEnoughContent && (
         <p className="mt-2 text-center text-xs text-amber-700">
@@ -255,10 +459,30 @@ export function GenerationPreview() {
               </div>
               <div>
                 <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
-                  Format
+                  Practice
                 </dt>
-                <dd className="mt-1 font-semibold">{format}</dd>
+                <dd className="mt-1 font-semibold">{selectedFormat.label}</dd>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t pt-4">
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                  Style
+                </dt>
+                <dd className="mt-1 font-semibold">{listeningStyle}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                  Pace
+                </dt>
+                <dd className="mt-1 font-semibold">{pace}</dd>
+              </div>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Accent
+              </dt>
+              <dd className="mt-1 font-semibold">{accent}</dd>
             </div>
           </dl>
         </Card>
