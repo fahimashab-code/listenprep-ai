@@ -53,6 +53,21 @@ const practiceFormats = [
 
 type PracticeFormat = (typeof practiceFormats)[number]["value"];
 
+const listeningStyles = [
+  {
+    value: "Conversation",
+    label: "Conversation",
+    detail: "Two people speaking naturally",
+  },
+  {
+    value: "Solo talk",
+    label: "Solo talk",
+    detail: "One person explaining a topic",
+  },
+] as const;
+
+type ListeningStyle = (typeof listeningStyles)[number]["value"];
+
 export function GenerationPreview() {
   const [active, setActive] = useState(-1);
   const [source, setSource] = useState<"topic" | "text">("topic");
@@ -60,6 +75,10 @@ export function GenerationPreview() {
   const [sourceText, setSourceText] = useState("");
   const [difficulty, setDifficulty] = useState("Standard");
   const [format, setFormat] = useState<PracticeFormat>("Full Test");
+  const [listeningStyle, setListeningStyle] =
+    useState<ListeningStyle>("Conversation");
+  const [accent, setAccent] = useState("Mixed UK accents");
+  const [pace, setPace] = useState("Exam pace");
   const selectedFormat = practiceFormats.find((item) => item.value === format)!;
   const hasEnoughContent =
     source === "topic"
@@ -258,6 +277,59 @@ export function GenerationPreview() {
           })}
         </div>
       </fieldset>
+      <fieldset className="mt-6 border-t pt-6">
+        <legend className="text-sm font-semibold">Listening style</legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {listeningStyles.map((item) => {
+            const selected = listeningStyle === item.value;
+            return (
+              <button
+                key={item.value}
+                type="button"
+                aria-pressed={selected}
+                onClick={() => setListeningStyle(item.value)}
+                className={`rounded-lg border p-3 text-left transition-colors ${
+                  selected
+                    ? "border-primary bg-primary-soft"
+                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                }`}
+              >
+                <span className="block text-sm font-bold">{item.label}</span>
+                <span className="mt-0.5 block text-xs text-muted">
+                  {item.detail}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+      <div className="mt-5 grid gap-5 sm:grid-cols-2">
+        <label className="block text-sm font-semibold">
+          Accent
+          <select
+            className={fieldClass}
+            value={accent}
+            onChange={(event) => setAccent(event.target.value)}
+          >
+            <option>Mixed UK accents</option>
+            <option>British</option>
+            <option>Australian</option>
+            <option>North American</option>
+          </select>
+        </label>
+        <label className="block text-sm font-semibold">
+          Speaking pace
+          <select
+            className={fieldClass}
+            value={pace}
+            onChange={(event) => setPace(event.target.value)}
+          >
+            <option>Comfortable pace</option>
+            <option>Exam pace</option>
+            <option>Fast challenge</option>
+          </select>
+        </label>
+      </div>
       <Button
         className="mt-7 w-full"
         size="lg"
@@ -304,6 +376,26 @@ export function GenerationPreview() {
                 </dt>
                 <dd className="mt-1 font-semibold">{selectedFormat.label}</dd>
               </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 border-t pt-4">
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                  Style
+                </dt>
+                <dd className="mt-1 font-semibold">{listeningStyle}</dd>
+              </div>
+              <div>
+                <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                  Pace
+                </dt>
+                <dd className="mt-1 font-semibold">{pace}</dd>
+              </div>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Accent
+              </dt>
+              <dd className="mt-1 font-semibold">{accent}</dd>
             </div>
           </dl>
         </Card>
