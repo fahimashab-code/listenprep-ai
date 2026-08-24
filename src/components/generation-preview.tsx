@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowLeft,
   CheckCircle2,
   ClipboardList,
   FileText,
@@ -70,6 +71,7 @@ type ListeningStyle = (typeof listeningStyles)[number]["value"];
 
 export function GenerationPreview() {
   const [active, setActive] = useState(-1);
+  const [reviewing, setReviewing] = useState(false);
   const [source, setSource] = useState<"topic" | "text">("topic");
   const [topic, setTopic] = useState("Artificial Intelligence in Healthcare");
   const [sourceText, setSourceText] = useState("");
@@ -153,7 +155,10 @@ export function GenerationPreview() {
               <Button
                 variant="secondary"
                 className="flex-1"
-                onClick={() => setActive(-1)}
+                onClick={() => {
+                  setActive(-1);
+                  setReviewing(false);
+                }}
               >
                 Adjust setup
               </Button>
@@ -164,6 +169,88 @@ export function GenerationPreview() {
           </p>
         </div>
       </Card>
+    );
+  }
+
+  if (reviewing) {
+    return (
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
+        <Card className="overflow-hidden">
+          <div className="border-b bg-gradient-to-br from-primary-soft to-white p-5 sm:p-7">
+            <span className="grid size-11 place-items-center rounded-lg bg-white text-primary shadow-sm">
+              <ClipboardList className="size-5" />
+            </span>
+            <h3 className="mt-4 text-xl font-bold">Review your practice</h3>
+            <p className="mt-2 type-body-sm text-muted">
+              Check the choices below before opening the creation preview.
+            </p>
+          </div>
+          <dl className="grid gap-5 p-5 text-sm sm:grid-cols-2 sm:p-7">
+            <div className="sm:col-span-2">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Content
+              </dt>
+              <dd className="mt-1 break-words font-semibold">{sourceSummary}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Practice
+              </dt>
+              <dd className="mt-1 font-semibold">{selectedFormat.label}</dd>
+              <dd className="mt-1 text-xs text-muted">{selectedFormat.detail}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Difficulty
+              </dt>
+              <dd className="mt-1 font-semibold">{difficulty}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Listening style
+              </dt>
+              <dd className="mt-1 font-semibold">{listeningStyle}</dd>
+              <dd className="mt-1 text-xs text-muted">{accent}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">
+                Speaking pace
+              </dt>
+              <dd className="mt-1 font-semibold">{pace}</dd>
+            </div>
+          </dl>
+          <div className="flex flex-col-reverse gap-3 border-t bg-surface-subtle p-5 sm:flex-row sm:justify-end sm:p-7">
+            <Button variant="secondary" onClick={() => setReviewing(false)}>
+              <ArrowLeft className="size-4" />
+              Edit setup
+            </Button>
+            <Button onClick={simulate}>
+              <Sparkles className="size-4" />
+              Start preview
+            </Button>
+          </div>
+        </Card>
+
+        <Card className="p-5 lg:sticky lg:top-24">
+          <h3 className="font-bold">What the finished flow will include</h3>
+          <ul className="mt-4 space-y-3 text-sm text-muted">
+            {[
+              "A listening scenario based on your source",
+              "Questions matched to the selected practice part",
+              "Answers and score review after the attempt",
+            ].map((item) => (
+              <li key={item} className="flex items-start gap-2.5">
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 border-t pt-4 text-xs leading-5 text-subtle">
+            This remains a frontend preview. It does not create audio, questions,
+            or backend records.
+          </p>
+        </Card>
+      </div>
     );
   }
 
@@ -333,10 +420,10 @@ export function GenerationPreview() {
       <Button
         className="mt-7 w-full"
         size="lg"
-        onClick={simulate}
+        onClick={() => setReviewing(true)}
         disabled={!hasEnoughContent}
       >
-        <Sparkles className="size-4" /> Preview creation flow
+        <ClipboardList className="size-4" /> Review practice setup
       </Button>
       {!hasEnoughContent && (
         <p className="mt-2 text-center text-xs text-amber-700">
