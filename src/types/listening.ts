@@ -38,6 +38,8 @@ export interface ListeningQuestion {
   difficulty: Difficulty;
   wordLimit?: number;
   maxSelections?: number;
+  imageUrl?: string;
+  imageAlt?: string;
   transcriptEvidence?: {
     text: string;
     startSeconds?: number;

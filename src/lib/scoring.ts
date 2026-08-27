@@ -47,14 +47,47 @@ export function isAnswerCorrect(
   return normalizedProvided.some((value) => normalizedAccepted.includes(value));
 }
 
+export function questionSlotCount(question: ListeningQuestion) {
+  return question.type === "multiple_choice"
+    ? Math.max(1, question.maxSelections ?? 1)
+    : 1;
+}
+
+export function scoreQuestion(
+  question: ListeningQuestion,
+  answer?: UserAnswer,
+) {
+  if (question.maxSelections && question.maxSelections > 1) {
+    const provided = Array.isArray(answer) ? answer : answer ? [answer] : [];
+    const accepted = new Set(question.acceptedAnswers.map(normalizeAnswer));
+    return Math.min(
+      question.maxSelections,
+      new Set(provided.map((value) => normalizeAnswer(String(value))))
+        .size === 0
+        ? 0
+        : provided.filter((value, index) => {
+            const normalized = normalizeAnswer(String(value));
+            return (
+              provided.findIndex(
+                (item) => normalizeAnswer(String(item)) === normalized,
+              ) === index && accepted.has(normalized)
+            );
+          }).length,
+    );
+  }
+  return isAnswerCorrect(question, answer) ? 1 : 0;
+}
+
 export function calculateRawScore(
   test: ListeningTest,
   answers: Record<string, UserAnswer>,
 ) {
   return test.parts
     .flatMap((part) => part.questions)
-    .filter((question) => isAnswerCorrect(question, answers[question.id]))
-    .length;
+    .reduce(
+      (score, question) => score + scoreQuestion(question, answers[question.id]),
+      0,
+    );
 }
 
 // Practice estimate only. This mirrors commonly used IELTS Listening conversion
@@ -83,28 +116,33 @@ export function getResultBreakdown(
 
   const byPart = test.parts.map((part) => ({
     label: `Part ${part.partNumber}`,
-    score: part.questions.filter((question) =>
-      isAnswerCorrect(question, answers[question.id]),
-    ).length,
-    total: part.questions.length,
+    score: part.questions.reduce(
+      (score, question) => score + scoreQuestion(question, answers[question.id]),
+      0,
+    ),
+    total: part.questions.reduce(
+      (total, question) => total + questionSlotCount(question),
+      0,
+    ),
   }));
 
   const byTypeMap = new Map<string, { score: number; total: number }>();
   const bySkillMap = new Map<string, { score: number; total: number }>();
 
   questions.forEach((question) => {
-    const correct = isAnswerCorrect(question, answers[question.id]) ? 1 : 0;
+    const correct = scoreQuestion(question, answers[question.id]);
+    const slots = questionSlotCount(question);
     const type = byTypeMap.get(question.type) ?? { score: 0, total: 0 };
     byTypeMap.set(question.type, {
       score: type.score + correct,
-      total: type.total + 1,
+      total: type.total + slots,
     });
 
     question.skillTags.forEach((skill) => {
       const item = bySkillMap.get(skill) ?? { score: 0, total: 0 };
       bySkillMap.set(skill, {
         score: item.score + correct,
-        total: item.total + 1,
+        total: item.total + slots,
       });
     });
   });

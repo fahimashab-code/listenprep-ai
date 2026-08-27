@@ -22,6 +22,8 @@ import {
   estimateListeningBand,
   getResultBreakdown,
   isAnswerCorrect,
+  questionSlotCount,
+  scoreQuestion,
 } from "@/lib/scoring";
 import { loadAttempt } from "@/lib/storage";
 import { cn, formatQuestionType, formatSkill } from "@/lib/utils";
@@ -104,7 +106,7 @@ function ReviewCard({
               Correct answer
             </p>
             <p className="mt-1 font-bold text-green-950">
-              {question.acceptedAnswers[0]}
+              {question.acceptedAnswers.join(", ")}
             </p>
           </div>
         </div>
@@ -261,7 +263,9 @@ export function ResultView({
           (Array.isArray(answer)
             ? answer.length === 0
             : String(answer).trim() === "");
-        const correct = !unanswered && isAnswerCorrect(question, answer);
+        const correct =
+          !unanswered &&
+          scoreQuestion(question, answer) === questionSlotCount(question);
         if (filter === "incorrect") return !unanswered && !correct;
         if (filter === "correct") return correct;
         if (filter === "unanswered") return unanswered;
@@ -270,18 +274,19 @@ export function ResultView({
     [answers, filter, questions],
   );
 
-  const incorrectCount = questions.filter((question) => {
+  const answeredCount = questions.reduce((total, question) => {
     const answer = answers[question.id];
     return (
-      answer !== undefined &&
-      String(answer).trim() !== "" &&
-      !isAnswerCorrect(question, answer)
+      total +
+      (Array.isArray(answer)
+        ? Math.min(questionSlotCount(question), answer.filter(Boolean).length)
+        : String(answer ?? "").trim()
+          ? 1
+          : 0)
     );
-  }).length;
-  const unansweredCount = questions.filter((question) => {
-    const answer = answers[question.id];
-    return answer === undefined || String(answer).trim() === "";
-  }).length;
+  }, 0);
+  const incorrectCount = Math.max(0, answeredCount - calculatedScore);
+  const unansweredCount = Math.max(0, 40 - answeredCount);
 
   return (
     <div className="min-h-screen bg-surface-subtle">
