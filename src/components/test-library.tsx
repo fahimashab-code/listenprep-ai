@@ -10,11 +10,16 @@ import { loadAttempts } from "@/lib/storage";
 import type { PublishedTestSummary, TestAttempt } from "@/types/listening";
 
 function countAnswers(attempt: TestAttempt) {
-  return Object.values(attempt.answers).filter((answer) =>
-    Array.isArray(answer)
-      ? answer.length > 0
-      : String(answer ?? "").trim() !== "",
-  ).length;
+  return Object.values(attempt.answers).reduce(
+    (count, answer) =>
+      count +
+      (Array.isArray(answer)
+        ? answer.filter(Boolean).length
+        : String(answer ?? "").trim() !== ""
+          ? 1
+          : 0),
+    0,
+  );
 }
 
 export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
