@@ -13,24 +13,29 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { learnerAttemptService } from "@/lib/api/listenly-service";
 import { saveAttempt } from "@/lib/storage";
-import type { ListeningTest } from "@/types/listening";
+import type { ListeningTest, TestAttempt } from "@/types/listening";
 
 export function PreTestScreen({
   test,
   attemptId,
   mode,
   demoEnabled,
+  initialAttempt,
 }: {
   test: ListeningTest;
   attemptId: string;
   mode: "mock" | "practice";
   demoEnabled: boolean;
+  initialAttempt: TestAttempt;
 }) {
   const router = useRouter();
   const [checking, setChecking] = useState(false);
   const [checked, setChecked] = useState(false);
   const [volume, setVolume] = useState(70);
+  const [starting, setStarting] = useState(false);
+  const [startError, setStartError] = useState("");
 
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
@@ -43,22 +48,25 @@ export function PreTestScreen({
     return () => clearTimeout(timeout);
   }, [checking]);
 
-  function start() {
-    saveAttempt({
-      id: attemptId,
-      testId: test.id,
-      userId: "demo-alex",
-      mode,
+  async function start() {
+    setStarting(true);
+    setStartError("");
+    const attempt: TestAttempt = {
+      ...initialAttempt,
       status: "in_progress",
       phase: "part_preview",
-      answers: {},
-      markedForReview: [],
-      currentPart: 1,
-      startedAt: new Date().toISOString(),
-    });
-    const query = new URLSearchParams({ mode });
-    if (demoEnabled) query.set("demo", "true");
-    router.push(`/test/${attemptId}?${query.toString()}`);
+      startedAt: initialAttempt.startedAt ?? new Date().toISOString(),
+    };
+    try {
+      saveAttempt(attempt);
+      await learnerAttemptService.save(attempt);
+      const query = new URLSearchParams({ mode });
+      if (demoEnabled) query.set("demo", "true");
+      router.push(`/test/${attemptId}?${query.toString()}`);
+    } catch (reason) {
+      setStartError(reason instanceof Error ? reason.message : "The test could not be started.");
+      setStarting(false);
+    }
   }
 
   return (
@@ -184,13 +192,14 @@ export function PreTestScreen({
               </p>
             )}
             <div className="mt-6 border-t pt-5">
+              {startError && <p className="mb-3 text-sm font-semibold text-red-700">{startError}</p>}
               <Button
                 size="lg"
                 className="w-full"
-                onClick={start}
-                disabled={!checked}
+                onClick={() => void start()}
+                disabled={!checked || starting}
               >
-                <ShieldCheck className="size-4" /> Start Listening Test
+                <ShieldCheck className="size-4" /> {starting ? "Starting…" : "Start Listening Test"}
               </Button>
               <p className="mt-3 text-center text-xs leading-5 text-subtle">
                 {checked

@@ -40,6 +40,7 @@ import {
   SIMULATED_PART_SECONDS,
 } from "@/config/demo";
 import { calculateRawScore, estimateListeningBand } from "@/lib/scoring";
+import { learnerAttemptService } from "@/lib/api/listenly-service";
 import { loadAttempt, saveAttempt } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import type {
@@ -74,13 +75,14 @@ function partLabel(partNumber: number) {
 export function ExamInterface({
   test,
   attemptId,
-  requestedMode,
   demoEnabled,
+  initialAttempt: loadedAttempt,
 }: {
   test: ListeningTest;
   attemptId: string;
   requestedMode: "mock" | "practice";
   demoEnabled: boolean;
+  initialAttempt: TestAttempt;
 }) {
   const router = useRouter();
   const previewDuration = demoEnabled
@@ -89,20 +91,7 @@ export function ExamInterface({
   const reviewDuration = demoEnabled
     ? DEMO_FINAL_REVIEW_SECONDS
     : PRODUCTION_FINAL_REVIEW_SECONDS;
-  const initialAttempt: TestAttempt = {
-    id: attemptId,
-    testId: test.id,
-    userId: "demo-alex",
-    mode: requestedMode,
-    status: "in_progress",
-    phase: "part_preview",
-    answers: {},
-    markedForReview: [],
-    currentPart: 1,
-    startedAt: new Date().toISOString(),
-  };
-
-  const [attempt, setAttempt] = useState<TestAttempt>(initialAttempt);
+  const [attempt, setAttempt] = useState<TestAttempt>(loadedAttempt);
   const attemptRef = useRef(attempt);
   const submittingRef = useRef(false);
   const questionRefs = useRef<Record<string, HTMLElement | null>>({});
@@ -116,6 +105,7 @@ export function ExamInterface({
   const [exitOpen, setExitOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
   const [practiceReviewOpen, setPracticeReviewOpen] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [activeQuestionId, setActiveQuestionId] = useState(
     test.parts[0].questions[0].id,
   );
@@ -174,7 +164,14 @@ export function ExamInterface({
   useEffect(() => {
     if (!hydrated) return;
     saveAttempt(attempt);
-    const timeout = window.setTimeout(() => setSaved(true), 350);
+    const timeout = window.setTimeout(() => {
+      learnerAttemptService.save(attempt)
+        .then(() => { setSaved(true); setSaveError(""); })
+        .catch((reason: unknown) => {
+          setSaved(false);
+          setSaveError(reason instanceof Error ? reason.message : "Your progress could not be saved.");
+        });
+    }, 500);
     return () => window.clearTimeout(timeout);
   }, [attempt, hydrated]);
 
@@ -259,7 +256,7 @@ export function ExamInterface({
     submitOpen,
   ]);
 
-  const submitAttempt = useCallback(() => {
+  const submitAttempt = useCallback(async () => {
     if (submittingRef.current) return;
     submittingRef.current = true;
     const current = attemptRef.current;
@@ -273,7 +270,14 @@ export function ExamInterface({
       estimatedBand: estimateListeningBand(rawScore),
     };
     saveAttempt(completed);
-    router.push(`/results/${attemptId}`);
+    try {
+      const result = await learnerAttemptService.submit(current);
+      saveAttempt(result);
+      router.push(`/results/${attemptId}`);
+    } catch (reason) {
+      submittingRef.current = false;
+      setSaveError(reason instanceof Error ? reason.message : "The attempt could not be submitted.");
+    }
   }, [attemptId, router, test]);
 
   useEffect(() => {
@@ -286,7 +290,7 @@ export function ExamInterface({
       ).getTime();
       const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
       setReviewSeconds(remaining);
-      if (remaining === 0) submitAttempt();
+      if (remaining === 0) void submitAttempt();
     }
 
     updateReviewTimer();
@@ -535,7 +539,7 @@ export function ExamInterface({
             )}
 
             <div className="flex items-center gap-2">
-              <span className="hidden items-center gap-1.5 text-xs text-muted sm:flex">
+              <span className={`hidden items-center gap-1.5 text-xs sm:flex ${saveError ? "text-red-700" : "text-muted"}`} title={saveError || undefined}>
                 <Save className="size-3.5" />
                 {saved ? "Saved" : "Saving…"}
               </span>
@@ -919,7 +923,7 @@ export function ExamInterface({
               >
                 Review answers
               </Button>
-              <Button className="flex-1" onClick={submitAttempt}>
+              <Button className="flex-1" onClick={() => void submitAttempt()}>
                 {unansweredCount > 0 ? "Submit anyway" : "Submit test"}
               </Button>
             </div>

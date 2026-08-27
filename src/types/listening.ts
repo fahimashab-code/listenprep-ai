@@ -81,6 +81,22 @@ export interface ListeningTest {
   status?: "not_started" | "in_progress" | "completed";
   previousScore?: number;
   parts: ListeningPart[];
+  source?: "official" | "community";
+  visibility?: "official" | "public" | "private";
+  publishedAt?: string;
+}
+
+export interface PublishedTestSummary {
+  id: string;
+  title: string;
+  description: string;
+  estimatedDurationMinutes: number;
+  questionCount: number;
+  difficulty: Difficulty;
+  source?: "official" | "community";
+  visibility?: "official" | "public" | "private";
+  publishedAt?: string;
+  parts: Array<Pick<ListeningPart, "partNumber" | "title" | "context" | "speakerCount">>;
 }
 
 export interface TestAttempt {
@@ -98,6 +114,10 @@ export interface TestAttempt {
   completedAt?: string;
   rawScore?: number;
   estimatedBand?: number;
+}
+
+export interface AttemptWithReview extends TestAttempt {
+  reviewTest?: ListeningTest;
 }
 
 export interface PracticeExercise {

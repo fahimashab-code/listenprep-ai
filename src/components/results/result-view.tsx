@@ -32,6 +32,7 @@ import {
 import type {
   ListeningQuestion,
   ListeningTest,
+  TestAttempt,
   UserAnswer,
 } from "@/types/listening";
 
@@ -194,11 +195,14 @@ function ReviewCard({
 export function ResultView({
   test,
   attemptId,
+  initialAttempt,
 }: {
   test: ListeningTest;
   attemptId: string;
+  initialAttempt: TestAttempt;
 }) {
   const [answers, setAnswers] = useState<Record<string, UserAnswer>>(() => {
+    if (initialAttempt.status === "completed") return initialAttempt.answers;
     const demoAnswersByNumber = new Map(
       mockTestOne.parts.flatMap((part) =>
         part.questions.map((question) => [
@@ -227,8 +231,9 @@ export function ResultView({
     return () => window.cancelAnimationFrame(frame);
   }, [attemptId]);
 
-  const score = calculateRawScore(test, answers);
-  const band = estimateListeningBand(score);
+  const calculatedScore = calculateRawScore(test, answers);
+  const score = initialAttempt.rawScore ?? calculatedScore;
+  const band = initialAttempt.estimatedBand ?? estimateListeningBand(score);
   const breakdown = getResultBreakdown(test, answers);
   const weakestPart = breakdown.byPart.reduce((weakest, item) =>
     item.score / item.total < weakest.score / weakest.total ? item : weakest,
