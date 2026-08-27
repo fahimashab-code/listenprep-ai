@@ -1,12 +1,4 @@
-import { notFound } from "next/navigation";
-import { PreTestScreen } from "@/components/listening/pre-test-screen";
-import { listeningTests } from "@/mock-data/listening-tests";
-
-export function generateStaticParams() {
-  return listeningTests.map((test) => ({
-    attemptId: `${test.id}-demo-attempt`,
-  }));
-}
+import { AttemptRouteLoader } from "@/components/attempt-route-loader";
 
 export default async function SetupPage({
   params,
@@ -14,14 +6,12 @@ export default async function SetupPage({
 }: PageProps<"/test/[attemptId]/setup">) {
   const { attemptId } = await params;
   const query = await searchParams;
-  const test = listeningTests.find((item) => attemptId.startsWith(item.id));
-  if (!test) notFound();
   const mode = query.mode === "practice" ? "practice" : "mock";
   return (
-    <PreTestScreen
-      test={test}
+    <AttemptRouteLoader
       attemptId={attemptId}
-      mode={mode}
+      view="setup"
+      requestedMode={mode}
       demoEnabled={query.demo === "true"}
     />
   );

@@ -5,8 +5,9 @@ import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { loadAttempt } from "@/lib/storage";
-import type { ListeningTest, TestAttempt } from "@/types/listening";
+import { learnerAttemptService } from "@/lib/api/listenly-service";
+import { loadAttempts } from "@/lib/storage";
+import type { PublishedTestSummary, TestAttempt } from "@/types/listening";
 
 function countAnswers(attempt: TestAttempt) {
   return Object.values(attempt.answers).filter((answer) =>
@@ -16,21 +17,22 @@ function countAnswers(attempt: TestAttempt) {
   ).length;
 }
 
-export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
+export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
   const [attempts, setAttempts] = useState<Record<string, TestAttempt>>({});
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      setAttempts(
-        Object.fromEntries(
-          tests.flatMap((test) => {
-            const attempt = loadAttempt(`${test.id}-demo-attempt`);
-            return attempt ? [[test.id, attempt]] : [];
-          }),
-        ),
-      );
+    let active = true;
+    learnerAttemptService.list().then((items) => {
+      const source = items.length > 0 ? items : loadAttempts();
+      const latest = new Map<string, TestAttempt>();
+      source.forEach((attempt) => {
+        if (!latest.has(attempt.testId)) latest.set(attempt.testId, attempt);
+      });
+      if (active) setAttempts(Object.fromEntries(latest));
+    }).catch(() => {
+      if (active) setAttempts(Object.fromEntries(loadAttempts().map((attempt) => [attempt.testId, attempt])));
     });
-    return () => window.cancelAnimationFrame(frame);
+    return () => { active = false; };
   }, [tests]);
 
   return (
@@ -88,7 +90,7 @@ export function TestLibrary({ tests }: { tests: ListeningTest[] }) {
             <h3 className="mt-1 text-xl font-bold">{test.title}</h3>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
               <span className="flex items-center gap-2">
-                <FileCheck2 className="size-4" /> 40 questions
+                <FileCheck2 className="size-4" /> {test.questionCount} questions
               </span>
               <span>4 Parts</span>
               <span className="flex items-center gap-2">
