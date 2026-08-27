@@ -1,9 +1,10 @@
 "use client";
 
-import { Save } from "lucide-react";
+import { Monitor, Moon, Save, Sun } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { useTheme, type ThemePreference } from "@/components/theme-provider";
 
 export function ProfileForm({
   userName,
@@ -13,6 +14,7 @@ export function ProfileForm({
   userEmail: string;
 }) {
   const [saved, setSaved] = useState(false);
+  const { preference, setPreference } = useTheme();
   const fieldClass =
     "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
 
@@ -60,6 +62,28 @@ export function ProfileForm({
             Exam date <span className="font-normal text-subtle">(optional)</span>
             <input className={fieldClass} type="date" defaultValue="2026-10-17" />
           </label>
+        </div>
+      </Card>
+
+      <Card className="p-5 sm:p-6 lg:col-span-2">
+        <h3 className="text-lg font-bold">Appearance</h3>
+        <p className="mt-2 type-body-sm text-muted">Choose a theme for this browser. System follows your device setting.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-3">
+          {([
+            ["system", "System", Monitor],
+            ["light", "Light", Sun],
+            ["dark", "Dark", Moon],
+          ] as const).map(([value, label, Icon]) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setPreference(value as ThemePreference)}
+              className={`flex items-center gap-3 rounded-lg border p-4 text-left text-sm font-semibold ${preference === value ? "border-primary bg-primary-soft text-primary" : "bg-surface hover:bg-surface-subtle"}`}
+              aria-pressed={preference === value}
+            >
+              <Icon className="size-5" /> {label}
+            </button>
+          ))}
         </div>
       </Card>
 

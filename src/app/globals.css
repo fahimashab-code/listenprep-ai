@@ -18,6 +18,38 @@
   --shadow-elevated: 0 18px 48px rgba(23, 61, 37, 0.12);
 }
 
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --background: #0f1712;
+  --surface: #18211b;
+  --surface-subtle: #202a23;
+  --foreground: #edf5ef;
+  --text-muted: #b3c1b7;
+  --text-subtle: #95a59a;
+  --primary: #70d594;
+  --primary-strong: #9ae6b4;
+  --primary-hover: #8de2aa;
+  --primary-active: #a8ebbd;
+  --primary-soft: #203d2b;
+  --border: #34423a;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.2), 0 8px 24px rgba(0, 0, 0, 0.16);
+  --shadow-elevated: 0 18px 48px rgba(0, 0, 0, 0.34);
+}
+
+:root[data-theme="dark"] .bg-white {
+  background-color: var(--surface);
+}
+
+:root[data-theme="dark"] .bg-white\/90,
+:root[data-theme="dark"] .bg-white\/95 {
+  background-color: color-mix(in srgb, var(--surface) 94%, transparent);
+}
+
+:root[data-theme="dark"] .hover\:bg-gray-100:hover,
+:root[data-theme="dark"] .hover\:bg-gray-50:hover {
+  background-color: var(--surface-subtle);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);

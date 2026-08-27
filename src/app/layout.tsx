@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { AmplifyProvider } from "@/components/auth/amplify-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 const geist = Geist({
@@ -21,9 +22,9 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={`${geist.variable} h-full antialiased`}>
+    <html lang="en" className={`${geist.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full font-sans">
-        <AmplifyProvider>{children}</AmplifyProvider>
+        <AmplifyProvider><ThemeProvider>{children}</ThemeProvider></AmplifyProvider>
       </body>
     </html>
   );

@@ -81,6 +81,7 @@ export function GenerationPreview() {
     useState<ListeningStyle>("Conversation");
   const [accent, setAccent] = useState("Mixed UK accents");
   const [pace, setPace] = useState("Exam pace");
+  const [visibility, setVisibility] = useState<"private" | "public">("private");
   const selectedFormat = practiceFormats.find((item) => item.value === format)!;
   const hasEnoughContent =
     source === "topic"
@@ -217,6 +218,10 @@ export function GenerationPreview() {
                 Speaking pace
               </dt>
               <dd className="mt-1 font-semibold">{pace}</dd>
+            </div>
+            <div className="border-t pt-4 sm:col-span-2">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">Visibility</dt>
+              <dd className="mt-1 font-semibold">{visibility === "private" ? "Only me" : "Public after review"}</dd>
             </div>
           </dl>
           <div className="flex flex-col-reverse gap-3 border-t bg-surface-subtle p-5 sm:flex-row sm:justify-end sm:p-7">
@@ -417,6 +422,26 @@ export function GenerationPreview() {
           </select>
         </label>
       </div>
+      <fieldset className="mt-6 border-t pt-6">
+        <legend className="text-sm font-semibold">Who can use this practice?</legend>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          {[
+            ["private", "Only me", "Keep it in your own practice library."],
+            ["public", "Public", "Share it after content review and safety checks."],
+          ].map(([value, label, detail]) => (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={visibility === value}
+              onClick={() => setVisibility(value as "private" | "public")}
+              className={`rounded-lg border p-3 text-left ${visibility === value ? "border-primary bg-primary-soft" : "bg-surface hover:bg-surface-subtle"}`}
+            >
+              <span className="block text-sm font-bold">{label}</span>
+              <span className="mt-0.5 block text-xs text-muted">{detail}</span>
+            </button>
+          ))}
+        </div>
+      </fieldset>
       <Button
         className="mt-7 w-full"
         size="lg"
@@ -483,6 +508,10 @@ export function GenerationPreview() {
                 Accent
               </dt>
               <dd className="mt-1 font-semibold">{accent}</dd>
+            </div>
+            <div className="border-t pt-4">
+              <dt className="text-xs font-bold uppercase tracking-wide text-subtle">Visibility</dt>
+              <dd className="mt-1 font-semibold">{visibility === "private" ? "Only me" : "Public after review"}</dd>
             </div>
           </dl>
         </Card>
