@@ -42,6 +42,20 @@ export type SignInResult =
   | { status: "reset-password"; email: string }
   | { status: "additional-step"; message: string };
 
+function isAlreadyAuthenticatedError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.name === "UserAlreadyAuthenticatedException"
+  );
+}
+
+async function signInWithCredentials(email: string, password: string) {
+  return signIn({
+    username: email,
+    password,
+  });
+}
+
 export async function registerUser(input: {
   name: string;
   email: string;
@@ -87,10 +101,28 @@ export async function loginUser(
 ): Promise<SignInResult> {
   requireAuthConfiguration();
   const normalizedEmail = email.trim().toLowerCase();
-  const output = await signIn({
-    username: normalizedEmail,
-    password,
-  });
+  let output;
+
+  try {
+    output = await signInWithCredentials(normalizedEmail, password);
+  } catch (error) {
+    if (!isAlreadyAuthenticatedError(error)) {
+      throw error;
+    }
+
+    try {
+      const session = await fetchAuthSession({ forceRefresh: true });
+      if (session.tokens?.accessToken && session.tokens.idToken) {
+        return { status: "signed-in" };
+      }
+    } catch {
+      // The stored refresh token is no longer usable. Clear the local session
+      // below so the submitted credentials can start a clean sign-in.
+    }
+
+    await signOut();
+    output = await signInWithCredentials(normalizedEmail, password);
+  }
 
   if (output.isSignedIn || output.nextStep.signInStep === "DONE") {
     return { status: "signed-in" };

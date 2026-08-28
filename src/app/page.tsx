@@ -9,7 +9,6 @@ import {
   Headphones,
   Map,
   MessageSquareText,
-  Play,
   ShieldCheck,
   Target,
 } from "lucide-react";
@@ -47,7 +46,7 @@ export default function Home() {
               Sign in
             </ButtonLink>
             <ButtonLink href="/register" size="sm">
-              Start Full Mock
+              Create account
             </ButtonLink>
           </nav>
           <ButtonLink href="/login" size="sm" className="md:hidden">
@@ -73,16 +72,16 @@ export default function Home() {
                 exactly what to practise next.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/login" size="lg">
+                <ButtonLink href="/register" size="lg">
                   Start Full Mock <ArrowRight className="size-4" />
                 </ButtonLink>
-                <ButtonLink href="/tests/mock-01" variant="secondary" size="lg">
-                  <Play className="size-4" /> View Listening Mock 01
+                <ButtonLink href="/tests" variant="secondary" size="lg">
+                  <ClipboardCheck className="size-4" /> Browse published tests
                 </ButtonLink>
               </div>
               <p className="mt-5 flex items-center gap-2 text-sm text-muted">
                 <Check className="size-4 text-primary" />
-                Original IELTS-style practice content. No card required.
+                Original practice content. No payment card required.
               </p>
               <div className="mt-7 grid max-w-xl grid-cols-3 gap-3">
                 {[
@@ -109,49 +108,47 @@ export default function Home() {
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-[#67ae79] to-[#c6e6cf]" />
                 <div className="flex items-start justify-between border-b pb-5">
                   <div>
-                    <div className="mb-2 flex items-center gap-2">
-                      <span className="size-2 rounded-full bg-primary" />
-                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">
-                        Full mock complete
-                      </p>
-                    </div>
-                    <h2 className="mt-1 text-xl font-bold">
-                      Listening Mock 05
-                    </h2>
+                    <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary">
+                      Before you begin
+                    </p>
+                    <h2 className="mt-2 text-xl font-bold">A clear listening test flow</h2>
                   </div>
                   <span className="grid size-11 place-items-center rounded-xl border border-[#cae5d1] bg-primary-soft text-primary shadow-sm">
                     <Headphones className="size-5" />
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-6 py-6">
-                  <div>
-                    <p className="text-sm text-muted">Listening score</p>
-                    <p className="mt-1 text-3xl font-bold">31 / 40</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted">Estimated band</p>
-                    <p className="mt-1 text-3xl font-bold text-primary">7.0</p>
-                  </div>
+                <div className="space-y-3 py-6">
+                  {[
+                    {
+                      icon: Headphones,
+                      title: "Check your audio",
+                      text: "Confirm your headphones and volume first.",
+                    },
+                    {
+                      icon: ClipboardCheck,
+                      title: "Complete all four parts",
+                      text: "Answer 40 questions with your progress saved.",
+                    },
+                    {
+                      icon: FileCheck2,
+                      title: "Review your result",
+                      text: "See your real score only after submission.",
+                    },
+                  ].map(({ icon: Icon, title, text }) => (
+                    <div key={title} className="flex items-start gap-3 rounded-xl bg-surface-subtle p-4">
+                      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
+                        <Icon className="size-4" />
+                      </span>
+                      <div>
+                        <p className="font-bold">{title}</p>
+                        <p className="mt-1 text-sm text-muted">{text}</p>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="rounded-xl border border-[#e6ece7] bg-surface-subtle p-4">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="font-semibold">Recent progress</span>
-                    <span className="font-bold text-primary">+4 questions</span>
-                  </div>
-                  <div className="mt-4 flex h-16 items-end gap-2">
-                    {[44, 54, 62, 74, 84].map((height, index) => (
-                      <div
-                        key={height}
-                        className="flex-1 rounded-t bg-gradient-to-t from-primary to-[#9bd1a9]"
-                        style={{ height: `${height}%` }}
-                        aria-label={`Test ${index + 1} score trend`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="mt-5 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
-                  <span className="text-amber-900">Weakest question type</span>
-                  <strong className="text-amber-900">Multiple Choice</strong>
+                <div className="flex items-center gap-2 rounded-lg border border-primary/20 bg-primary-soft px-4 py-3 text-sm font-semibold text-primary-strong">
+                  <Check className="size-4" />
+                  Results are based on your completed answers
                 </div>
               </Card>
             </div>
@@ -199,7 +196,7 @@ export default function Home() {
                   What you can practise
                 </p>
                 <h2 className="type-marketing-title mt-3">
-                  Every Part. Every common question format.
+                  Every part and common question formats.
                 </h2>
               </div>
               <p className="type-body-sm max-w-md text-muted">
@@ -307,7 +304,7 @@ export default function Home() {
               size="lg"
               className="mt-7"
             >
-              Start with demo account <ArrowRight className="size-4" />
+              Create your account <ArrowRight className="size-4" />
             </ButtonLink>
           </div>
         </section>

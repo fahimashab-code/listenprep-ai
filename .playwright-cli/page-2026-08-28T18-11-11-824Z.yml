@@ -1,0 +1,27 @@
+- generic [active] [ref=f3e1]:
+  - generic [ref=f3e2]:
+    - generic [ref=f3e3]:
+      - banner [ref=f3e4]:
+        - generic [ref=f3e5]:
+          - button "Open navigation" [ref=f3e6]
+          - heading "History" [level=1] [ref=f3e8]
+        - generic [ref=f3e9]:
+          - button "Use dark theme" [ref=f3e10]
+          - button "F" [ref=f3e14]
+      - main [ref=f3e16]:
+        - generic [ref=f3e18]:
+          - heading "Listening History" [level=2] [ref=f3e19]
+          - paragraph [ref=f3e20]: Open completed tests to review your answers and results.
+        - generic [ref=f3e21]: Loading your history…
+    - navigation "Mobile navigation" [ref=f3e22]:
+      - link "Home" [ref=f3e23] [cursor=pointer]:
+        - /url: /dashboard
+      - link "Tests" [ref=f3e27] [cursor=pointer]:
+        - /url: /tests
+      - link "Practice" [ref=f3e31] [cursor=pointer]:
+        - /url: /practice
+      - link "Create Practice" [ref=f3e35] [cursor=pointer]:
+        - /url: /generate
+      - link "History" [ref=f3e39] [cursor=pointer]:
+        - /url: /history
+  - button "Open Next.js Dev Tools" [ref=f3e49] [cursor=pointer]

@@ -150,7 +150,7 @@ export function GenerationPreview() {
           </div>
           {done && (
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/tests/mock-01" className="flex-1">
+              <ButtonLink href="/tests" className="flex-1">
                 Open sample practice
               </ButtonLink>
               <Button

@@ -41,8 +41,8 @@ export function ScoreChart({
             tick={{ fill: "var(--text-subtle)", fontSize: 13 }}
           />
           <YAxis
-            domain={[20, 40]}
-            ticks={[20, 25, 30, 35, 40]}
+            domain={[0, 40]}
+            ticks={[0, 10, 20, 30, 40]}
             axisLine={false}
             tickLine={false}
             tick={{ fill: "var(--text-subtle)", fontSize: 13 }}
@@ -52,6 +52,8 @@ export function ScoreChart({
             contentStyle={{
               border: "1px solid var(--border)",
               borderRadius: "10px",
+              background: "var(--surface)",
+              color: "var(--foreground)",
               boxShadow: "0 8px 24px rgba(23,32,26,.08)",
             }}
             formatter={(value) => [`${value} / 40`, "Score"]}

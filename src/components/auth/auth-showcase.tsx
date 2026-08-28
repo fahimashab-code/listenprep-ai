@@ -6,12 +6,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-const parts = [
-  { label: "Part 1", progress: "100%" },
-  { label: "Part 2", progress: "76%" },
-  { label: "Part 3", progress: "48%" },
-  { label: "Part 4", progress: "24%" },
-];
+const parts = ["Part 1", "Part 2", "Part 3", "Part 4"];
 
 export function AuthShowcase() {
   return (
@@ -45,9 +40,9 @@ export function AuthShowcase() {
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
-                  Full mock progress
+                  Full mock structure
                 </p>
-                <p className="mt-1 text-lg font-bold">Listening Mock 01</p>
+                <p className="mt-1 text-lg font-bold">4 parts · 40 questions</p>
               </div>
               <span className="grid size-11 place-items-center rounded-xl bg-primary text-white shadow-[0_8px_20px_rgba(23,107,58,0.24)]">
                 <Headphones className="size-5" aria-hidden="true" />
@@ -55,21 +50,9 @@ export function AuthShowcase() {
             </div>
 
             <div className="mt-6 grid grid-cols-4 gap-2">
-              {parts.map((part, index) => (
-                <div key={part.label}>
-                  <div className="h-1.5 overflow-hidden rounded-full bg-[#dde6df]">
-                    <div
-                      className="h-full rounded-full bg-primary"
-                      style={{ width: part.progress }}
-                    />
-                  </div>
-                  <p
-                    className={`mt-2 text-[11px] font-semibold ${
-                      index === 0 ? "text-primary" : "text-muted"
-                    }`}
-                  >
-                    {part.label}
-                  </p>
+              {parts.map((part) => (
+                <div key={part} className="rounded-lg bg-primary-soft px-2 py-2 text-center">
+                  <p className="text-[11px] font-semibold text-primary">{part}</p>
                 </div>
               ))}
             </div>
@@ -91,7 +74,7 @@ export function AuthShowcase() {
                   )}
                 </div>
                 <p className="mt-1 text-xs font-semibold text-muted">
-                  Part 2 · Questions 11–20
+                  Clear part and question position
                 </p>
               </div>
               <span className="flex items-center gap-1.5 text-xs font-semibold text-muted">
@@ -107,7 +90,7 @@ export function AuthShowcase() {
                 </span>
                 Progress saved automatically
               </span>
-              <span className="text-sm font-bold text-primary">18 / 40</span>
+              <span className="text-sm font-bold text-primary">Resume safely</span>
             </div>
           </div>
         </div>
