@@ -1,0 +1,145 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - link "Listenly home" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e9]: Listenly
+      - navigation [ref=e10]:
+        - link "Practice" [ref=e11] [cursor=pointer]:
+          - /url: "#practice"
+        - link "How it works" [ref=e12] [cursor=pointer]:
+          - /url: "#how-it-works"
+        - link "Test structure" [ref=e13] [cursor=pointer]:
+          - /url: "#structure"
+        - link "Sign in" [ref=e14] [cursor=pointer]:
+          - /url: /login
+        - link "Create account" [ref=e15] [cursor=pointer]:
+          - /url: /register
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: Full IELTS Listening practice
+        - heading "Take a Full IELTS Listening Mock." [level=1] [ref=e21]
+        - paragraph [ref=e22]: Complete all 4 Parts and 40 questions in a focused, real-test-style experience. Then review your mistakes and know exactly what to practise next.
+        - generic [ref=e23]:
+          - link "Start Full Mock" [ref=e24] [cursor=pointer]:
+            - /url: /register
+          - link "Browse published tests" [ref=e27] [cursor=pointer]:
+            - /url: /tests
+        - paragraph [ref=e32]: Original practice content. No payment card required.
+        - generic [ref=e35]:
+          - generic [ref=e36]:
+            - paragraph [ref=e41]: 4 Parts
+            - paragraph [ref=e42]: Complete format
+          - generic [ref=e43]:
+            - paragraph [ref=e48]: 40 Questions
+            - paragraph [ref=e49]: Full mock
+          - generic [ref=e50]:
+            - paragraph [ref=e54]: ~30 min
+            - paragraph [ref=e55]: Realistic timing
+      - generic [ref=e59]:
+        - generic [ref=e62]:
+          - paragraph [ref=e63]: Before you begin
+          - heading "A clear listening test flow" [level=2] [ref=e64]
+        - generic [ref=e68]:
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: Check your audio
+            - paragraph [ref=e75]: Confirm your headphones and volume first.
+          - generic [ref=e82]:
+            - paragraph [ref=e83]: Complete all four parts
+            - paragraph [ref=e84]: Answer 40 questions with your progress saved.
+          - generic [ref=e91]:
+            - paragraph [ref=e92]: Review your result
+            - paragraph [ref=e93]: See your real score only after submission.
+        - generic [ref=e94]: Results are based on your completed answers
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - paragraph [ref=e99]: A simple improvement loop
+        - heading "Practise. Understand. Improve." [level=2] [ref=e100]
+      - generic [ref=e101]:
+        - generic [ref=e102]:
+          - generic [ref=e103]: "01"
+          - heading "Practice" [level=3] [ref=e104]
+          - paragraph [ref=e105]: Take a full IELTS-style Listening test or focus on one Part.
+        - generic [ref=e108]:
+          - generic [ref=e109]: "02"
+          - heading "Understand" [level=3] [ref=e110]
+          - paragraph [ref=e111]: See exactly which questions you missed, with transcript evidence and explanations.
+        - generic [ref=e114]:
+          - generic [ref=e115]: "03"
+          - heading "Improve" [level=3] [ref=e116]
+          - paragraph [ref=e117]: Practise your weak question types and track progress over time.
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - paragraph [ref=e124]: What you can practise
+          - heading "Every part and common question formats." [level=2] [ref=e125]
+        - paragraph [ref=e126]: Start with a realistic mock or use a short focused session when you have less time.
+      - generic [ref=e127]:
+        - generic [ref=e134]:
+          - heading "Full Listening Mock" [level=3] [ref=e135]
+          - paragraph [ref=e136]: 40 questions · 4 Parts
+        - generic [ref=e143]:
+          - heading "Part 1" [level=3] [ref=e144]
+          - paragraph [ref=e145]: Social conversation
+        - generic [ref=e152]:
+          - heading "Part 2" [level=3] [ref=e153]
+          - paragraph [ref=e154]: Social monologue
+        - generic [ref=e162]:
+          - heading "Part 3" [level=3] [ref=e163]
+          - paragraph [ref=e164]: Educational discussion
+        - generic [ref=e171]:
+          - heading "Part 4" [level=3] [ref=e172]
+          - paragraph [ref=e173]: Academic monologue
+        - generic [ref=e182]:
+          - heading "Question Types" [level=3] [ref=e183]
+          - paragraph [ref=e184]: Focused skill practice
+        - generic [ref=e191]:
+          - generic [ref=e192]:
+            - heading "Custom Practice" [level=3] [ref=e193]
+            - generic [ref=e194]: Coming soon
+          - paragraph [ref=e195]: Topic-led listening practice
+    - generic [ref=e196]:
+      - generic [ref=e197]:
+        - paragraph [ref=e198]: IELTS Listening structure
+        - heading "Build confidence across all four Parts." [level=2] [ref=e199]
+        - paragraph [ref=e200]: Difficulty generally increases from an everyday conversation to an academic monologue.
+        - generic [ref=e201]:
+          - generic [ref=e202]:
+            - generic [ref=e203]: Full mock
+            - strong [ref=e204]: 40 questions
+          - generic [ref=e205]:
+            - generic [ref=e206]: Mock Exam audio
+            - strong [ref=e207]: Played once
+      - generic [ref=e208]:
+        - generic [ref=e209]:
+          - generic [ref=e210]: "1"
+          - text: Part 1
+          - heading "Social conversation" [level=3] [ref=e211]
+          - paragraph [ref=e212]: Everyday booking, services, travel
+        - generic [ref=e213]:
+          - generic [ref=e214]: "2"
+          - text: Part 2
+          - heading "Social monologue" [level=3] [ref=e215]
+          - paragraph [ref=e216]: Community places, tours, facilities
+        - generic [ref=e217]:
+          - generic [ref=e218]: "3"
+          - text: Part 3
+          - heading "Educational discussion" [level=3] [ref=e219]
+          - paragraph [ref=e220]: Students, tutors, training
+        - generic [ref=e221]:
+          - generic [ref=e222]: "4"
+          - text: Part 4
+          - heading "Academic monologue" [level=3] [ref=e223]
+          - paragraph [ref=e224]: Lecture-style presentation
+    - generic [ref=e226]:
+      - heading "Take your first full Listening mock" [level=2] [ref=e227]
+      - paragraph [ref=e228]: Discover what you already do well and what to practise next.
+      - generic [ref=e229]: Focused practice · Clear feedback · No distractions
+      - link "Create your account" [ref=e233] [cursor=pointer]:
+        - /url: /login
+  - contentinfo [ref=e236]:
+    - generic [ref=e237]:
+      - link "Listenly home" [ref=e238] [cursor=pointer]:
+        - /url: /
+      - paragraph [ref=e242]: IELTS-style practice. Not affiliated with IELTS, Cambridge, British Council or IDP.
