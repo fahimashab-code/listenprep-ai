@@ -9,9 +9,11 @@ import {
   Home,
   LogOut,
   Menu,
+  Moon,
   PanelLeftClose,
   PanelLeftOpen,
   Sparkles,
+  Sun,
   UserRound,
   X,
 } from "lucide-react";
@@ -19,6 +21,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Brand } from "@/components/brand";
+import { useTheme } from "@/components/theme-provider";
 import { logoutUser } from "@/lib/auth/client";
 import { cn } from "@/lib/utils";
 
@@ -65,7 +68,7 @@ function NavLink({
         collapsed && "justify-center px-0",
         active
           ? "bg-primary-soft text-primary"
-          : "text-muted hover:bg-[#f0f3f1] hover:text-ink",
+          : "text-muted hover:bg-surface-subtle hover:text-ink",
       )}
       aria-current={active ? "page" : undefined}
       aria-label={collapsed ? label : undefined}
@@ -92,6 +95,8 @@ export function AppShell({
   const [userOpen, setUserOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+  const { preference, setPreference } = useTheme();
+  const darkTheme = preference === "dark";
   const rootPath = `/${pathname.split("/")[1]}`;
   const title =
     titles[rootPath] ??
@@ -155,7 +160,7 @@ export function AppShell({
           title={sidebarCollapsed ? `${displayName} · ${userEmail}` : undefined}
         >
           {sidebarCollapsed ? (
-            <span className="grid size-9 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
+            <span className="grid size-9 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
               {initial}
             </span>
           ) : (
@@ -178,7 +183,7 @@ export function AppShell({
             <div className="flex items-center justify-between">
               <Brand href="/dashboard" />
               <button
-                className="grid size-10 place-items-center rounded-lg hover:bg-gray-100"
+                className="grid size-10 place-items-center rounded-lg hover:bg-surface-subtle"
                 onClick={() => setMobileOpen(false)}
                 aria-label="Close menu"
               >
@@ -214,7 +219,7 @@ export function AppShell({
                 type="button"
                 onClick={handleSignOut}
                 disabled={signingOut}
-                className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-muted hover:bg-[#f0f3f1] hover:text-ink disabled:opacity-50"
+                className="flex h-11 w-full items-center gap-3 rounded-lg px-3 text-sm font-semibold text-muted hover:bg-surface-subtle hover:text-ink disabled:opacity-50"
               >
                 <LogOut className="size-[18px]" aria-hidden="true" />
                 {signingOut ? "Signing out…" : "Sign out"}
@@ -241,32 +246,46 @@ export function AppShell({
             </button>
             <h1 className="text-lg font-bold sm:text-xl">{title}</h1>
           </div>
-          <div className="relative">
+          <div className="flex items-center gap-1">
             <button
               type="button"
-              className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-gray-100"
-              onClick={() => setUserOpen((value) => !value)}
-              aria-expanded={userOpen}
-              aria-haspopup="menu"
+              onClick={() => setPreference(darkTheme ? "light" : "dark")}
+              className="grid size-10 place-items-center rounded-lg text-muted hover:bg-surface-subtle hover:text-ink"
+              aria-label={darkTheme ? "Use light theme" : "Use dark theme"}
+              title={darkTheme ? "Use light theme" : "Use dark theme"}
             >
-              <span className="grid size-8 place-items-center rounded-full bg-[#dff1e4] text-sm font-bold text-primary">
-                {initial}
-              </span>
-              <span className="hidden max-w-36 truncate text-sm font-semibold md:inline">
-                {displayName}
-              </span>
-              <ChevronDown
-                className={cn(
-                  "hidden size-4 text-gray-500 transition-transform md:inline",
-                  userOpen && "rotate-180",
-                )}
-              />
+              {darkTheme ? (
+                <Sun className="size-5" />
+              ) : (
+                <Moon className="size-5" />
+              )}
             </button>
-            {userOpen && (
-              <div
-                className="absolute right-0 mt-2 w-48 rounded-xl border bg-white p-1.5 shadow-lg"
-                role="menu"
+            <div className="relative">
+              <button
+                type="button"
+                className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-surface-subtle"
+                onClick={() => setUserOpen((value) => !value)}
+                aria-expanded={userOpen}
+                aria-haspopup="menu"
               >
+                <span className="grid size-8 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
+                  {initial}
+                </span>
+                <span className="hidden max-w-36 truncate text-sm font-semibold md:inline">
+                  {displayName}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    "hidden size-4 text-muted transition-transform md:inline",
+                    userOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {userOpen && (
+                <div
+                  className="absolute right-0 mt-2 w-48 rounded-xl border bg-white p-1.5 shadow-lg"
+                  role="menu"
+                >
                 {[
                   { href: "/progress", label: "Progress", icon: BarChart3 },
                   { href: "/profile", label: "Profile", icon: UserRound },
@@ -292,8 +311,9 @@ export function AppShell({
                   <LogOut className="size-4" aria-hidden="true" />
                   {signingOut ? "Signing out…" : "Sign out"}
                 </button>
-              </div>
-            )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
         <main className="mx-auto max-w-[1280px] px-4 py-6 pb-24 sm:px-6 lg:px-8 lg:py-8">

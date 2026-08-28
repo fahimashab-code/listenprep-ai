@@ -25,7 +25,7 @@ export default function TestsPage() {
     <>
       <PageHeading
         title="Listening Mock Tests"
-        description="Choose a complete 4-Part, 40-question Listening mock. Use Mock Test for real-test-style conditions or Practice to learn at your own pace."
+        description="Choose a published 4-part, 40-question listening test. Review the format, then start in test or practice mode."
       />
       {loading ? (
         <Card className="p-8 text-center text-muted">Loading published tests…</Card>

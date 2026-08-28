@@ -292,8 +292,8 @@ export function ExamInterface({
   useEffect(() => {
     if (!currentPart.audioUrl) {
       audioRef.current = null;
-      setAudioDuration(0);
-      return;
+      const frame = window.requestAnimationFrame(() => setAudioDuration(0));
+      return () => window.cancelAnimationFrame(frame);
     }
     const audio = new Audio(currentPart.audioUrl);
     audio.preload = "metadata";
