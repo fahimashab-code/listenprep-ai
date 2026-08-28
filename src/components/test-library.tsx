@@ -58,15 +58,15 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
             key={test.id}
             className={`group relative overflow-hidden p-5 hover:-translate-y-1 hover:shadow-lg sm:p-6 ${
               index === 0
-                ? "border-[#9fc8aa] shadow-[0_10px_30px_rgba(23,79,48,.07)]"
-                : "hover:border-[#b9d4c0]"
+                ? "border-primary/30 shadow-[0_10px_30px_rgba(23,79,48,.07)]"
+                : "hover:border-primary/30"
             }`}
           >
             {index === 0 && (
               <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-[#8ac69a]" />
             )}
             <div className="flex items-start justify-between gap-4">
-              <span className="grid size-11 place-items-center rounded-xl border border-[#d4e8d9] bg-primary-soft text-primary transition-transform group-hover:scale-105">
+              <span className="grid size-11 place-items-center rounded-xl border border-primary/20 bg-primary-soft text-primary transition-transform group-hover:scale-105">
                 <Headphones className="size-5" />
               </span>
               <div className="flex flex-wrap justify-end gap-2">

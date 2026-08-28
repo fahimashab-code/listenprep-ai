@@ -8,10 +8,10 @@ import { cn } from "@/lib/utils";
 
 const variants = {
   primary:
-    "bg-primary text-white shadow-[0_5px_14px_rgba(23,107,58,.18)] hover:-translate-y-px hover:bg-primary-hover hover:shadow-[0_7px_18px_rgba(23,107,58,.22)] active:translate-y-0 active:bg-primary-active",
+    "bg-primary text-primary-contrast shadow-[0_5px_14px_rgba(23,107,58,.18)] hover:-translate-y-px hover:bg-primary-hover hover:shadow-[0_7px_18px_rgba(23,107,58,.22)] active:translate-y-0 active:bg-primary-active",
   secondary:
-    "border border-[#cfd8d1] bg-white text-ink shadow-sm hover:-translate-y-px hover:border-[#8fa394] hover:bg-[#f7faf8] hover:shadow-md active:translate-y-0",
-  ghost: "text-muted hover:bg-[#edf2ee] hover:text-ink",
+    "border border-border bg-surface text-ink shadow-sm hover:-translate-y-px hover:border-primary/50 hover:bg-surface-subtle hover:shadow-md active:translate-y-0",
+  ghost: "text-muted hover:bg-surface-subtle hover:text-ink",
   danger:
     "border border-red-200 bg-white text-red-700 hover:bg-red-50",
 };
