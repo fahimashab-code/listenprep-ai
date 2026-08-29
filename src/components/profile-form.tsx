@@ -16,7 +16,7 @@ export function ProfileForm({
   const [saved, setSaved] = useState(false);
   const { preference, setPreference } = useTheme();
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border bg-surface px-3 text-base leading-6 text-ink outline-none focus:border-primary focus:ring-3 focus:ring-primary/15";
 
   return (
     <form

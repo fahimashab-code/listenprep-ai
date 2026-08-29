@@ -47,7 +47,7 @@ export default function PracticePage() {
         title="Practice Listening Skills"
         description="Use a short, focused exercise to improve the skill that is currently costing you the most marks."
       />
-      <Card className="overflow-hidden border-[#bddbc5]">
+      <Card className="overflow-hidden border-primary/35">
         <div className="grid lg:grid-cols-[1fr_280px]">
           <div className="p-6 sm:p-8">
             <Badge variant="green">Recommended for you</Badge>

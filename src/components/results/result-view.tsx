@@ -58,7 +58,7 @@ function ReviewCard({
 
   return (
     <details
-      className="group rounded-xl border bg-white shadow-[var(--shadow-card)] transition-[border-color,box-shadow] hover:border-[#bdd5c3] hover:shadow-md"
+      className="group rounded-xl border bg-surface shadow-[var(--shadow-card)] transition-[border-color,box-shadow] hover:border-primary/35 hover:shadow-md"
       open={defaultOpen}
     >
       <summary className="flex cursor-pointer list-none items-center gap-4 p-5 sm:p-6">
@@ -68,7 +68,7 @@ function ReviewCard({
             correct
               ? "bg-green-50 text-green-700"
               : unanswered
-                ? "bg-gray-100 text-gray-600"
+                ? "bg-surface-subtle text-muted"
                 : "bg-red-50 text-red-700",
           )}
         >
@@ -91,7 +91,7 @@ function ReviewCard({
       </summary>
       <div className="border-t px-5 pb-6 pt-5 sm:px-6">
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg bg-[#f4f6f4] p-4">
+          <div className="rounded-lg bg-surface-subtle p-4">
             <p className="text-xs font-semibold text-muted">Your answer</p>
             <p className="mt-1 font-bold">
               {unanswered
@@ -290,7 +290,7 @@ export function ResultView({
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <header className="sticky top-0 z-30 border-b bg-white/90 backdrop-blur-xl">
+      <header className="sticky top-0 z-30 border-b bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
           <ButtonLink href="/dashboard" variant="ghost" size="sm">
             <ArrowLeft className="size-4" /> Home
@@ -305,7 +305,7 @@ export function ResultView({
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-        <Card className="overflow-hidden border-[#a8cdb1] shadow-[0_18px_48px_rgba(23,79,48,.1)]">
+        <Card className="overflow-hidden border-primary/40 shadow-[0_18px_48px_rgba(23,79,48,.1)]">
           <div className="grid lg:grid-cols-[1fr_330px]">
             <div className="p-6 sm:p-8">
               <div className="flex items-center gap-3">
@@ -372,7 +372,7 @@ export function ResultView({
             {breakdown.byPart.map((item) => (
               <Card
                 key={item.label}
-                className="group p-5 hover:-translate-y-0.5 hover:border-[#b5d2bc] hover:shadow-md"
+                className="group p-5 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
               >
                 <div className="flex items-center justify-between">
                   <h3 className="font-bold">{item.label}</h3>
@@ -404,7 +404,7 @@ export function ResultView({
           </div>
         </section>
 
-        <details className="group mt-6 rounded-xl border bg-white shadow-[var(--shadow-card)] open:border-[#b7d2be]">
+        <details className="group mt-6 rounded-xl border bg-surface shadow-[var(--shadow-card)] open:border-primary/35">
           <summary className="flex cursor-pointer list-none items-center justify-between p-5 font-bold sm:p-6">
             View detailed analysis
             <ChevronDown className="size-5 text-subtle transition-transform group-open:rotate-180" />
@@ -478,7 +478,7 @@ export function ResultView({
           </div>
         </details>
 
-        <Card className="mt-6 border-[#a9ceb3] bg-gradient-to-br from-white to-primary-soft/60 p-5 shadow-md sm:p-6">
+        <Card className="mt-6 border-primary/35 bg-gradient-to-br from-surface to-primary-soft/60 p-5 shadow-md sm:p-6">
           <div className="flex gap-4">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
               <BookOpenCheck className="size-5" />
@@ -509,7 +509,7 @@ export function ResultView({
               </p>
               <h2 className="type-section-title mt-1">Question review</h2>
             </div>
-            <div className="flex gap-1 overflow-x-auto rounded-lg border bg-white p-1">
+            <div className="flex gap-1 overflow-x-auto rounded-lg border bg-surface p-1">
               {[
                 ["all", `All · 40`],
                 ["incorrect", `Incorrect · ${incorrectCount}`],
@@ -523,7 +523,7 @@ export function ResultView({
                     "whitespace-nowrap rounded-md px-3 py-2 text-xs font-bold",
                     filter === value
                       ? "bg-primary-soft text-primary"
-                      : "text-muted hover:bg-gray-50",
+                      : "text-muted hover:bg-surface-subtle",
                   )}
                 >
                   {label}

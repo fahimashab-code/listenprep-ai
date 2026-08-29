@@ -16,7 +16,7 @@ export function ResetPasswordForm({ initialEmail }: { initialEmail: string }) {
   const [submitting, setSubmitting] = useState(false);
 
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border border-[#cfd8d1] bg-white px-3 text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border border-border bg-surface px-3 text-base leading-6 text-ink outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-primary/15";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -49,7 +49,7 @@ export function ResetPasswordForm({ initialEmail }: { initialEmail: string }) {
       {error && (
         <div
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+          className="rounded-lg border border-danger-border bg-danger-soft px-3 py-2.5 text-sm text-danger"
         >
           {error}
         </div>

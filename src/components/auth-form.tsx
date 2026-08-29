@@ -137,7 +137,7 @@ export function AuthForm({
   }
 
   const fieldClass = cn(
-    "mt-1.5 w-full border border-[#cfd8d1] bg-white text-base leading-6 outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-green-100",
+    "mt-1.5 w-full border border-border bg-surface text-base leading-6 text-ink outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-primary/15",
     mode === "login"
       ? "h-14 rounded-2xl px-4"
       : "h-11 rounded-lg px-3",
@@ -148,7 +148,7 @@ export function AuthForm({
       {formError && (
         <div
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+          className="rounded-lg border border-danger-border bg-danger-soft px-3 py-2.5 text-sm text-danger"
         >
           {formError}
         </div>
@@ -196,7 +196,7 @@ export function AuthForm({
           />
           <button
             type="button"
-            className="absolute right-1 top-2 grid size-9 place-items-center rounded-md text-gray-500 hover:bg-gray-100"
+            className="absolute right-1 top-2 grid size-9 place-items-center rounded-md text-muted hover:bg-surface-subtle hover:text-ink"
             onClick={() => setShowPassword((value) => !value)}
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
@@ -254,9 +254,9 @@ export function AuthForm({
       {authEnv.googleEnabled && (
         <>
           <div className="flex items-center gap-3 py-1 text-xs text-subtle">
-            <span className="h-px flex-1 bg-[#e0e5e1]" />
+            <span className="h-px flex-1 bg-border" />
             or
-            <span className="h-px flex-1 bg-[#e0e5e1]" />
+            <span className="h-px flex-1 bg-border" />
           </div>
           <Button
             type="button"

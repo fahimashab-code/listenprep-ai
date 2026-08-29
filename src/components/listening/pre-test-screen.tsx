@@ -71,10 +71,10 @@ export function PreTestScreen({
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <header className="border-b bg-white">
+      <header className="border-b bg-surface">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-lg bg-primary text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-primary text-primary-contrast">
               <Headphones className="size-5" />
             </span>
             <span className="font-bold">{test.title}</span>

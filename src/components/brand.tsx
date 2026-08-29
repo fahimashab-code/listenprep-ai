@@ -20,7 +20,7 @@ export function Brand({
       )}
       aria-label="Listenly home"
     >
-      <span className="grid size-9 place-items-center rounded-lg bg-primary text-white">
+      <span className="grid size-9 place-items-center rounded-lg bg-primary text-primary-contrast">
         <Headphones className="size-5" aria-hidden="true" />
       </span>
       {!compact && <span className="text-xl">Listenly</span>}

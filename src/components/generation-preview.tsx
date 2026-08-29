@@ -107,7 +107,7 @@ export function GenerationPreview() {
     return (
       <Card className="mx-auto max-w-2xl overflow-hidden">
         <div className="border-b bg-gradient-to-br from-primary-soft to-white p-6 text-center sm:p-8">
-          <span className="mx-auto grid size-14 place-items-center rounded-xl bg-white text-primary shadow-sm">
+          <span className="mx-auto grid size-14 place-items-center rounded-xl bg-surface text-primary shadow-sm">
             {done ? (
               <CheckCircle2 className="size-7" />
             ) : (
@@ -178,7 +178,7 @@ export function GenerationPreview() {
       <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
         <Card className="overflow-hidden">
           <div className="border-b bg-gradient-to-br from-primary-soft to-white p-5 sm:p-7">
-            <span className="grid size-11 place-items-center rounded-lg bg-white text-primary shadow-sm">
+            <span className="grid size-11 place-items-center rounded-lg bg-surface text-primary shadow-sm">
               <ClipboardList className="size-5" />
             </span>
             <h3 className="mt-4 text-xl font-bold">Review your practice</h3>
@@ -260,7 +260,7 @@ export function GenerationPreview() {
   }
 
   const fieldClass =
-    "mt-1.5 h-11 w-full rounded-lg border bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100";
+    "mt-1.5 h-11 w-full rounded-lg border bg-surface px-3 text-base leading-6 text-ink outline-none focus:border-primary focus:ring-3 focus:ring-primary/15";
   return (
     <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
       <Card className="p-5 sm:p-7">
@@ -291,7 +291,7 @@ export function GenerationPreview() {
             onClick={() => setSource(value as "topic" | "text")}
             className={`rounded-md px-3 py-2.5 text-sm font-semibold ${
               source === value
-                ? "bg-white text-primary shadow-sm"
+                ? "bg-surface text-primary shadow-sm"
                 : "text-muted hover:text-ink"
             }`}
           >
@@ -317,7 +317,7 @@ export function GenerationPreview() {
           <label className="block text-sm font-semibold">
             Source text
             <textarea
-              className="mt-1.5 min-h-36 w-full rounded-lg border bg-white p-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100"
+              className="mt-1.5 min-h-36 w-full rounded-lg border bg-surface p-3 text-base leading-6 text-ink outline-none focus:border-primary focus:ring-3 focus:ring-primary/15"
               value={sourceText}
               onChange={(event) => setSourceText(event.target.value)}
               placeholder="Paste at least a short paragraph to base the practice on."
@@ -357,7 +357,7 @@ export function GenerationPreview() {
                 className={`rounded-lg border p-3 text-left transition-colors ${
                   selected
                     ? "border-primary bg-primary-soft"
-                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                    : "bg-surface hover:border-primary/35 hover:bg-surface-subtle"
                 } ${item.value === "Full Test" ? "sm:col-span-2" : ""}`}
               >
                 <span className="block text-sm font-bold">{item.label}</span>
@@ -383,7 +383,7 @@ export function GenerationPreview() {
                 className={`rounded-lg border p-3 text-left transition-colors ${
                   selected
                     ? "border-primary bg-primary-soft"
-                    : "bg-white hover:border-[#a8b8ac] hover:bg-surface-subtle"
+                    : "bg-surface hover:border-primary/35 hover:bg-surface-subtle"
                 }`}
               >
                 <span className="block text-sm font-bold">{item.label}</span>
@@ -516,7 +516,7 @@ export function GenerationPreview() {
           </dl>
         </Card>
 
-        <Card className="border-[#cfe3d5] bg-primary-soft/60 p-5">
+        <Card className="border-primary/25 bg-primary-soft/60 p-5">
           <div className="flex items-start gap-3">
             <LockKeyhole className="mt-0.5 size-4 shrink-0 text-primary" />
             <div>

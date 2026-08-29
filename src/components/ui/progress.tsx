@@ -13,7 +13,7 @@ export function Progress({
 }) {
   return (
     <div
-      className={cn("h-2 overflow-hidden rounded-full bg-[#e8ede9]", className)}
+      className={cn("h-2 overflow-hidden rounded-full bg-surface-subtle", className)}
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}

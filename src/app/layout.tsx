@@ -9,6 +9,8 @@ const geist = Geist({
   subsets: ["latin"],
 });
 
+const themeScript = `(function(){try{var saved=localStorage.getItem("listenly-theme");var dark=saved==="dark"||(saved!=="light"&&window.matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.dataset.theme=dark?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}})();`;
+
 export const metadata: Metadata = {
   title: {
     default: "Listenly — IELTS Listening Practice",
@@ -28,6 +30,9 @@ export default function RootLayout({
       data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className="min-h-full font-sans">
         <AmplifyProvider><ThemeProvider>{children}</ThemeProvider></AmplifyProvider>
       </body>

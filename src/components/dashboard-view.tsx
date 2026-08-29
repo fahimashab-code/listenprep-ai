@@ -54,7 +54,7 @@ export function DashboardView() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="w-fit rounded-full border bg-white px-4 py-2 text-sm shadow-sm">
+          <div className="w-fit rounded-full border bg-surface px-4 py-2 text-sm shadow-sm">
             <span className="text-muted">Target band</span>{" "}
             <strong className="text-primary">8.0</strong>
           </div>
@@ -65,7 +65,7 @@ export function DashboardView() {
         </div>
       </div>
 
-      <Card className="overflow-hidden border-[#9fc8aa] shadow-[0_16px_42px_rgba(23,79,48,.09)]">
+      <Card className="overflow-hidden border-primary/40 shadow-[0_16px_42px_rgba(23,79,48,.09)]">
         <div className="grid lg:grid-cols-[1fr_320px]">
           <div className="p-6 sm:p-8">
             <Badge variant="green">
@@ -144,7 +144,7 @@ export function DashboardView() {
       </Card>
 
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card className="group p-5 hover:-translate-y-0.5 hover:border-[#b9d4c0] hover:shadow-lg sm:p-6">
+        <Card className="group p-5 hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-lg sm:p-6">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-sm font-semibold text-muted">
@@ -191,7 +191,7 @@ export function DashboardView() {
         </Card>
       </section>
 
-      <Card className="overflow-hidden p-5 hover:border-[#b9d4c0] hover:shadow-md sm:p-6">
+      <Card className="overflow-hidden p-5 hover:border-primary/35 hover:shadow-md sm:p-6">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div>
             <p className="text-sm font-semibold text-muted">Recent scores</p>

@@ -2,10 +2,10 @@ import type { HTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
 
 const variants = {
-  green: "border-green-200 bg-green-50 text-green-800",
-  gray: "border-gray-200 bg-gray-50 text-gray-700",
-  amber: "border-amber-200 bg-amber-50 text-amber-800",
-  red: "border-red-200 bg-red-50 text-red-700",
+  green: "border-primary/25 bg-primary-soft text-primary-strong",
+  gray: "border-border bg-surface-subtle text-muted",
+  amber: "border-warning-border bg-warning-soft text-warning",
+  red: "border-danger-border bg-danger-soft text-danger",
 };
 
 export function Badge({

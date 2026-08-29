@@ -72,7 +72,7 @@ export function ProgressView() {
           )}
 
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <Card className="border-primary/30 bg-primary-strong p-5 text-white">
+            <Card className="border-primary/30 bg-brand-panel p-5 text-brand-panel-contrast">
               <p className="text-sm font-semibold text-white/70">Latest estimated band</p>
               <p className="mt-3 text-4xl font-bold">
                 {typeof latest.estimatedBand === "number"

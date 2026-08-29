@@ -28,8 +28,8 @@ const practiceCards = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 border-b border-[#edf0ed] bg-white/90 backdrop-blur-xl">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 border-b bg-surface/90 backdrop-blur-xl">
         <div className="mx-auto flex h-[72px] max-w-[1180px] items-center justify-between px-5 sm:px-8">
           <Brand />
           <nav className="hidden items-center gap-7 text-sm font-semibold text-muted md:flex">
@@ -91,7 +91,7 @@ export default function Home() {
                 ].map(({ label, text, icon: Icon }) => (
                   <div
                     key={label}
-                    className="rounded-xl border border-white/80 bg-white/70 p-3 shadow-sm backdrop-blur"
+                    className="rounded-xl border bg-surface/80 p-3 shadow-sm backdrop-blur"
                   >
                     <Icon className="size-4 text-primary" aria-hidden="true" />
                     <p className="mt-2 text-sm font-bold">{label}</p>
@@ -102,9 +102,9 @@ export default function Home() {
             </div>
 
             <div className="relative mx-auto w-full max-w-[470px]">
-              <div className="absolute -left-8 -top-8 size-44 rounded-full bg-[#d7eddd] blur-sm" />
-              <div className="absolute -bottom-8 -right-8 size-36 rounded-full bg-[#e8f2e9]" />
-              <Card className="relative overflow-hidden border-white/80 p-6 shadow-[var(--shadow-elevated)] sm:p-8">
+              <div className="absolute -left-8 -top-8 size-44 rounded-full bg-primary-soft blur-sm" />
+              <div className="absolute -bottom-8 -right-8 size-36 rounded-full bg-primary-soft" />
+              <Card className="relative overflow-hidden p-6 shadow-[var(--shadow-elevated)] sm:p-8">
                 <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary via-[#67ae79] to-[#c6e6cf]" />
                 <div className="flex items-start justify-between border-b pb-5">
                   <div>
@@ -113,7 +113,7 @@ export default function Home() {
                     </p>
                     <h2 className="mt-2 text-xl font-bold">A clear listening test flow</h2>
                   </div>
-                  <span className="grid size-11 place-items-center rounded-xl border border-[#cae5d1] bg-primary-soft text-primary shadow-sm">
+                  <span className="grid size-11 place-items-center rounded-xl border border-primary/25 bg-primary-soft text-primary shadow-sm">
                     <Headphones className="size-5" />
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export default function Home() {
             ].map(([number, title, text]) => (
               <Card
                 key={title}
-                className="group relative overflow-hidden p-6 hover:-translate-y-1 hover:border-[#b4d4bc] hover:shadow-lg"
+                className="group relative overflow-hidden p-6 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
               >
                 <span className="grid size-9 place-items-center rounded-full bg-primary-soft text-sm font-bold text-primary">
                   {number}
@@ -208,7 +208,7 @@ export default function Home() {
               {practiceCards.map(([title, text, Icon]) => (
                 <Card
                   key={String(title)}
-                  className="group flex items-center gap-4 p-5 hover:-translate-y-1 hover:border-[#a9c8b1] hover:shadow-lg"
+                  className="group flex items-center gap-4 p-5 hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg"
                 >
                   <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
                     <Icon className="size-5" />
@@ -221,7 +221,7 @@ export default function Home() {
                 </Card>
               ))}
               <Card className="flex items-center gap-4 border-dashed p-5">
-                <span className="grid size-11 place-items-center rounded-lg bg-[#eef0ee] text-subtle">
+                <span className="grid size-11 place-items-center rounded-lg bg-surface-subtle text-subtle">
                   <Map className="size-5" />
                 </span>
                 <div>
@@ -273,7 +273,7 @@ export default function Home() {
             ].map(([part, title, text]) => (
               <Card
                 key={part}
-                className="group relative overflow-hidden p-5 hover:-translate-y-0.5 hover:border-[#a9c8b1] hover:shadow-md"
+                className="group relative overflow-hidden p-5 hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md"
               >
                 <span className="absolute -right-1 -top-5 text-7xl font-black text-primary/[0.045]">
                   {part.replace("Part ", "")}
@@ -310,7 +310,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t bg-white">
+      <footer className="border-t bg-surface">
         <div className="mx-auto flex max-w-[1180px] flex-col gap-4 px-5 py-8 text-sm text-muted sm:px-8 md:flex-row md:items-center md:justify-between">
           <Brand compact />
           <p>

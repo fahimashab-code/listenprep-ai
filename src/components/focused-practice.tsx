@@ -42,7 +42,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
           <ArrowLeft className="size-4" /> Practice home
         </ButtonLink>
         <Card className="mt-4 overflow-hidden">
-          <div className="bg-primary-strong p-7 text-white sm:p-9">
+          <div className="bg-brand-panel p-7 text-brand-panel-contrast sm:p-9">
             <Badge className="border-white/20 bg-white/10 text-white">
               Focused practice complete
             </Badge>
@@ -148,7 +148,7 @@ export function FocusedPractice({ slug }: { slug: string }) {
         </div>
       </Card>
 
-      <div className="sticky top-16 z-10 mt-6 rounded-xl border bg-white/95 p-4 shadow-sm backdrop-blur">
+      <div className="sticky top-16 z-10 mt-6 rounded-xl border bg-surface/95 p-4 shadow-sm backdrop-blur">
         <div className="flex items-center justify-between text-sm">
           <span className="font-semibold">
             {Object.keys(answers).filter((key) => answers[key] !== "").length} of{" "}

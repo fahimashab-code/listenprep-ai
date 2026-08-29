@@ -501,7 +501,7 @@ export function ExamInterface({
 
   if (attempt.phase === "part_preview") {
     return (
-      <div className="grid min-h-screen place-items-center bg-primary-strong px-5 text-white">
+      <div className="grid min-h-screen place-items-center bg-brand-panel px-5 text-brand-panel-contrast">
         <div className="w-full max-w-xl text-center">
           <Badge className="border-white/20 bg-white/10 text-white">
             {attempt.mode === "mock" ? "Mock Test" : "Practice"}
@@ -554,7 +554,7 @@ export function ExamInterface({
   if (attempt.phase === "part_transition") {
     const nextPart = test.parts[attempt.currentPart];
     return (
-      <div className="grid min-h-screen place-items-center bg-primary-strong px-5 text-white">
+      <div className="grid min-h-screen place-items-center bg-brand-panel px-5 text-brand-panel-contrast">
         <div className="max-w-xl text-center">
           <span className="mx-auto grid size-14 place-items-center rounded-full bg-white/10">
             <Check className="size-7" />
@@ -592,7 +592,7 @@ export function ExamInterface({
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <header className="sticky top-0 z-30 border-b bg-white">
+      <header className="sticky top-0 z-30 border-b bg-surface">
         <div className="mx-auto max-w-[1440px] px-4 sm:px-6">
           <div className="flex min-h-16 items-center justify-between gap-4 py-2">
             <div>
@@ -687,7 +687,7 @@ export function ExamInterface({
                 </Button>
               )}
               <button
-                className="grid size-9 place-items-center rounded-lg border text-muted hover:bg-gray-50"
+                className="grid size-9 place-items-center rounded-lg border text-muted hover:bg-surface-subtle hover:text-ink"
                 onClick={() => setExitOpen(true)}
                 aria-label="Exit test"
               >
@@ -785,7 +785,7 @@ export function ExamInterface({
                       <Card
                         className={cn(
                           "p-5 sm:p-6",
-                          answered && "border-[#bfd8c5]",
+                          answered && "border-primary/30",
                           activeQuestionId === question.id &&
                             "ring-2 ring-primary/30",
                           marked && "border-amber-300",
@@ -819,7 +819,7 @@ export function ExamInterface({
                         ) : null}
 
                         <div className="flex gap-4">
-                          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#edf3ee] text-sm font-bold text-ink">
+                          <span className="grid size-8 shrink-0 place-items-center rounded-full bg-surface-subtle text-sm font-bold text-ink">
                             {questionSlotCount(question) > 1
                               ? `${question.number}–${lastQuestionNumber(question)}`
                               : question.number}
@@ -837,7 +837,7 @@ export function ExamInterface({
                                   "flex h-9 shrink-0 items-center gap-1.5 rounded-lg border px-2.5 text-xs font-bold",
                                   marked
                                     ? "border-amber-300 bg-amber-50 text-amber-900"
-                                    : "text-muted hover:bg-gray-50",
+                                    : "text-muted hover:bg-surface-subtle",
                                 )}
                               >
                                 <Flag
@@ -975,11 +975,11 @@ export function ExamInterface({
                     className={cn(
                       "relative grid aspect-square place-items-center rounded-md border text-xs font-bold",
                       answered &&
-                        "border-[#b9d8c1] bg-primary-soft text-primary",
+                        "border-primary/30 bg-primary-soft text-primary",
                       available &&
                         !answered &&
-                        "border-[#789881] bg-white text-ink",
-                      !available && "bg-gray-50 text-gray-400",
+                        "border-border bg-surface text-ink",
+                      !available && "bg-surface-subtle text-subtle",
                       current &&
                         "border-primary ring-2 ring-primary ring-offset-1",
                       marked && "rounded-tr-none border-amber-400",
@@ -991,7 +991,7 @@ export function ExamInterface({
                   >
                     {number}
                     {answered && (
-                      <CheckCircle2 className="absolute -bottom-1 -right-1 size-3.5 rounded-full bg-white text-primary" />
+                      <CheckCircle2 className="absolute -bottom-1 -right-1 size-3.5 rounded-full bg-surface text-primary" />
                     )}
                     {marked && (
                       <Flag className="absolute -right-1 -top-1 size-3.5 fill-amber-400 text-amber-700" />
@@ -1006,7 +1006,7 @@ export function ExamInterface({
                 Answered
               </p>
               <p className="flex items-center gap-2">
-                <span className="size-3 rounded-sm border border-[#789881] bg-white" />
+                <span className="size-3 rounded-sm border border-border bg-surface" />
                 Unanswered
               </p>
               <p className="flex items-center gap-2">

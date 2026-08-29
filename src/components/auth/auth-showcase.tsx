@@ -36,7 +36,7 @@ export function AuthShowcase() {
 
       <div className="relative z-10 mx-10 my-10 max-w-xl xl:mx-16">
         <div className="rounded-[1.75rem] border border-white/15 bg-white/[0.09] p-4 shadow-[0_30px_80px_rgba(0,0,0,0.22)] backdrop-blur-md xl:p-5">
-          <div className="rounded-[1.35rem] bg-[#f8fbf9] p-5 text-ink shadow-xl xl:p-6">
+          <div className="rounded-[1.35rem] bg-surface p-5 text-ink shadow-xl xl:p-6">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
@@ -44,7 +44,7 @@ export function AuthShowcase() {
                 </p>
                 <p className="mt-1 text-lg font-bold">4 parts · 40 questions</p>
               </div>
-              <span className="grid size-11 place-items-center rounded-xl bg-primary text-white shadow-[0_8px_20px_rgba(23,107,58,0.24)]">
+              <span className="grid size-11 place-items-center rounded-xl bg-primary text-primary-contrast shadow-[0_8px_20px_rgba(23,107,58,0.24)]">
                 <Headphones className="size-5" aria-hidden="true" />
               </span>
             </div>
@@ -57,7 +57,7 @@ export function AuthShowcase() {
               ))}
             </div>
 
-            <div className="mt-6 flex items-center gap-4 rounded-xl border border-[#dce7df] bg-white p-4">
+            <div className="mt-6 flex items-center gap-4 rounded-xl border bg-surface-subtle p-4">
               <span className="grid size-10 shrink-0 place-items-center rounded-full bg-primary-soft text-primary">
                 <AudioLines className="size-5" aria-hidden="true" />
               </span>
@@ -83,9 +83,9 @@ export function AuthShowcase() {
               </span>
             </div>
 
-            <div className="mt-4 flex items-center justify-between rounded-xl bg-[#eef7f0] px-4 py-3">
+            <div className="mt-4 flex items-center justify-between rounded-xl bg-primary-soft px-4 py-3">
               <span className="flex items-center gap-2 text-sm font-semibold text-primary-strong">
-                <span className="grid size-5 place-items-center rounded-full bg-primary text-white">
+                <span className="grid size-5 place-items-center rounded-full bg-primary text-primary-contrast">
                   <Check className="size-3" aria-hidden="true" />
                 </span>
                 Progress saved automatically
