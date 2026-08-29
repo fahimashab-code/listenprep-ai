@@ -16,9 +16,9 @@ export default async function AuthLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(440px,0.92fr)]">
+    <div className="min-h-screen bg-surface lg:grid lg:grid-cols-[minmax(0,1.08fr)_minmax(440px,0.92fr)]">
       <AuthShowcase />
-      <section className="flex min-h-screen flex-col border-l bg-white">
+      <section className="flex min-h-screen flex-col border-l bg-surface">
         <header className="flex h-20 items-center px-5 sm:px-8 lg:px-10 xl:px-14">
           <Brand />
         </header>

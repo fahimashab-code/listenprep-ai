@@ -6,7 +6,6 @@ import {
   Clock3,
   Headphones,
   Library,
-  Sparkles,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -100,13 +99,9 @@ export function LearnerDashboard() {
           <p className="mt-2 max-w-2xl text-muted">
             {activeAttempt
               ? "Your last test is saved, so you can continue where you stopped."
-              : "Choose a published listening test or create a shorter practice session."}
+              : "Choose a listening test published by your Listenly administrator."}
           </p>
         </div>
-        <ButtonLink href="/generate" variant="secondary" size="sm">
-          <Sparkles className="size-4" />
-          Create practice
-        </ButtonLink>
       </div>
 
       <Card className="overflow-hidden border-primary/30 shadow-[0_16px_42px_rgba(23,79,48,.09)]">
@@ -189,7 +184,7 @@ export function LearnerDashboard() {
         </div>
       </Card>
 
-      <section className="grid gap-4 lg:grid-cols-2">
+      <section>
         <Card className="p-5 sm:p-6">
           <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
             <Library className="size-5" />
@@ -203,18 +198,6 @@ export function LearnerDashboard() {
           </ButtonLink>
         </Card>
 
-        <Card className="p-5 sm:p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
-            <Sparkles className="size-5" />
-          </span>
-          <h3 className="mt-5 text-xl font-bold">Short practice</h3>
-          <p className="mt-2 type-body-sm text-muted">
-            Pick a part, question type, and difficulty to create a focused practice session.
-          </p>
-          <ButtonLink href="/generate" variant="secondary" className="mt-5" size="sm">
-            Create practice <ArrowRight className="size-4" />
-          </ButtonLink>
-        </Card>
       </section>
 
       <Card className="p-5 sm:p-6">

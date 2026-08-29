@@ -42,7 +42,7 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
-      {tests.map((test, index) => {
+      {tests.map((test) => {
         const attempt = attempts[test.id];
         const status =
           attempt?.status === "completed"
@@ -56,21 +56,13 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
         return (
           <Card
             key={test.id}
-            className={`group relative overflow-hidden p-5 hover:-translate-y-1 hover:shadow-lg sm:p-6 ${
-              index === 0
-                ? "border-primary/30 shadow-[0_10px_30px_rgba(23,79,48,.07)]"
-                : "hover:border-primary/30"
-            }`}
+            className="group relative overflow-hidden p-5 hover:-translate-y-1 hover:border-primary/30 hover:shadow-lg sm:p-6"
           >
-            {index === 0 && (
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-primary to-[#8ac69a]" />
-            )}
             <div className="flex items-start justify-between gap-4">
               <span className="grid size-11 place-items-center rounded-xl border border-primary/20 bg-primary-soft text-primary transition-transform group-hover:scale-105">
                 <Headphones className="size-5" />
               </span>
               <div className="flex flex-wrap justify-end gap-2">
-                {index === 0 && <Badge variant="green">Recommended</Badge>}
                 <Badge
                   variant={
                     status === "completed"
@@ -90,7 +82,7 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
             </div>
 
             <p className="mt-5 text-xs font-bold uppercase tracking-[0.12em] text-primary">
-              Full mock {String(index + 1).padStart(2, "0")}
+              Published listening test
             </p>
             <h3 className="mt-1 text-xl font-bold">{test.title}</h3>
             <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">

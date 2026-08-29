@@ -43,7 +43,7 @@ export function ForgotPasswordForm({
       {error && (
         <div
           role="alert"
-          className="mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700"
+          className="mb-4 rounded-lg border border-danger-border bg-danger-soft px-3 py-2.5 text-sm text-danger"
         >
           {error}
         </div>
@@ -56,7 +56,7 @@ export function ForgotPasswordForm({
           autoComplete="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
-          className="mt-1.5 h-11 w-full rounded-lg border border-[#cfd8d1] bg-white px-3 text-base leading-6 outline-none focus:border-primary focus:ring-3 focus:ring-green-100"
+          className="mt-1.5 h-11 w-full rounded-lg border border-border bg-surface px-3 text-base leading-6 text-ink outline-none placeholder:text-subtle focus:border-primary focus:ring-3 focus:ring-primary/15"
           placeholder="you@example.com"
         />
       </label>

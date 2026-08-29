@@ -12,7 +12,6 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Sparkles,
   Sun,
   UserRound,
   X,
@@ -29,7 +28,6 @@ const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/tests", label: "Mock Tests", icon: ClipboardList },
   { href: "/practice", label: "Practice", icon: BookOpenCheck },
-  { href: "/generate", label: "Create Practice", icon: Sparkles },
   { href: "/history", label: "History", icon: History },
 ];
 
@@ -40,7 +38,6 @@ const titles: Record<string, string> = {
   "/progress": "Progress",
   "/history": "History",
   "/profile": "Profile",
-  "/generate": "Create Custom Practice",
 };
 
 function NavLink({
@@ -95,12 +92,10 @@ export function AppShell({
   const [userOpen, setUserOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
-  const { preference, setPreference } = useTheme();
-  const darkTheme = preference === "dark";
+  const { resolvedTheme, setPreference } = useTheme();
+  const darkTheme = resolvedTheme === "dark";
   const rootPath = `/${pathname.split("/")[1]}`;
-  const title =
-    titles[rootPath] ??
-    (pathname.includes("/practice/") ? "Focused Practice" : "Listenly");
+  const title = titles[rootPath] ?? "Listenly";
   const displayName = userName || userEmail;
   const initial = displayName.trim().charAt(0).toUpperCase() || "U";
 
@@ -109,7 +104,6 @@ export function AppShell({
     try {
       await logoutUser();
     } finally {
-      localStorage.removeItem("listenly-demo-auth");
       router.replace("/login");
       router.refresh();
     }
@@ -119,7 +113,7 @@ export function AppShell({
     <div className="min-h-screen bg-background">
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-30 hidden border-r bg-white py-6 transition-[width] duration-200 lg:flex lg:flex-col",
+          "fixed inset-y-0 left-0 z-30 hidden border-r bg-surface py-6 transition-[width] duration-200 lg:flex lg:flex-col",
           sidebarCollapsed ? "w-20 px-3" : "w-[248px] px-4",
         )}
       >
@@ -129,7 +123,7 @@ export function AppShell({
         <button
           type="button"
           onClick={() => setSidebarCollapsed((value) => !value)}
-          className="absolute -right-4 top-7 grid size-8 place-items-center rounded-full border bg-white text-muted shadow-sm hover:bg-surface-subtle hover:text-ink"
+          className="absolute -right-4 top-7 grid size-8 place-items-center rounded-full border bg-surface text-muted shadow-sm hover:bg-surface-subtle hover:text-ink"
           aria-label={
             sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"
           }
@@ -179,7 +173,7 @@ export function AppShell({
             onClick={() => setMobileOpen(false)}
             aria-label="Close navigation"
           />
-          <aside className="relative h-full w-[280px] bg-white p-5 shadow-xl">
+          <aside className="relative h-full w-[280px] bg-surface p-5 shadow-xl">
             <div className="flex items-center justify-between">
               <Brand href="/dashboard" />
               <button
@@ -235,7 +229,7 @@ export function AppShell({
           sidebarCollapsed ? "lg:pl-20" : "lg:pl-[248px]",
         )}
       >
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-surface/95 px-4 backdrop-blur sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <button
               className="grid size-10 place-items-center rounded-lg border lg:hidden"
@@ -283,7 +277,7 @@ export function AppShell({
               </button>
               {userOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-48 rounded-xl border bg-white p-1.5 shadow-lg"
+                  className="absolute right-0 mt-2 w-48 rounded-xl border bg-surface p-1.5 shadow-lg"
                   role="menu"
                 >
                 {[
@@ -322,7 +316,7 @@ export function AppShell({
       </div>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-white px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
+        className="fixed inset-x-0 bottom-0 z-30 grid grid-cols-5 border-t bg-surface px-1 pb-[max(6px,env(safe-area-inset-bottom))] pt-1 lg:hidden"
         aria-label="Mobile navigation"
       >
         {navItems.map(({ href, label, icon: Icon }) => {

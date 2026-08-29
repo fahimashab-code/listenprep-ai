@@ -8,7 +8,7 @@ import {
   Volume2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,13 +21,11 @@ export function PreTestScreen({
   test,
   attemptId,
   mode,
-  demoEnabled,
   initialAttempt,
 }: {
   test: ListeningTest;
   attemptId: string;
   mode: "mock" | "practice";
-  demoEnabled: boolean;
   initialAttempt: TestAttempt;
 }) {
   const router = useRouter();
@@ -37,16 +35,34 @@ export function PreTestScreen({
   const [starting, setStarting] = useState(false);
   const [startError, setStartError] = useState("");
 
-  useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    if (checking) {
-      timeout = setTimeout(() => {
+  const audioReady =
+    test.parts.length > 0 && test.parts.every((part) => Boolean(part.audioUrl));
+
+  async function playTestSound() {
+    setChecking(true);
+    setChecked(false);
+    setStartError("");
+    try {
+      const context = new AudioContext();
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = "sine";
+      oscillator.frequency.value = 440;
+      gain.gain.value = volume / 100;
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start();
+      oscillator.stop(context.currentTime + 0.7);
+      oscillator.onended = () => {
+        void context.close();
         setChecking(false);
         setChecked(true);
-      }, 1300);
+      };
+    } catch {
+      setChecking(false);
+      setStartError("Your browser could not play the audio check.");
     }
-    return () => clearTimeout(timeout);
-  }, [checking]);
+  }
 
   async function start() {
     setStarting(true);
@@ -61,7 +77,6 @@ export function PreTestScreen({
       saveAttempt(attempt);
       await learnerAttemptService.save(attempt);
       const query = new URLSearchParams({ mode });
-      if (demoEnabled) query.set("demo", "true");
       router.push(`/test/${attemptId}?${query.toString()}`);
     } catch (reason) {
       setStartError(reason instanceof Error ? reason.message : "The test could not be started.");
@@ -71,10 +86,10 @@ export function PreTestScreen({
 
   return (
     <div className="min-h-screen bg-surface-subtle">
-      <header className="border-b bg-white">
+      <header className="border-b bg-surface">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-5">
           <div className="flex items-center gap-3">
-            <span className="grid size-9 place-items-center rounded-lg bg-primary text-white">
+            <span className="grid size-9 place-items-center rounded-lg bg-primary text-primary-contrast">
               <Headphones className="size-5" />
             </span>
             <span className="font-bold">{test.title}</span>
@@ -103,7 +118,7 @@ export function PreTestScreen({
             <h2 className="text-lg font-bold">Test instructions</h2>
             <ul className="mt-5 space-y-4">
               {[
-                ["40 questions", "Ten questions in each of four Parts."],
+                [`${test.questionCount} questions`, `${test.parts.length} published Parts.`],
                 ["Answer every question", "You can change answers while the test is active."],
                 [
                   mode === "mock" ? "Audio plays once" : "Learning controls available",
@@ -124,12 +139,10 @@ export function PreTestScreen({
                 </li>
               ))}
             </ul>
-            {mode === "mock" && (
+            {!audioReady && (
               <div className="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 type-body-sm text-amber-900">
-                <strong>Demo restore limitation:</strong> answers and the
-                current Part are restored after refresh. Because there is no
-                real audio file in this prototype, the simulated progress for
-                that Part restarts.
+                <strong>Audio unavailable:</strong> this test cannot start
+                until the administrator publishes audio for every Part.
               </div>
             )}
           </Card>
@@ -142,7 +155,7 @@ export function PreTestScreen({
               <div>
                 <h2 className="font-bold">Check your audio</h2>
                 <p className="mt-0.5 text-xs text-muted">
-                  Simulated test sound
+                  Browser sound check
                 </p>
               </div>
             </div>
@@ -166,10 +179,7 @@ export function PreTestScreen({
             <Button
               variant="secondary"
               className="mt-5 w-full"
-              onClick={() => {
-                setChecked(false);
-                setChecking(true);
-              }}
+              onClick={() => void playTestSound()}
               disabled={checking}
             >
               {checking ? (
@@ -197,7 +207,7 @@ export function PreTestScreen({
                 size="lg"
                 className="w-full"
                 onClick={() => void start()}
-                disabled={!checked || starting}
+                disabled={!audioReady || !checked || starting}
               >
                 <ShieldCheck className="size-4" /> {starting ? "Starting…" : "Start Listening Test"}
               </Button>

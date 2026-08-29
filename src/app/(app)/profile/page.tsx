@@ -13,7 +13,7 @@ export default async function ProfilePage() {
     <>
       <PageHeading
         title="Profile"
-        description="Keep your listening target and practice preference up to date."
+        description="Review your account details and choose how Listenly looks on this browser."
       />
       <ProfileForm userName={user.name} userEmail={user.email} />
     </>

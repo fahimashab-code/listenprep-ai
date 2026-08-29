@@ -1,0 +1,2 @@
+export const PART_PREVIEW_SECONDS = 30;
+export const FINAL_REVIEW_SECONDS = 120;

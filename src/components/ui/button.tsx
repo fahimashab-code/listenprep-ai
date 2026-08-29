@@ -13,7 +13,7 @@ const variants = {
     "border border-border bg-surface text-ink shadow-sm hover:-translate-y-px hover:border-primary/50 hover:bg-surface-subtle hover:shadow-md active:translate-y-0",
   ghost: "text-muted hover:bg-surface-subtle hover:text-ink",
   danger:
-    "border border-red-200 bg-white text-red-700 hover:bg-red-50",
+    "border border-danger-border bg-surface text-danger hover:bg-danger-soft",
 };
 
 const sizes = {

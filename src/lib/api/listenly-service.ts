@@ -1,7 +1,6 @@
 "use client";
 
 import { authenticatedFetch } from "@/lib/api/authenticated-fetch";
-import { listeningTests } from "@/mock-data/listening-tests";
 import type {
   AttemptWithReview,
   ListeningTest,
@@ -10,27 +9,6 @@ import type {
 } from "@/types/listening";
 
 const apiUrl = process.env.NEXT_PUBLIC_LISTENLY_API_URL?.replace(/\/$/, "");
-
-export const hasLiveApi = Boolean(apiUrl);
-
-function demoSummary(test: ListeningTest): PublishedTestSummary {
-  return {
-    id: test.id,
-    title: test.title,
-    description: test.description,
-    estimatedDurationMinutes: test.estimatedDurationMinutes,
-    questionCount: test.questionCount,
-    difficulty: test.difficulty,
-    source: "official",
-    visibility: "official",
-    parts: test.parts.map(({ partNumber, title, context, speakerCount }) => ({
-      partNumber,
-      title,
-      context,
-      speakerCount,
-    })),
-  };
-}
 
 function normalizeTest(test: ListeningTest): ListeningTest {
   return {
@@ -65,13 +43,11 @@ async function apiRequest<T>(path: string, init: RequestInit = {}) {
 
 export const learnerTestService = {
   async list(): Promise<PublishedTestSummary[]> {
-    if (!apiUrl) return listeningTests.map(demoSummary);
     const result = await apiRequest<{ items: PublishedTestSummary[] }>("/tests");
     return result.items;
   },
 
   async get(testId: string): Promise<ListeningTest | undefined> {
-    if (!apiUrl) return listeningTests.find((test) => test.id === testId);
     try {
       return normalizeTest(await apiRequest<ListeningTest>(`/tests/${testId}`));
     } catch (error) {
@@ -85,27 +61,11 @@ export const learnerTestService = {
 
 export const learnerAttemptService = {
   async list(): Promise<TestAttempt[]> {
-    if (!apiUrl) return [];
     const result = await apiRequest<{ items: TestAttempt[] }>("/attempts");
     return result.items;
   },
 
   async create(testId: string, mode: "mock" | "practice") {
-    if (!apiUrl) {
-      const id = `${testId}-${crypto.randomUUID()}`;
-      return {
-        id,
-        testId,
-        userId: "demo-user",
-        mode,
-        status: "in_progress",
-        phase: "part_preview",
-        answers: {},
-        markedForReview: [],
-        currentPart: 1,
-        startedAt: new Date().toISOString(),
-      } satisfies TestAttempt;
-    }
     return apiRequest<TestAttempt>("/attempts", {
       method: "POST",
       body: JSON.stringify({ testId, mode }),
@@ -117,7 +77,6 @@ export const learnerAttemptService = {
   },
 
   async save(attempt: TestAttempt): Promise<TestAttempt> {
-    if (!apiUrl) return attempt;
     return apiRequest<TestAttempt>(`/attempts/${attempt.id}`, {
       method: "PUT",
       body: JSON.stringify({
@@ -131,7 +90,6 @@ export const learnerAttemptService = {
   },
 
   async submit(attempt: TestAttempt): Promise<AttemptWithReview> {
-    if (!apiUrl) return attempt;
     return apiRequest<AttemptWithReview>(`/attempts/${attempt.id}/submit`, {
       method: "POST",
     });
