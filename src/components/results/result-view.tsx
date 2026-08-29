@@ -3,7 +3,6 @@
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpenCheck,
   CheckCircle2,
   ChevronDown,
   FileText,
@@ -12,7 +11,7 @@ import {
   Target,
   XCircle,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -25,12 +24,7 @@ import {
   questionSlotCount,
   scoreQuestion,
 } from "@/lib/scoring";
-import { loadAttempt } from "@/lib/storage";
 import { cn, formatQuestionType, formatSkill } from "@/lib/utils";
-import {
-  demoSubmittedAnswers,
-  mockTestOne,
-} from "@/mock-data/listening-tests";
 import type {
   ListeningQuestion,
   ListeningTest,
@@ -49,7 +43,6 @@ function ReviewCard({
   answer?: UserAnswer;
   defaultOpen?: boolean;
 }) {
-  const [fullTranscript, setFullTranscript] = useState(false);
   const unanswered =
     answer === undefined ||
     (Array.isArray(answer) ? answer.length === 0 : String(answer).trim() === "");
@@ -119,7 +112,7 @@ function ReviewCard({
             </div>
             <p className="mt-2 type-body-sm text-muted">
               {question.distractor?.explanation ??
-                "The recording gives the required detail using different wording. Compare the answer with the transcript evidence below."}
+                "Review the correct answer, then listen again in Practice mode to find the detail you missed."}
             </p>
             {question.distractor && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -131,31 +124,19 @@ function ReviewCard({
           </div>
         )}
 
-        <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
-          <div className="flex items-center gap-2">
-            <FileText className="size-4 text-blue-700" />
-            <h3 className="text-sm font-bold text-blue-950">
-              Relevant transcript segment
-            </h3>
-          </div>
-          <p className="mt-2 type-body-sm text-blue-950">
-            {question.transcriptEvidence?.text ??
-              "The relevant transcript segment is not available for this demo question."}
-          </p>
-          {fullTranscript && (
-            <p className="mt-3 border-t border-blue-200 pt-3 type-body-sm text-blue-900">
-              The full transcript would continue here with the surrounding
-              context. This demo keeps the relevant evidence first so the
-              explanation stays focused.
+        {question.transcriptEvidence?.text && (
+          <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+            <div className="flex items-center gap-2">
+              <FileText className="size-4 text-blue-700" />
+              <h3 className="text-sm font-bold text-blue-950">
+                Relevant transcript segment
+              </h3>
+            </div>
+            <p className="mt-2 type-body-sm text-blue-950">
+              {question.transcriptEvidence.text}
             </p>
-          )}
-          <button
-            className="mt-3 text-xs font-bold text-blue-800 hover:underline"
-            onClick={() => setFullTranscript((value) => !value)}
-          >
-            {fullTranscript ? "Hide full transcript" : "View full transcript"}
-          </button>
-        </div>
+          </div>
+        )}
 
         {question.paraphrase && (
           <div className="mt-5 rounded-lg bg-surface-subtle p-4">
@@ -196,42 +177,13 @@ function ReviewCard({
 
 export function ResultView({
   test,
-  attemptId,
   initialAttempt,
 }: {
   test: ListeningTest;
-  attemptId: string;
   initialAttempt: TestAttempt;
 }) {
-  const [answers, setAnswers] = useState<Record<string, UserAnswer>>(() => {
-    if (initialAttempt.status === "completed") return initialAttempt.answers;
-    const demoAnswersByNumber = new Map(
-      mockTestOne.parts.flatMap((part) =>
-        part.questions.map((question) => [
-          question.number,
-          demoSubmittedAnswers[question.id],
-        ]),
-      ),
-    );
-    return Object.fromEntries(
-      test.parts.flatMap((part) =>
-        part.questions.map((question) => [
-          question.id,
-          demoAnswersByNumber.get(question.number) ??
-            question.acceptedAnswers[0],
-        ]),
-      ),
-    );
-  });
+  const answers = initialAttempt.answers;
   const [filter, setFilter] = useState<Filter>("all");
-
-  useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
-      const attempt = loadAttempt(attemptId);
-      if (attempt?.status === "completed") setAnswers(attempt.answers);
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [attemptId]);
 
   const calculatedScore = calculateRawScore(test, answers);
   const score = initialAttempt.rawScore ?? calculatedScore;
@@ -252,7 +204,6 @@ export function ResultView({
             "Academic information",
           ][weakestPartNumber - 1]
         }`;
-  const weaknessHref = `/practice/part-${weakestPartNumber}`;
   const questions = test.parts.flatMap((part) => part.questions);
   const visibleQuestions = useMemo(
     () =>
@@ -351,11 +302,11 @@ export function ResultView({
                 mistakes, then practise similar questions.
               </p>
               <ButtonLink
-                href={weaknessHref}
+                href="/tests"
                 variant="secondary"
                 className="mt-6 w-full"
               >
-                Practice this weakness <ArrowRight className="size-4" />
+                Choose another test <ArrowRight className="size-4" />
               </ButtonLink>
             </div>
           </div>
@@ -398,8 +349,8 @@ export function ResultView({
             >
               Review mistakes <ArrowRight className="size-4" />
             </Button>
-            <ButtonLink href={weaknessHref} variant="secondary">
-              Practice weakness
+            <ButtonLink href="/tests" variant="secondary">
+              Choose another test
             </ButtonLink>
           </div>
         </section>
@@ -477,29 +428,6 @@ export function ResultView({
           </Card>
           </div>
         </details>
-
-        <Card className="mt-6 border-primary/35 bg-gradient-to-br from-surface to-primary-soft/60 p-5 shadow-md sm:p-6">
-          <div className="flex gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-primary-soft text-primary">
-              <BookOpenCheck className="size-5" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-primary">
-                Recommended next practice
-              </p>
-              <h2 className="mt-1 text-xl font-bold">
-                {weaknessTitle}
-              </h2>
-              <p className="mt-2 type-body-sm text-muted">
-                Practise the Part that caused the most difficulty before taking
-                your next full Listening mock.
-              </p>
-              <ButtonLink href={weaknessHref} className="mt-4" size="sm">
-                Start recommended practice <ArrowRight className="size-4" />
-              </ButtonLink>
-            </div>
-          </div>
-        </Card>
 
         <section className="mt-8" id="question-review">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">

@@ -121,24 +121,3 @@ export interface TestAttempt {
 export interface AttemptWithReview extends TestAttempt {
   reviewTest?: ListeningTest;
 }
-
-export interface PracticeExercise {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  questionCount: number;
-  durationMinutes: number;
-  accuracy: number;
-  category: "part" | "question_type" | "skill";
-  focus: string[];
-}
-
-export interface HistoricalAttempt {
-  id: string;
-  testTitle: string;
-  date: string;
-  score: number;
-  estimatedBand: number;
-  durationMinutes: number;
-}

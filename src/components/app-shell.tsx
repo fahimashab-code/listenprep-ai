@@ -12,7 +12,6 @@ import {
   Moon,
   PanelLeftClose,
   PanelLeftOpen,
-  Sparkles,
   Sun,
   UserRound,
   X,
@@ -29,7 +28,6 @@ const navItems = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/tests", label: "Mock Tests", icon: ClipboardList },
   { href: "/practice", label: "Practice", icon: BookOpenCheck },
-  { href: "/generate", label: "Create Practice", icon: Sparkles },
   { href: "/history", label: "History", icon: History },
 ];
 
@@ -40,7 +38,6 @@ const titles: Record<string, string> = {
   "/progress": "Progress",
   "/history": "History",
   "/profile": "Profile",
-  "/generate": "Create Custom Practice",
 };
 
 function NavLink({
@@ -98,9 +95,7 @@ export function AppShell({
   const { resolvedTheme, setPreference } = useTheme();
   const darkTheme = resolvedTheme === "dark";
   const rootPath = `/${pathname.split("/")[1]}`;
-  const title =
-    titles[rootPath] ??
-    (pathname.includes("/practice/") ? "Focused Practice" : "Listenly");
+  const title = titles[rootPath] ?? "Listenly";
   const displayName = userName || userEmail;
   const initial = displayName.trim().charAt(0).toUpperCase() || "U";
 
@@ -109,7 +104,6 @@ export function AppShell({
     try {
       await logoutUser();
     } finally {
-      localStorage.removeItem("listenly-demo-auth");
       router.replace("/login");
       router.refresh();
     }

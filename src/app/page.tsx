@@ -7,10 +7,8 @@ import {
   Clock3,
   FileCheck2,
   Headphones,
-  Map,
   MessageSquareText,
   ShieldCheck,
-  Target,
 } from "lucide-react";
 import { Brand } from "@/components/brand";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +21,7 @@ const practiceCards = [
   ["Part 2", "Social monologue", Headphones],
   ["Part 3", "Educational discussion", BookOpenCheck],
   ["Part 4", "Academic monologue", BarChart3],
-  ["Question Types", "Focused skill practice", Target],
+  ["Answer Review", "Available after submission", FileCheck2],
 ];
 
 export default function Home() {
@@ -169,9 +167,9 @@ export default function Home() {
           </div>
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {[
-              ["01", "Practice", "Take a full IELTS-style Listening test or focus on one Part."],
+              ["01", "Practice", "Take a published IELTS-style Listening test with all four Parts."],
               ["02", "Understand", "See exactly which questions you missed, with transcript evidence and explanations."],
-              ["03", "Improve", "Practise your weak question types and track progress over time."],
+              ["03", "Improve", "Use your real result breakdown to plan the next listening test."],
             ].map(([number, title, text]) => (
               <Card
                 key={title}
@@ -200,8 +198,8 @@ export default function Home() {
                 </h2>
               </div>
               <p className="type-body-sm max-w-md text-muted">
-                Start with a realistic mock or use a short focused session when
-                you have less time.
+                Choose a test published by your administrator and complete it
+                in Mock Test or Practice mode.
               </p>
             </div>
             <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -220,20 +218,6 @@ export default function Home() {
                   <ArrowRight className="ml-auto size-4 text-subtle group-hover:translate-x-1 group-hover:text-primary" />
                 </Card>
               ))}
-              <Card className="flex items-center gap-4 border-dashed p-5">
-                <span className="grid size-11 place-items-center rounded-lg bg-surface-subtle text-subtle">
-                  <Map className="size-5" />
-                </span>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-bold">Custom Practice</h3>
-                    <Badge>Coming soon</Badge>
-                  </div>
-                  <p className="mt-1 text-sm text-muted">
-                    Topic-led listening practice
-                  </p>
-                </div>
-              </Card>
             </div>
           </div>
         </section>

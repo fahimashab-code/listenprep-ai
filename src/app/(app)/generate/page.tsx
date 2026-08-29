@@ -1,15 +1,5 @@
-import { GenerationPreview } from "@/components/generation-preview";
-import { PageHeading } from "@/components/page-heading";
+import { redirect } from "next/navigation";
 
 export default function GeneratePage() {
-  return (
-    <>
-      <PageHeading
-        eyebrow="Personalised practice"
-        title="Create Custom Listening Practice"
-        description="Choose a topic or bring your own source text, then preview how a tailored IELTS Listening practice will be created."
-      />
-      <GenerationPreview />
-    </>
-  );
+  redirect("/practice");
 }

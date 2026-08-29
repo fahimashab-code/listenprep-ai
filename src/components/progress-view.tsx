@@ -132,7 +132,7 @@ export function ProgressView() {
                 <div>
                   <h3 className="font-bold">Review your latest answers</h3>
                   <p className="mt-1 text-sm text-muted">
-                    Part and question-type breakdowns will appear when answer-level analytics are available.
+                    Open the latest completed test to see its Part and question-type breakdowns.
                   </p>
                 </div>
               </div>

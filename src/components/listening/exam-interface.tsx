@@ -33,12 +33,9 @@ import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import {
-  DEMO_FINAL_REVIEW_SECONDS,
-  DEMO_PART_PREVIEW_SECONDS,
-  PRODUCTION_FINAL_REVIEW_SECONDS,
-  PRODUCTION_PART_PREVIEW_SECONDS,
-  SIMULATED_PART_SECONDS,
-} from "@/config/demo";
+  FINAL_REVIEW_SECONDS,
+  PART_PREVIEW_SECONDS,
+} from "@/config/listening-timing";
 import {
   calculateRawScore,
   estimateListeningBand,
@@ -114,22 +111,15 @@ function partLabel(partNumber: number) {
 export function ExamInterface({
   test,
   attemptId,
-  demoEnabled,
   initialAttempt: loadedAttempt,
 }: {
   test: ListeningTest;
   attemptId: string;
-  requestedMode: "mock" | "practice";
-  demoEnabled: boolean;
   initialAttempt: TestAttempt;
 }) {
   const router = useRouter();
-  const previewDuration = demoEnabled
-    ? DEMO_PART_PREVIEW_SECONDS
-    : PRODUCTION_PART_PREVIEW_SECONDS;
-  const reviewDuration = demoEnabled
-    ? DEMO_FINAL_REVIEW_SECONDS
-    : PRODUCTION_FINAL_REVIEW_SECONDS;
+  const previewDuration = PART_PREVIEW_SECONDS;
+  const reviewDuration = FINAL_REVIEW_SECONDS;
   const [attempt, setAttempt] = useState<TestAttempt>(loadedAttempt);
   const attemptRef = useRef(attempt);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -231,6 +221,11 @@ export function ExamInterface({
   }, [attempt, hydrated]);
 
   const startPart = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) {
+      setAudioError(`Audio is unavailable for Part ${attemptRef.current.currentPart}.`);
+      return;
+    }
     setAudioSeconds(0);
     setPaused(false);
     setAudioError("");
@@ -239,18 +234,15 @@ export function ExamInterface({
       status: "in_progress",
       phase: "part_playing",
     }));
-    const audio = audioRef.current;
-    if (audio) {
-      audio.currentTime = 0;
-      void audio.play().catch(() =>
-        setAudioError("Audio could not start automatically. Use Resume audio to continue."),
-      );
-    }
+    audio.currentTime = 0;
+    void audio.play().catch(() =>
+      setAudioError("Audio could not start automatically. Use Resume audio to continue."),
+    );
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
   useEffect(() => {
-    if (!hydrated || attempt.phase !== "part_preview") return;
+    if (!hydrated || attempt.phase !== "part_preview" || !currentPart.audioUrl) return;
     const timer = window.setInterval(() => {
       setPreviewSeconds((seconds) => {
         if (seconds <= 1) {
@@ -261,7 +253,7 @@ export function ExamInterface({
       });
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [attempt.phase, hydrated, startPart]);
+  }, [attempt.phase, currentPart.audioUrl, hydrated, startPart]);
 
   const enterFinalReview = useCallback(() => {
     const reviewEndsAt = new Date(
@@ -300,19 +292,22 @@ export function ExamInterface({
     audio.volume = 0.7;
     const updateTime = () => setAudioSeconds(Math.floor(audio.currentTime));
     const updateDuration = () => setAudioDuration(audio.duration || 0);
+    const fail = () => setAudioError(`Audio could not be loaded for Part ${currentPart.partNumber}.`);
     const finish = () => finishCurrentPart();
     audio.addEventListener("timeupdate", updateTime);
     audio.addEventListener("loadedmetadata", updateDuration);
+    audio.addEventListener("error", fail);
     audio.addEventListener("ended", finish);
     audioRef.current = audio;
     return () => {
       audio.pause();
       audio.removeEventListener("timeupdate", updateTime);
       audio.removeEventListener("loadedmetadata", updateDuration);
+      audio.removeEventListener("error", fail);
       audio.removeEventListener("ended", finish);
       if (audioRef.current === audio) audioRef.current = null;
     };
-  }, [currentPart.audioUrl, finishCurrentPart]);
+  }, [currentPart.audioUrl, currentPart.partNumber, finishCurrentPart]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume / 100;
@@ -328,40 +323,7 @@ export function ExamInterface({
     }
   }, [attempt.phase, exitOpen, paused, submitOpen]);
 
-  useEffect(() => {
-    if (
-      !hydrated ||
-      attempt.phase !== "part_playing" ||
-      Boolean(currentPart.audioUrl) ||
-      paused ||
-      exitOpen ||
-      submitOpen
-    ) {
-      return;
-    }
-
-    const timer = window.setInterval(() => {
-      setAudioSeconds((seconds) => {
-        if (seconds + 1 >= SIMULATED_PART_SECONDS) {
-          window.setTimeout(finishCurrentPart, 0);
-          return SIMULATED_PART_SECONDS;
-        }
-        return seconds + 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [
-    attempt.phase,
-    currentPart.audioUrl,
-    exitOpen,
-    finishCurrentPart,
-    hydrated,
-    paused,
-    submitOpen,
-  ]);
-
-  const playbackDuration = audioDuration || SIMULATED_PART_SECONDS;
+  const playbackDuration = audioDuration || 1;
 
   const submitAttempt = useCallback(async () => {
     if (submittingRef.current) return;
@@ -541,11 +503,6 @@ export function ExamInterface({
           >
             Start Part {attempt.currentPart} <Play className="size-4" />
           </Button>
-          {demoEnabled && (
-            <p className="mt-4 text-xs font-semibold text-white/60">
-              Demo mode · shortened preview timing
-            </p>
-          )}
         </div>
       </div>
     );
@@ -917,15 +874,11 @@ export function ExamInterface({
                         : "Review block"}
                     </Button>
                   )}
-                  {(demoEnabled || attempt.mode === "practice") && (
+                  {attempt.mode === "practice" && (
                     <Button onClick={finishCurrentPart}>
-                      {demoEnabled
-                        ? attempt.currentPart < 4
-                          ? "Demo: finish Part"
-                          : "Demo: start final review"
-                        : attempt.currentPart < 4
-                          ? "Next Part"
-                          : "Start final review"}
+                      {attempt.currentPart < 4
+                        ? "Next Part"
+                        : "Start final review"}
                       <ArrowRight className="size-4" />
                     </Button>
                   )}
@@ -1031,7 +984,7 @@ export function ExamInterface({
             <h2 className="mt-4 text-xl font-bold">Leave this test?</h2>
             <p className="mt-2 type-body-sm text-muted">
               Your answers, current Part, and marked questions are saved. The
-              simulated audio for the current Part restarts when you return.
+              recording starts from the beginning of this Part when you return.
             </p>
             <div className="mt-6 flex gap-3">
               <Button

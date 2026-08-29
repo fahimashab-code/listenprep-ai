@@ -12,7 +12,6 @@ export default async function SetupPage({
       attemptId={attemptId}
       view="setup"
       requestedMode={mode}
-      demoEnabled={query.demo === "true"}
     />
   );
 }

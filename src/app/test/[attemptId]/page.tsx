@@ -12,7 +12,6 @@ export default async function TestPage({
       attemptId={attemptId}
       view="exam"
       requestedMode={requestedMode}
-      demoEnabled={query.demo === "true"}
     />
   );
 }
