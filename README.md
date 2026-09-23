@@ -1,13 +1,10 @@
-# Listenly — IELTS Listening Practice Frontend
+# Listenly learner app
 
-Listenly is a frontend demo for focused IELTS Listening preparation. It
-supports full 40-question mocks, strict and practice test modes, local
-autosave, educational result analysis, targeted practice, and progress
-tracking.
+Listenly is an IELTS Listening practice application. The current source supports published full tests, mock and practice modes, answers and submission, results, review, and attempt history.
 
-All practice content in this repository is original IELTS-style demo content.
-The product is not affiliated with IELTS, Cambridge, the British Council, or
-IDP.
+The [product documents](docs/README.md) describe the next direction: dependable tests, easier mistake review, and one-part practice. One-part selection and question-level replay from results are planned improvements, not confirmed current features. Shared structure and working rules are in [Architecture](docs/ARCHITECTURE.md) and [Implementation guidelines](docs/IMPLEMENTATION_GUIDELINES.md).
+
+This README was checked against source on 23 September 2026. It does not establish that the deployed application, available content, or cloud configuration works.
 
 ## Run locally
 
@@ -16,51 +13,49 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`. On the sign-in screen, use **Continue with demo
-account**; the other authentication controls are intentionally mocked.
+In Windows PowerShell, use `npm.cmd` if script execution is restricted. The default local address is [localhost:3000](http://localhost:3000). If Admin is also running, the apps need separate ports.
 
-Production checks:
+Authentication uses Amplify/Cognito. Follow the shared [authentication guide](docs/AUTHENTICATION.md). The source reads `NEXT_PUBLIC_COGNITO_USER_POOL_ID` and `NEXT_PUBLIC_COGNITO_USER_POOL_CLIENT_ID`; optional Google sign-in also depends on its feature flag and Cognito domain configuration.
+
+Test and attempt requests require `NEXT_PUBLIC_LISTENLY_API_URL` and an available backend. Authentication and test APIs are separate: basic authentication configuration does not make test content available. Do not commit secrets or `.env.local` values.
+
+## Main routes
+
+| Route | Current purpose |
+| --- | --- |
+| `/` | Public landing page |
+| `/login`, `/register`, `/confirm-signup` | Sign-in and account confirmation |
+| `/forgot-password`, `/reset-password`, `/callback` | Recovery and OAuth callback |
+| `/dashboard` | Start or continue a test; recent activity |
+| `/tests`, `/tests/[testId]` | Published tests and mode selection |
+| `/test/[attemptId]/setup` | Pre-test instructions and audio check |
+| `/test/[attemptId]` | Test questions and recording playback |
+| `/results/[attemptId]` | Score and question review |
+| `/practice` | Entry to published full tests in practice mode; not a separate skill-exercise library |
+| `/progress`, `/history`, `/profile` | Attempt summaries, past attempts, and account details |
+| `/generate` | Redirects to `/practice` |
+
+Use actual test and attempt IDs from the configured service. Old demo IDs are not setup instructions.
+
+## Source map
+
+- `src/lib/api/listenly-service.ts` calls learner test and attempt endpoints.
+- `src/lib/auth/` contains Cognito configuration and session operations.
+- `src/components/listening/` contains setup, question rendering, and playback.
+- `src/components/results/result-view.tsx` presents answers and review evidence supplied by question content.
+- `src/lib/scoring.ts` contains answer and result helpers.
+- `src/lib/storage.ts` contains browser persistence helpers; some views can use locally saved attempts when fetching fails.
+- `src/types/listening.ts` defines test, question, and attempt shapes.
+
+The active playback path uses published audio URLs. Existence of a URL or route does not prove a complete, reviewed test is available. Resume behavior and saved playback position must be checked before making guarantees to learners.
+
+Practice estimates are not official IELTS results. Listenly is not affiliated with IELTS, Cambridge, British Council, or IDP.
+
+## Code checks
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## Important routes
-
-- `/` — marketing landing page
-- `/login`, `/register`, `/forgot-password` — mocked authentication
-- `/dashboard` — priority-based learner dashboard
-- `/tests` and `/tests/mock-01` — mock library and mode selection
-- `/test/mock-01-demo-attempt/setup?mode=mock` — pre-test audio check
-- `/test/mock-01-demo-attempt?mode=mock` — distraction-free exam
-- `/results/history-07` — populated educational result and review
-- `/practice` and `/practice/multiple-choice` — targeted practice journey
-- `/progress`, `/history`, `/profile` — learner analytics and settings
-- `/generate` — simulated future custom-practice workflow
-
-## Architecture
-
-- `src/types` contains backend-ready Listening test, question, Part, attempt,
-  and answer models.
-- `src/mock-data` contains five full mocks, focused exercises, progress, and
-  historical attempts.
-- `src/lib/services.ts` defines service interfaces and local mock
-  implementations that can later be replaced by API adapters.
-- `src/lib/scoring.ts` normalizes answers, checks word limits, scores attempts,
-  estimates practice bands, and produces result breakdowns.
-- `src/lib/storage.ts` isolates localStorage persistence.
-- `src/components/listening` contains the data-driven question renderer,
-  pre-test flow, and exam state.
-
-## Demo behaviour
-
-`DEMO_TIMING` is enabled in `src/config/demo.ts`. It accelerates the simulated
-audio flow and exposes a labelled **Demo: next Part** control. No copyrighted
-audio is bundled; local placeholder audio paths are represented by a
-non-seekable simulated player.
-
-Answers and the current Part are restored from localStorage. Because there is
-no real audio file or backend clock in this prototype, simulated audio progress
-within the restored Part restarts after a refresh. This limitation is explained
-on the pre-test and exit screens.
+Run these checks after code changes. The shared documents by themselves do not require an application build.

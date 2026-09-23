@@ -1,8 +1,8 @@
 # Codex Instructions
 
-## How to use this file
+## Documentation
 
-Codex reads `AGENTS.md` when a session starts in this repository. Keep only durable project rules here; put the current task, requirements, and acceptance criteria in the chat prompt. Update this file only when the project structure, standard commands, or long-term working rules change. Restart the Codex session after editing it. Use a temporary `AGENTS.override.md` only when a short-lived override is truly needed, and remove it afterward.
+Read the shared [documentation index](docs/README.md) and [implementation guidelines](docs/IMPLEMENTATION_GUIDELINES.md) before implementation. Product intent, planned work, and current architecture are separate documents. Read the sections relevant to the task and update the existing document when behavior changes.
 
 ## Scope
 
@@ -31,7 +31,7 @@ Add "use client" only for state, events, effects, or browser APIs.
 
 ## Authentication
 
-- Before changing authentication, read `docs/AUTH_SYSTEM_BLUEPRINT.md`.
+- Before changing authentication, read [Authentication](docs/AUTHENTICATION.md).
 - Keep authentication inside this application and preserve the existing UI architecture.
 - Basic Cognito authentication must work without Lambda or API Gateway.
 - Lambda and API integrations must remain optional and must not prevent startup when their environment variables are missing.
@@ -42,7 +42,10 @@ Add "use client" only for state, events, effects, or browser APIs.
 - Run `npm run build` for changes that can affect compilation, routing, configuration, or production behavior.
 - If a relevant check cannot be run, report why.
 
-## Documentation
+## Scope and maintenance
 
-- Update `README.md` or files in `docs/` only when setup, architecture, environment variables, public behavior, or authentication flows change.
-- Do not store temporary task status, chat history, implementation plans, or completed-task notes in `AGENTS.md`.
+- Documentation-only changes need documentation checks, not application tests or builds.
+- Do not start servers, generate paid audio, deploy, commit, or push unless requested for the task.
+- Keep setup in this README and shared product/technical guidance in `docs/`.
+- Do not store task status, chat history, implementation plans, or completed-task notes in `AGENTS.md`.
+- Do not add duplicate overviews or archived instruction files.

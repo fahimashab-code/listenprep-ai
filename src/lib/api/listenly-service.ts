@@ -90,6 +90,7 @@ export const learnerAttemptService = {
   },
 
   async submit(attempt: TestAttempt): Promise<AttemptWithReview> {
+    await this.save(attempt);
     return apiRequest<AttemptWithReview>(`/attempts/${attempt.id}/submit`, {
       method: "POST",
     });
