@@ -29,7 +29,9 @@ export interface ListeningQuestion {
   id: string;
   number: number;
   type: QuestionType;
+  groupId?: string;
   instruction?: string;
+  completionTemplate?: string;
   prompt: string;
   label?: string;
   options?: QuestionOption[];

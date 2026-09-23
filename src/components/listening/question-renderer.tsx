@@ -1,6 +1,6 @@
 "use client";
 
-import { Check } from "lucide-react";
+import { Check, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ListeningQuestion, UserAnswer } from "@/types/listening";
 
@@ -11,6 +11,136 @@ type Props = {
   disabled?: boolean;
   compact?: boolean;
 };
+
+type CompletionTemplateProps = {
+  template: string;
+  questions: ListeningQuestion[];
+  answers: Record<string, UserAnswer>;
+  disabled?: boolean;
+  markedForReview: string[];
+  activeQuestionId?: string;
+  onChange: (questionId: string, answer: UserAnswer) => void;
+  onFocus: (questionId: string) => void;
+  onToggleReview: (questionId: string) => void;
+  setQuestionRef: (questionId: string, node: HTMLElement | null) => void;
+};
+
+const COMPLETION_PLACEHOLDER_PATTERN = /\[\[(\d{1,2})\]\]/g;
+
+export function isCompletionTemplateUsable(
+  template: string,
+  questionCount: number,
+) {
+  const numbers = [...template.matchAll(COMPLETION_PLACEHOLDER_PATTERN)].map(
+    (match) => Number(match[1]),
+  );
+
+  return (
+    numbers.length === questionCount &&
+    numbers.every((number, index) => number === index + 1)
+  );
+}
+
+function CompletionTemplateLine({
+  line,
+  questions,
+  answers,
+  disabled,
+  markedForReview,
+  activeQuestionId,
+  onChange,
+  onFocus,
+  onToggleReview,
+  setQuestionRef,
+}: { line: string } & Omit<CompletionTemplateProps, "template">) {
+  const parts = line.split(/(\*\*[^*]+\*\*|\[\[\d{1,2}\]\])/g).filter(Boolean);
+
+  return (
+    <>
+      {parts.map((part, index) => {
+        const placeholder = part.match(/^\[\[(\d{1,2})\]\]$/);
+        if (placeholder) {
+          const templateNumber = Number(placeholder[1]);
+          const question = questions.at(templateNumber - 1);
+          if (!question) return <span key={`${part}-${index}`}>{part}</span>;
+          const marked = markedForReview.includes(question.id);
+          return (
+            <span
+              key={`${part}-${index}`}
+              id={`question-${question.number}`}
+              ref={(node) => setQuestionRef(question.id, node)}
+              className={cn(
+                "mx-1 inline-flex items-center gap-1 rounded-md px-1 py-0.5 align-middle",
+                activeQuestionId === question.id && "bg-primary-soft ring-2 ring-primary/20",
+                marked && "bg-amber-50",
+              )}
+            >
+              <label className="inline-flex items-center gap-1.5">
+                <span className="font-bold text-ink">({question.number})</span>
+                <span className="sr-only">Answer for question {question.number}</span>
+                <input
+                  disabled={disabled}
+                  value={typeof answers[question.id] === "string" ? answers[question.id] : ""}
+                  onFocus={() => onFocus(question.id)}
+                  onChange={(event) => onChange(question.id, event.target.value)}
+                  className="h-9 w-36 border-0 border-b-2 border-border bg-transparent px-2 text-center text-base font-semibold text-ink outline-none focus:border-primary disabled:bg-surface-subtle sm:w-44"
+                  autoComplete="off"
+                />
+              </label>
+              <button
+                type="button"
+                disabled={disabled}
+                onClick={() => onToggleReview(question.id)}
+                className={cn(
+                  "grid size-7 place-items-center rounded text-subtle hover:bg-surface-subtle hover:text-ink",
+                  marked && "text-amber-700",
+                )}
+                aria-label={`${marked ? "Remove" : "Mark"} question ${question.number} for review`}
+                aria-pressed={marked}
+              >
+                <Flag className={cn("size-3.5", marked && "fill-current")} />
+              </button>
+            </span>
+          );
+        }
+        if (/^\*\*[^*]+\*\*$/.test(part)) {
+          return <strong key={`${part}-${index}`}>{part.slice(2, -2)}</strong>;
+        }
+        return <span key={`${part}-${index}`}>{part}</span>;
+      })}
+    </>
+  );
+}
+
+export function CompletionTemplateRenderer(props: CompletionTemplateProps) {
+  return (
+    <div className="rounded-xl border bg-surface p-5 sm:p-7">
+      {props.template.split(/\r?\n/).map((rawLine, index) => {
+        const line = rawLine.trim();
+        if (!line) return <div key={`space-${index}`} className="h-4" />;
+        if (line.startsWith("# ")) {
+          return (
+            <h3 key={`title-${index}`} className="mb-5 text-xl font-bold text-ink">
+              {line.slice(2)}
+            </h3>
+          );
+        }
+        if (line.startsWith("## ")) {
+          return (
+            <h4 key={`heading-${index}`} className="mb-3 mt-5 text-base font-bold text-ink">
+              {line.slice(3)}
+            </h4>
+          );
+        }
+        return (
+          <p key={`line-${index}`} className="mb-2 leading-9 text-ink">
+            <CompletionTemplateLine line={line} {...props} />
+          </p>
+        );
+      })}
+    </div>
+  );
+}
 
 function OptionLabel({
   id,

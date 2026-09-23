@@ -26,6 +26,8 @@ import {
 } from "react";
 import {
   CentreMap,
+  CompletionTemplateRenderer,
+  isCompletionTemplateUsable,
   QuestionRenderer,
 } from "@/components/listening/question-renderer";
 import { Badge } from "@/components/ui/badge";
@@ -728,6 +730,78 @@ export function ExamInterface({
 
               <div className="mt-4 space-y-4">
                 {part.questions.map((question, index) => {
+                  const templateQuestions = question.groupId
+                    ? part.questions.filter(
+                        (item) => item.groupId === question.groupId,
+                      )
+                    : [];
+                  const renderCompletionTemplate = Boolean(
+                    question.completionTemplate &&
+                      question.groupId &&
+                      templateQuestions.every(
+                        (item) =>
+                          item.completionTemplate ===
+                          question.completionTemplate,
+                      ) &&
+                      isCompletionTemplateUsable(
+                        question.completionTemplate,
+                        templateQuestions.length,
+                      ),
+                  );
+
+                  if (
+                    renderCompletionTemplate &&
+                    templateQuestions[0]?.id !== question.id
+                  ) {
+                    return null;
+                  }
+
+                  if (renderCompletionTemplate && question.completionTemplate) {
+                    const templateAnswered = templateQuestions.some((item) =>
+                      hasAnswer(attempt.answers[item.id]),
+                    );
+                    const templateMarked = templateQuestions.some((item) =>
+                      attempt.markedForReview.includes(item.id),
+                    );
+                    const templateActive = templateQuestions.some(
+                      (item) => item.id === activeQuestionId,
+                    );
+                    return (
+                      <section key={question.groupId ?? question.id}>
+                        <Card
+                          className={cn(
+                            "p-5 sm:p-6",
+                            templateAnswered && "border-primary/30",
+                            templateActive && "ring-2 ring-primary/30",
+                            templateMarked && "border-amber-300",
+                          )}
+                        >
+                          <div className="mb-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4 type-body-sm text-blue-950">
+                            <strong>
+                              Questions {templateQuestions[0].number}–
+                              {lastQuestionNumber(templateQuestions.at(-1)!)}
+                            </strong>
+                            <br />
+                            {question.instruction}
+                          </div>
+                          <CompletionTemplateRenderer
+                            template={question.completionTemplate}
+                            questions={templateQuestions}
+                            answers={attempt.answers}
+                            markedForReview={attempt.markedForReview}
+                            activeQuestionId={activeQuestionId}
+                            onChange={setAnswer}
+                            onFocus={setActiveQuestionId}
+                            onToggleReview={toggleReview}
+                            setQuestionRef={(questionId, node) => {
+                              questionRefs.current[questionId] = node;
+                            }}
+                          />
+                        </Card>
+                      </section>
+                    );
+                  }
+
                   const marked = attempt.markedForReview.includes(question.id);
                   const answered = hasAnswer(attempt.answers[question.id]);
                   return (

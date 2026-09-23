@@ -74,6 +74,7 @@ Persist stable asset identifiers and object keys. Signed URLs are temporary acce
 
 - Active Admin test routes import `api-test-service.ts`. The older local `test-service.ts` still exists; its presence does not make the active builder browser-only.
 - `listening-section-service.ts` still stores section drafts in localStorage and delegates audio generation to the API. Do not claim that all content editing is persisted remotely.
+- Published form-completion groups carry a shared `completionTemplate` and `groupId` on their learner questions. The learner test renders a valid template once with inline answer fields; missing or malformed template data falls back to the ordinary question cards so questions remain answerable.
 - Learner attempts refer to a test ID. Submission and review read the current test record; a frozen test snapshot per attempt is not established in this source.
 - Some internal test values use `official`. That is a data label, not evidence of IELTS affiliation or licensed official test content.
 - The current Terraform CORS configuration permits all origins. Production origin restrictions and deployment state have not been verified.
