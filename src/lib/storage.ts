@@ -4,15 +4,21 @@ import type { TestAttempt } from "@/types/listening";
 
 const ATTEMPT_PREFIX = "listenly-attempt:";
 
-export function saveAttempt(attempt: TestAttempt) {
-  localStorage.setItem(`${ATTEMPT_PREFIX}${attempt.id}`, JSON.stringify(attempt));
+type StoredAttempt = TestAttempt & { pendingSync?: boolean };
+
+export function saveAttempt(attempt: TestAttempt, pendingSync = false) {
+  try {
+    localStorage.setItem(`${ATTEMPT_PREFIX}${attempt.id}`, JSON.stringify({ ...attempt, pendingSync }));
+  } catch {
+    // Browser storage can be unavailable; API-backed saving must still work.
+  }
 }
 
-export function loadAttempt(attemptId: string): TestAttempt | null {
-  const value = localStorage.getItem(`${ATTEMPT_PREFIX}${attemptId}`);
-  if (!value) return null;
+export function loadAttempt(attemptId: string): StoredAttempt | null {
   try {
-    const attempt = JSON.parse(value) as TestAttempt;
+    const value = localStorage.getItem(`${ATTEMPT_PREFIX}${attemptId}`);
+    if (!value) return null;
+    const attempt = JSON.parse(value) as StoredAttempt;
     return {
       ...attempt,
       phase:
@@ -26,6 +32,28 @@ export function loadAttempt(attemptId: string): TestAttempt | null {
     };
   } catch {
     return null;
+  }
+}
+
+export function restoreAttempt<T extends TestAttempt>(serverAttempt: T): T {
+  const local = loadAttempt(serverAttempt.id);
+  if (
+    serverAttempt.status !== "completed" && local?.pendingSync &&
+    local.status !== "completed" && local.userId === serverAttempt.userId &&
+    local.testId === serverAttempt.testId
+  ) {
+    return { ...serverAttempt, ...local };
+  }
+  saveAttempt(serverAttempt);
+  return serverAttempt;
+}
+
+export function acknowledgeAttempt(attempt: TestAttempt) {
+  const local = loadAttempt(attempt.id);
+  // An older request must not mark a newer local edit as synchronized.
+  if (local && JSON.stringify({ ...local, pendingSync: false }) ===
+    JSON.stringify({ ...attempt, pendingSync: false })) {
+    saveAttempt(local);
   }
 }
 

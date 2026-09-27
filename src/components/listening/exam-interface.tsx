@@ -38,13 +38,9 @@ import {
   FINAL_REVIEW_SECONDS,
   PART_PREVIEW_SECONDS,
 } from "@/config/listening-timing";
-import {
-  calculateRawScore,
-  estimateListeningBand,
-  questionSlotCount,
-} from "@/lib/scoring";
+import { questionSlotCount } from "@/lib/scoring";
 import { learnerAttemptService } from "@/lib/api/listenly-service";
-import { loadAttempt, saveAttempt } from "@/lib/storage";
+import { acknowledgeAttempt, saveAttempt } from "@/lib/storage";
 import { cn } from "@/lib/utils";
 import type {
   ListeningPart,
@@ -126,6 +122,9 @@ export function ExamInterface({
   const attemptRef = useRef(attempt);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const submittingRef = useRef(false);
+  const autoSubmittedRef = useRef(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const questionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [hydrated, setHydrated] = useState(false);
   const [audioSeconds, setAudioSeconds] = useState(0);
@@ -174,7 +173,7 @@ export function ExamInterface({
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
-      const restored = loadAttempt(attemptId);
+      const restored = loadedAttempt;
       if (restored?.status === "completed") {
         router.replace(`/results/${attemptId}`);
         return;
@@ -206,21 +205,25 @@ export function ExamInterface({
       setHydrated(true);
     });
     return () => window.cancelAnimationFrame(frame);
-  }, [attemptId, previewDuration, reviewDuration, router, test.parts]);
+  }, [attemptId, loadedAttempt, previewDuration, reviewDuration, router, test.parts]);
 
   useEffect(() => {
-    if (!hydrated) return;
-    saveAttempt(attempt);
+    if (!hydrated || submitting || attempt.status === "completed") return;
+    saveAttempt(attempt, true);
     const timeout = window.setTimeout(() => {
       learnerAttemptService.save(attempt)
-        .then(() => { setSaved(true); setSaveError(""); })
+        .then(() => {
+          acknowledgeAttempt(attempt);
+          if (attemptRef.current === attempt) { setSaved(true); setSaveError(""); }
+        })
         .catch((reason: unknown) => {
+          if (attemptRef.current !== attempt || submittingRef.current) return;
           setSaved(false);
           setSaveError(reason instanceof Error ? reason.message : "Your progress could not be saved.");
         });
     }, 500);
     return () => window.clearTimeout(timeout);
-  }, [attempt, hydrated]);
+  }, [attempt, hydrated, submitting]);
 
   const startPart = useCallback(() => {
     const audio = audioRef.current;
@@ -237,9 +240,10 @@ export function ExamInterface({
       phase: "part_playing",
     }));
     audio.currentTime = 0;
-    void audio.play().catch(() =>
-      setAudioError("Audio could not start automatically. Use Resume audio to continue."),
-    );
+    void audio.play().catch(() => {
+      setPaused(true);
+      setAudioError("Audio could not start automatically. Use Resume audio to continue.");
+    });
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
@@ -321,7 +325,10 @@ export function ExamInterface({
     if (paused || exitOpen || submitOpen) {
       audio.pause();
     } else {
-      void audio.play().catch(() => setAudioError("Select Resume audio to continue playback."));
+      void audio.play().catch(() => {
+        setPaused(true);
+        setAudioError("Select Resume audio to continue playback.");
+      });
     }
   }, [attempt.phase, exitOpen, paused, submitOpen]);
 
@@ -330,26 +337,22 @@ export function ExamInterface({
   const submitAttempt = useCallback(async () => {
     if (submittingRef.current) return;
     submittingRef.current = true;
+    setSubmitting(true);
+    setSubmitOpen(true);
+    setSubmitError("");
     const current = attemptRef.current;
-    const rawScore = calculateRawScore(test, current.answers);
-    const completed: TestAttempt = {
-      ...current,
-      status: "completed",
-      phase: "submitted",
-      completedAt: new Date().toISOString(),
-      rawScore,
-      estimatedBand: estimateListeningBand(rawScore),
-    };
-    saveAttempt(completed);
+    saveAttempt(current, true);
     try {
       const result = await learnerAttemptService.submit(current);
       saveAttempt(result);
       router.push(`/results/${attemptId}`);
     } catch (reason) {
       submittingRef.current = false;
-      setSaveError(reason instanceof Error ? reason.message : "The attempt could not be submitted.");
+      setSubmitting(false);
+      setSubmitOpen(true);
+      setSubmitError(reason instanceof Error ? reason.message : "The attempt could not be submitted. Please try again.");
     }
-  }, [attemptId, router, test]);
+  }, [attemptId, router]);
 
   useEffect(() => {
     if (!hydrated || attempt.phase !== "final_review") return;
@@ -361,7 +364,10 @@ export function ExamInterface({
       ).getTime();
       const remaining = Math.max(0, Math.ceil((end - Date.now()) / 1000));
       setReviewSeconds(remaining);
-      if (remaining === 0) void submitAttempt();
+      if (remaining === 0 && !autoSubmittedRef.current) {
+        autoSubmittedRef.current = true;
+        void submitAttempt();
+      }
     }
 
     updateReviewTimer();
@@ -383,6 +389,7 @@ export function ExamInterface({
         answers: { ...current.answers, [questionId]: answer },
       };
       attemptRef.current = next;
+      saveAttempt(next, true);
       return next;
     });
   }
@@ -397,6 +404,7 @@ export function ExamInterface({
           : [...current.markedForReview, questionId],
       };
       attemptRef.current = next;
+      saveAttempt(next, true);
       return next;
     });
   }
@@ -404,6 +412,8 @@ export function ExamInterface({
   function continueToNextPart() {
     const nextPart = test.parts[attempt.currentPart];
     setAudioSeconds(0);
+    setAudioDuration(0);
+    setAudioError("");
     setPaused(false);
     setPracticeReviewOpen(false);
     setPreviewSeconds(previewDuration);
@@ -446,6 +456,7 @@ export function ExamInterface({
     try {
       await audioRef.current?.play();
     } catch {
+      setPaused(true);
       setAudioError("Audio playback is unavailable. Check the recording and browser permissions.");
     }
   }
@@ -458,53 +469,6 @@ export function ExamInterface({
           <p className="mt-3 text-sm font-semibold text-muted">
             Restoring your test…
           </p>
-        </div>
-      </div>
-    );
-  }
-
-  if (attempt.phase === "part_preview") {
-    return (
-      <div className="grid min-h-screen place-items-center bg-brand-panel px-5 text-brand-panel-contrast">
-        <div className="w-full max-w-xl text-center">
-          <Badge className="border-white/20 bg-white/10 text-white">
-            {attempt.mode === "mock" ? "Mock Test" : "Practice"}
-          </Badge>
-          <p className="mt-7 text-sm font-semibold uppercase tracking-[0.16em] text-white/70">
-            Part {attempt.currentPart} of 4
-          </p>
-          <h1 className="mt-3 text-3xl font-bold sm:text-4xl">
-            Questions {currentPart.questions[0].number}–
-            {currentPart.questions.at(-1)
-              ? lastQuestionNumber(currentPart.questions.at(-1)!)
-              : currentPart.questions[0].number}
-          </h1>
-          <p className="mt-4 text-lg text-white/80">
-            {partLabel(currentPart.partNumber)}
-          </p>
-          <div className="mx-auto mt-8 max-w-md rounded-xl border border-white/15 bg-white/5 p-5">
-            <p className="font-semibold">
-              You now have time to read Questions{" "}
-              {currentPart.questions[0].number}–
-              {currentPart.questions.at(-1)
-                ? lastQuestionNumber(currentPart.questions.at(-1)!)
-                : currentPart.questions[0].number}.
-            </p>
-            <p className="mt-4 text-sm text-white/70">
-              Audio starts in
-            </p>
-            <p className="mt-1 text-4xl font-bold tabular-nums">
-              {formatTime(previewSeconds)}
-            </p>
-          </div>
-          <Button
-            variant="secondary"
-            size="lg"
-            className="mt-7"
-            onClick={startPart}
-          >
-            Start Part {attempt.currentPart} <Play className="size-4" />
-          </Button>
         </div>
       </div>
     );
@@ -545,6 +509,7 @@ export function ExamInterface({
   }
 
   const finalReview = attempt.phase === "final_review";
+  const partPreview = attempt.phase === "part_preview";
   const displayedParts: ListeningPart[] = finalReview
     ? test.parts
     : [currentPart];
@@ -597,7 +562,7 @@ export function ExamInterface({
                 <div className="flex-1">
                   <div className="mb-1 flex justify-between text-xs">
                     <span className="font-semibold">
-                      {paused ? "Audio paused" : "Audio playing"}
+                      {partPreview ? "Read the questions below" : paused ? "Audio paused" : "Audio playing"}
                     </span>
                     <span className="text-subtle">
                       {Math.floor(audioSeconds / 60)}:
@@ -629,7 +594,7 @@ export function ExamInterface({
                 <Save className="size-3.5" />
                 {saved ? "Saved" : "Saving…"}
               </span>
-              {!finalReview && attempt.mode === "practice" && (
+              {!finalReview && !partPreview && attempt.mode === "practice" && (
                 <Button
                   variant="secondary"
                   size="sm"
@@ -664,7 +629,7 @@ export function ExamInterface({
                 label="Non-interactive audio progress"
               />
               <span className="text-xs font-semibold">
-                {paused ? "Paused" : "Playing"}
+                {partPreview ? "Reading time" : paused ? "Paused" : "Playing"}
               </span>
             </div>
           )}
@@ -672,6 +637,15 @@ export function ExamInterface({
       </header>
 
       <main className="mx-auto grid max-w-[1440px] gap-5 px-4 py-5 sm:px-6 lg:grid-cols-[1fr_280px]">
+        {partPreview && (
+          <Card className="flex flex-wrap items-center justify-between gap-4 border-primary/30 bg-primary-soft p-5 lg:col-span-2">
+            <div>
+              <h1 className="text-xl font-bold">Read Part {attempt.currentPart} questions</h1>
+              <p className="mt-1 text-sm">{currentPart.audioUrl ? `Audio starts in ${formatTime(previewSeconds)}` : "Audio is unavailable. Your answers remain saved."}</p>
+            </div>
+            <Button onClick={startPart} disabled={!currentPart.audioUrl}>Start Part {attempt.currentPart} <Play className="size-4" /></Button>
+          </Card>
+        )}
         {audioError && (
           <Card className="flex flex-col gap-3 border-amber-300 bg-amber-50 p-4 text-amber-950 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
             <p className="text-sm font-semibold">{audioError}</p>
@@ -935,7 +909,7 @@ export function ExamInterface({
                 </>
               ) : (
                 <>
-                  {attempt.mode === "practice" && (
+                  {attempt.mode === "practice" && currentPart.questions.some((question) => question.transcriptEvidence?.text) && (
                     <Button
                       variant="secondary"
                       onClick={() =>
@@ -946,6 +920,11 @@ export function ExamInterface({
                       {practiceReviewOpen
                         ? "Hide transcript"
                         : "Review block"}
+                    </Button>
+                  )}
+                  {attempt.mode === "practice" && !partPreview && (
+                    <Button variant="secondary" onClick={startPart}>
+                      <Play className="size-4" /> Replay this part
                     </Button>
                   )}
                   {attempt.mode === "practice" && (
@@ -1087,6 +1066,7 @@ export function ExamInterface({
               )}
             </span>
             <h2 className="mt-4 text-xl font-bold">Submit Listening Test?</h2>
+            {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError} Your answers are still here. Try submitting again.</p>}
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-surface-subtle p-4">
                 <p className="text-xs text-muted">Answered</p>
@@ -1109,6 +1089,7 @@ export function ExamInterface({
               <Button
                 variant="secondary"
                 className="flex-1"
+                disabled={submitting}
                 onClick={() => {
                   if (unansweredCount > 0) reviewFirstUnanswered();
                   else setSubmitOpen(false);
@@ -1116,11 +1097,12 @@ export function ExamInterface({
               >
                 Review answers
               </Button>
-              <Button className="flex-1" onClick={() => void submitAttempt()}>
-                {unansweredCount > 0 ? "Submit anyway" : "Submit test"}
+              <Button className="flex-1" disabled={submitting} onClick={() => void submitAttempt()}>
+                {submitting ? "Submitting…" : unansweredCount > 0 ? "Submit anyway" : "Submit test"}
               </Button>
             </div>
             <button
+              disabled={submitting}
               onClick={() => setSubmitOpen(false)}
               className="mt-4 flex w-full items-center justify-center gap-1 text-sm font-semibold text-muted"
             >

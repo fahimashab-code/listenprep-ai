@@ -36,6 +36,8 @@ export interface ListeningQuestion {
   label?: string;
   options?: QuestionOption[];
   acceptedAnswers: string[];
+  explanation?: string;
+  transcriptText?: string;
   skillTags: string[];
   difficulty: Difficulty;
   wordLimit?: number;

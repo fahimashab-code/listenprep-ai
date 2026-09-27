@@ -1,6 +1,8 @@
 import "server-only";
 
 import { CognitoJwtVerifier } from "aws-jwt-verify";
+import { SimpleJsonFetcher } from "aws-jwt-verify/https";
+import { SimpleJwksCache } from "aws-jwt-verify/jwk";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 import { authEnv } from "@/lib/auth/env";
@@ -16,12 +18,20 @@ type CookieReader = {
   get(name: string): { value: string } | undefined;
 };
 
+// The default 1.5-second key fetch is too short on slower connections.
+// Both token types use the same pool keys and should share the cached response.
+const jwksCache = new SimpleJwksCache({
+  fetcher: new SimpleJsonFetcher({
+    defaultRequestOptions: { responseTimeout: 10000 },
+  }),
+});
+
 const idTokenVerifier = authEnv.isConfigured
   ? CognitoJwtVerifier.create({
       userPoolId: authEnv.userPoolId,
       clientId: authEnv.userPoolClientId,
       tokenUse: "id",
-    })
+    }, { jwksCache })
   : null;
 
 const accessTokenVerifier = authEnv.isConfigured
@@ -29,7 +39,7 @@ const accessTokenVerifier = authEnv.isConfigured
       userPoolId: authEnv.userPoolId,
       clientId: authEnv.userPoolClientId,
       tokenUse: "access",
-    })
+    }, { jwksCache })
   : null;
 
 function stringValue(value: unknown) {

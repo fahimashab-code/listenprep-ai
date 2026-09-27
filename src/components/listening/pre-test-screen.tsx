@@ -124,7 +124,7 @@ export function PreTestScreen({
                   mode === "mock" ? "Audio plays once" : "Learning controls available",
                   mode === "mock"
                     ? "You cannot pause, rewind, seek or restart the audio."
-                    : "You may pause and replay a question block.",
+                    : "You may pause and replay each part. Answers and explanations appear after submission.",
                 ],
                 ["Respect word limits", "For example: NO MORE THAN TWO WORDS AND/OR A NUMBER."],
               ].map(([title, text]) => (

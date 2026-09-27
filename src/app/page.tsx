@@ -283,7 +283,7 @@ export default function Home() {
               Focused practice · Clear feedback · No distractions
             </div>
             <ButtonLink
-              href="/login"
+              href="/register"
               variant="secondary"
               size="lg"
               className="mt-7"
