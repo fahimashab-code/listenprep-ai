@@ -16,7 +16,6 @@ import {
   learnerAttemptService,
   learnerTestService,
 } from "@/lib/api/listenly-service";
-import { loadAttempts } from "@/lib/storage";
 import type { PublishedTestSummary, TestAttempt } from "@/types/listening";
 
 function hasAnswer(answer: TestAttempt["answers"][string]) {
@@ -37,16 +36,12 @@ export function LearnerDashboard() {
 
   useEffect(() => {
     let active = true;
-    const frame = window.requestAnimationFrame(() => {
-      if (active) setAttempts(loadAttempts());
-    });
-
     Promise.allSettled([
       learnerAttemptService.list(),
       learnerTestService.list(),
     ]).then(([attemptResult, testResult]) => {
       if (!active) return;
-      if (attemptResult.status === "fulfilled" && attemptResult.value.length) {
+      if (attemptResult.status === "fulfilled") {
         setAttempts(attemptResult.value);
       }
       if (testResult.status === "fulfilled") {
@@ -56,7 +51,6 @@ export function LearnerDashboard() {
 
     return () => {
       active = false;
-      window.cancelAnimationFrame(frame);
     };
   }, []);
 

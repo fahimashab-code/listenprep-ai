@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { learnerAttemptService } from "@/lib/api/listenly-service";
-import { loadAttempts } from "@/lib/storage";
 import type { PublishedTestSummary, TestAttempt } from "@/types/listening";
 
 function countAnswers(attempt: TestAttempt) {
@@ -28,14 +27,13 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
   useEffect(() => {
     let active = true;
     learnerAttemptService.list().then((items) => {
-      const source = items.length > 0 ? items : loadAttempts();
       const latest = new Map<string, TestAttempt>();
-      source.forEach((attempt) => {
+      items.forEach((attempt) => {
         if (!latest.has(attempt.testId)) latest.set(attempt.testId, attempt);
       });
       if (active) setAttempts(Object.fromEntries(latest));
     }).catch(() => {
-      if (active) setAttempts(Object.fromEntries(loadAttempts().map((attempt) => [attempt.testId, attempt])));
+      if (active) setAttempts({});
     });
     return () => { active = false; };
   }, [tests]);

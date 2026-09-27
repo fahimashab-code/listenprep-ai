@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { learnerAttemptService } from "@/lib/api/listenly-service";
-import { loadAttempts } from "@/lib/storage";
 import type { TestAttempt } from "@/types/listening";
 
 export function useLearnerAttempts() {
@@ -12,15 +11,11 @@ export function useLearnerAttempts() {
 
   useEffect(() => {
     let active = true;
-    const frame = window.requestAnimationFrame(() => {
-      if (active) setAttempts(loadAttempts());
-    });
-
     learnerAttemptService
       .list()
       .then((items) => {
         if (!active) return;
-        if (items.length > 0) setAttempts(items);
+        setAttempts(items);
         setError("");
       })
       .catch((reason: unknown) => {
@@ -37,7 +32,6 @@ export function useLearnerAttempts() {
 
     return () => {
       active = false;
-      window.cancelAnimationFrame(frame);
     };
   }, []);
 

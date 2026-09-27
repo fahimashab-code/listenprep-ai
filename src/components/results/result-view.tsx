@@ -38,16 +38,24 @@ function ReviewCard({
   question,
   answer,
   defaultOpen,
+  audioUrl,
+  partNumber,
 }: {
   question: ListeningQuestion;
   answer?: UserAnswer;
   defaultOpen?: boolean;
+  audioUrl?: string;
+  partNumber: number;
 }) {
   const unanswered =
     answer === undefined ||
     (Array.isArray(answer) ? answer.length === 0 : String(answer).trim() === "");
   const correct = !unanswered && isAnswerCorrect(question, answer);
   const status = unanswered ? "Unanswered" : correct ? "Correct" : "Incorrect";
+  const start = question.transcriptEvidence?.startSeconds;
+  const end = question.transcriptEvidence?.endSeconds;
+  const hasPassage = typeof start === "number" && Number.isFinite(start) && start >= 0 &&
+    typeof end === "number" && Number.isFinite(end) && end > start;
 
   return (
     <details
@@ -104,15 +112,27 @@ function ReviewCard({
           </div>
         </div>
 
-        {!correct && (
+        {audioUrl && (
+          <div className="mt-5">
+            <h3 className="mb-2 text-sm font-bold">{hasPassage ? "Listen to the answer passage" : `Listen to Part ${partNumber} again`}</h3>
+            <audio
+              controls
+              preload="none"
+              aria-label={`Review audio for question ${question.number}`}
+              src={hasPassage ? `${audioUrl.split("#")[0]}#t=${start},${end}` : audioUrl}
+              className="h-10 w-full"
+            />
+          </div>
+        )}
+
+        {(question.explanation || question.distractor?.explanation) && (
           <div className="mt-5">
             <div className="flex items-center gap-2">
               <Lightbulb className="size-4 text-amber-700" />
-              <h3 className="font-bold">Why was this wrong?</h3>
+              <h3 className="font-bold">Answer explanation</h3>
             </div>
             <p className="mt-2 type-body-sm text-muted">
-              {question.distractor?.explanation ??
-                "Review the correct answer, then listen again in Practice mode to find the detail you missed."}
+              {question.explanation || question.distractor?.explanation}
             </p>
             {question.distractor && (
               <div className="mt-3 flex flex-wrap gap-2">
@@ -124,7 +144,7 @@ function ReviewCard({
           </div>
         )}
 
-        {question.transcriptEvidence?.text && (
+        {(question.transcriptEvidence?.text || question.transcriptText) && (
           <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
             <div className="flex items-center gap-2">
               <FileText className="size-4 text-blue-700" />
@@ -133,7 +153,7 @@ function ReviewCard({
               </h3>
             </div>
             <p className="mt-2 type-body-sm text-blue-950">
-              {question.transcriptEvidence.text}
+              {question.transcriptEvidence?.text || question.transcriptText}
             </p>
           </div>
         )}
@@ -262,7 +282,7 @@ export function ResultView({
               <div className="flex items-center gap-3">
                 <Badge variant="green">Practice estimate</Badge>
                 <span className="text-xs font-semibold text-muted">
-                  Full mock complete
+                  {initialAttempt.mode === "practice" ? "Practice complete · replay allowed" : "Full mock complete"}
                 </span>
               </div>
               <h1 className="type-page-title mt-4">
@@ -465,6 +485,8 @@ export function ResultView({
                 key={question.id}
                 question={question}
                 answer={answers[question.id]}
+                audioUrl={test.parts.find((part) => part.questions.some((item) => item.id === question.id))?.audioUrl}
+                partNumber={test.parts.find((part) => part.questions.some((item) => item.id === question.id))?.partNumber ?? 1}
                 defaultOpen={filter === "incorrect" && index === 0}
               />
             ))}

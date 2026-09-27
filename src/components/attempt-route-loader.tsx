@@ -7,7 +7,7 @@ import { ResultView } from "@/components/results/result-view";
 import { ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { learnerAttemptService, learnerTestService } from "@/lib/api/listenly-service";
-import { saveAttempt } from "@/lib/storage";
+import { restoreAttempt } from "@/lib/storage";
 import type { AttemptWithReview, ListeningTest } from "@/types/listening";
 
 export function AttemptRouteLoader({ attemptId, view, requestedMode = "mock" }: {
@@ -28,8 +28,7 @@ export function AttemptRouteLoader({ attemptId, view, requestedMode = "mock" }: 
         if (!current) throw new Error("This attempt could not be found.");
         const currentTest = current.reviewTest ?? await learnerTestService.get(current.testId);
         if (!currentTest) throw new Error("The test for this attempt is unavailable.");
-        saveAttempt(current);
-        if (active) { setAttempt(current); setTest(currentTest); }
+        if (active) { setAttempt(restoreAttempt(current)); setTest(currentTest); }
       } catch (reason) {
         if (active) setError(reason instanceof Error ? reason.message : "This attempt could not be loaded.");
       } finally {

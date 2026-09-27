@@ -10,6 +10,45 @@ import type {
 
 const apiUrl = process.env.NEXT_PUBLIC_LISTENLY_API_URL?.replace(/\/$/, "");
 
+class ApiError extends Error {
+  constructor(message: string, readonly status: number) {
+    super(message);
+  }
+}
+
+function normalizeAttempt(attempt: AttemptWithReview): AttemptWithReview {
+  return attempt.reviewTest
+    ? { ...attempt, reviewTest: normalizeTest(attempt.reviewTest) }
+    : attempt;
+}
+
+// Keep autosaves and submission in order, even on a slow connection.
+const pendingWrites = new Map<string, Promise<unknown>>();
+
+function queueWrite<T>(attemptId: string, write: () => Promise<T>): Promise<T> {
+  const previous = pendingWrites.get(attemptId) ?? Promise.resolve();
+  const next = previous.catch(() => undefined).then(write);
+  pendingWrites.set(attemptId, next);
+  const cleanup = () => {
+    if (pendingWrites.get(attemptId) === next) pendingWrites.delete(attemptId);
+  };
+  void next.then(cleanup, cleanup);
+  return next;
+}
+
+function writeAttempt(attempt: TestAttempt) {
+  return apiRequest<TestAttempt>(`/attempts/${attempt.id}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      answers: attempt.answers,
+      markedForReview: attempt.markedForReview,
+      currentPart: attempt.currentPart,
+      phase: attempt.phase,
+      reviewEndsAt: attempt.reviewEndsAt,
+    }),
+  });
+}
+
 function normalizeTest(test: ListeningTest): ListeningTest {
   return {
     ...test,
@@ -36,7 +75,7 @@ async function apiRequest<T>(path: string, init: RequestInit = {}) {
     message?: string;
   };
   if (!response.ok) {
-    throw new Error(body.message || "Listenly could not complete this request.");
+    throw new ApiError(body.message || "Listenly could not complete this request.", response.status);
   }
   return body;
 }
@@ -73,26 +112,28 @@ export const learnerAttemptService = {
   },
 
   async get(attemptId: string): Promise<AttemptWithReview> {
-    return apiRequest<AttemptWithReview>(`/attempts/${attemptId}`);
+    return normalizeAttempt(await apiRequest<AttemptWithReview>(`/attempts/${attemptId}`));
   },
 
   async save(attempt: TestAttempt): Promise<TestAttempt> {
-    return apiRequest<TestAttempt>(`/attempts/${attempt.id}`, {
-      method: "PUT",
-      body: JSON.stringify({
-        answers: attempt.answers,
-        markedForReview: attempt.markedForReview,
-        currentPart: attempt.currentPart,
-        phase: attempt.phase,
-        reviewEndsAt: attempt.reviewEndsAt,
-      }),
-    });
+    return queueWrite(attempt.id, () => writeAttempt(attempt));
   },
 
   async submit(attempt: TestAttempt): Promise<AttemptWithReview> {
-    await this.save(attempt);
-    return apiRequest<AttemptWithReview>(`/attempts/${attempt.id}/submit`, {
-      method: "POST",
+    return queueWrite(attempt.id, async () => {
+      try {
+        await writeAttempt(attempt);
+      } catch (error) {
+        // A previous submission may have succeeded but lost its response.
+        if (error instanceof ApiError && error.status === 409) {
+          const stored = await this.get(attempt.id);
+          if (stored.status === "completed") return stored;
+        }
+        throw error;
+      }
+      return normalizeAttempt(await apiRequest<AttemptWithReview>(`/attempts/${attempt.id}/submit`, {
+        method: "POST",
+      }));
     });
   },
 };

@@ -2,7 +2,7 @@
 
 Listenly is an IELTS Listening practice application. The current source supports published full tests, mock and practice modes, answers and submission, results, review, and attempt history.
 
-The [product documents](docs/README.md) describe the next direction: dependable tests, easier mistake review, and one-part practice. One-part selection and question-level replay from results are planned improvements, not confirmed current features. Shared structure and working rules are in [Architecture](docs/ARCHITECTURE.md) and [Implementation guidelines](docs/IMPLEMENTATION_GUIDELINES.md).
+The [product documents](docs/README.md) describe the next direction: dependable tests, easier mistake review, and one-part practice. Results now include explanations and audio replay; passage playback depends on supplied evidence timestamps. One-part selection remains planned. Shared structure and working rules are in [Architecture](docs/ARCHITECTURE.md) and [Implementation guidelines](docs/IMPLEMENTATION_GUIDELINES.md).
 
 This README was checked against source on 23 September 2026. It does not establish that the deployed application, available content, or cloud configuration works.
 
@@ -44,7 +44,7 @@ Use actual test and attempt IDs from the configured service. Old demo IDs are no
 - `src/components/listening/` contains setup, question rendering, and playback.
 - `src/components/results/result-view.tsx` presents answers and review evidence supplied by question content.
 - `src/lib/scoring.ts` contains answer and result helpers.
-- `src/lib/storage.ts` contains browser persistence helpers; some views can use locally saved attempts when fetching fails.
+- `src/lib/storage.ts` preserves pending answers for an API-verified attempt belonging to the same learner. Account-wide lists use the authenticated API.
 - `src/types/listening.ts` defines test, question, and attempt shapes.
 
 The active playback path uses published audio URLs. Existence of a URL or route does not prove a complete, reviewed test is available. Resume behavior and saved playback position must be checked before making guarantees to learners.
@@ -56,6 +56,7 @@ Practice estimates are not official IELTS results. Listenly is not affiliated wi
 ```bash
 npm run lint
 npm run build
+node --test tests/learner-regressions.test.mjs
 ```
 
 Run these checks after code changes. The shared documents by themselves do not require an application build.

@@ -1,6 +1,6 @@
 # Listenly product plan
 
-Updated 23 September 2026. Based on local documents, focused source inspection, public learner discussions, app reviews, and official IELTS guidance. No live product tests or learner interviews were performed.
+Updated 26 September 2026. Product priorities are based on local documents, focused source inspection, public learner discussions, app reviews, and official IELTS guidance. Local browser QA has started; no learner interviews have been performed.
 
 **First make taking a test and reviewing it dependable. Then add a convenient way to practise one part. Add further exercises only when a clear learner need supports them.**
 
@@ -10,7 +10,7 @@ The [product direction](PRODUCT.md) defines the experience. The [research notes]
 
 Keep the full-test builder, reusable audio, reviewed transcripts, existing test screens, saved attempts, and answer review. The source already contains Admin publishing API calls and learner test and attempt API calls. It also contains actual audio playback, Cognito authentication, and result explanations when the question content supplies them.
 
-That is source evidence, not proof that the deployed flow works. We have not checked the available published tests, their audio quality, the completeness of their explanations, or cross-device saving. Do not plan to rebuild these foundations merely because older documents call them demo-only.
+That is source evidence, not proof that the whole deployed flow works. The portfolio check below covers the available demonstration test and basic playback; audio quality, explanation completeness, and cross-device saving still need review. Do not plan to rebuild these foundations merely because older documents call them demo-only.
 
 ## The actual gaps to address
 
@@ -18,7 +18,7 @@ That is source evidence, not proof that the deployed flow works. We have not che
 | --- | --- | --- |
 | Practice currently sends people to the full-test library. | A learner cannot use that page to choose a single part. | Add one-part practice after the main test and review path is dependable. Keep full tests available. |
 | Results labels the lowest-scoring part with a broad description and sends “Focus next” to the test library. | It does not deliver the precise next-practice guidance promised on the homepage. | Lead with the learner's actual wrong answers. Recommend specific further content only when it exists and fits. |
-| The inspected results review has text evidence but no question-level audio replay control. | Finding the passage still requires another step outside that review card. | Put contextual audio replay next to the answer. Check available audio boundaries before implementation. |
+| Results now show published explanations and audio replay beside each answer. Passage playback requires valid evidence timestamps; otherwise the whole part is available. | The usefulness of replay still depends on the content's evidence and timing. | Review the available recordings and supply accurate timestamps where possible. |
 | Detailed explanations are optional; some questions can show generic advice. | A polished results screen can still leave the learner confused. | Require an answer explanation and matching evidence for content included in the first release. |
 | Learner copy refers to tests “published by your administrator.” | It describes internal operations instead of helping someone choose practice. | Use simple learner-facing descriptions of the test and its length. |
 | Progress combines completed-attempt summaries. | Assisted practice and fresh mocks need different interpretation. | Label attempt conditions and repeated tests clearly before making improvement claims. |
@@ -26,6 +26,14 @@ That is source evidence, not proof that the deployed flow works. We have not che
 These are product observations from source. Their effect on real learners still needs observation.
 
 ## Work in this order
+
+### Portfolio verification, 26 September
+
+Local learner sign-in, the published test library, Admin preview, and the browser sound check were exercised against the configured services. The existing Portfolio QA Mock is explicitly a system demonstration and repeats recordings across parts; it is not a reviewed, realistic four-part IELTS test.
+
+Local fixes cover account switching, pending-answer recovery, ordered saves, failed-submission recovery, visible questions during reading time, and results explanations/replay. The live API returned an error on submission. The local backend patch stores the band as a DynamoDB-compatible Decimal and prevents publishing unfinished audio; its deployment and a successful live submission remain to be verified.
+
+On 27 September, a fresh learner sign-in reached Home and recovered the previous practice attempt in Part 4 with both saved answers. The final frontend lint and production build passed, along with 11 frontend regression tests and 3 backend tests. These checks do not replace the pending live submission and results check.
 
 ### 1 Check one complete test and its answers
 

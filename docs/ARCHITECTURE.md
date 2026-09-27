@@ -1,6 +1,6 @@
 # Listenly architecture
 
-Source inspected 23 September 2026. This document describes the local implementation, not a verified deployment. Planned product work belongs in [Plan](PLAN.md).
+Source updated 26 September 2026. This document describes the local implementation; deployment and content readiness require separate checks. Planned product work belongs in [Plan](PLAN.md).
 
 ## Applications and responsibilities
 
@@ -18,11 +18,15 @@ Both applications use Next.js, React, TypeScript, Tailwind, and Amplify/Cognito.
 1. The Admin test builder calls `src/services/api-test-service.ts`. Its active routes are under `/listening-tests`.
 2. `src/lib/api/admin-api.ts` attaches the Admin access token and sends requests to the configured API.
 3. API Gateway routes `/admin/tests` requests through the Admin JWT authorizer to `tests-api`.
-4. `tests-api` saves test records in DynamoDB. Publishing checks the test structure and that each referenced audio record exists, then changes its publication state. It does not currently require each audio job to be completed; an unfinished job can leave a learner part without a playback URL.
+4. `tests-api` saves test records in DynamoDB. Publishing validates the record and changes its publication state.
 5. The learner app's `src/lib/api/listenly-service.ts` requests `/tests` and `/tests/{testId}` through a learner-authenticated fetch helper.
 6. The backend returns published learner-visible tests and temporary audio URLs. Normal test responses exclude accepted answers and review evidence.
-7. A learner creates an attempt, saves answers and the current phase, and submits it. The learner service saves the latest attempt before submission. The backend scopes attempts to the authenticated subject and calculates the stored score.
+7. A learner creates an attempt, saves answers and the current phase, and submits it. The backend scopes attempts to the authenticated subject and calculates the stored score.
 8. Completed attempts can include `reviewTest`, which contains answers, explanations, and transcript material for results review.
+
+Learner writes are serialized per attempt so a slow autosave cannot overtake submission. Pending browser answers are restored only after the API verifies the same attempt, learner, and test; a completed server result takes precedence. Submission marks an attempt complete only after server confirmation and can recover when a successful submission response was lost. Attempt lists use the authenticated API rather than displaying another account's browser cache.
+
+Results normalize optional question fields, display the published explanation for correct and incorrect answers, and offer audio replay. Valid evidence timestamps select a passage; otherwise the control explicitly replays the whole part. Practice results identify that replay was allowed. The reading countdown keeps questions visible before playback.
 
 The current handler adds review content after completion for both attempt modes. A future learning feature that reveals help earlier needs an explicit API decision; adding a button alone does not make that content available.
 
@@ -78,7 +82,7 @@ Persist stable asset identifiers and object keys. Signed URLs are temporary acce
 - Learner attempts refer to a test ID. Submission and review read the current test record; a frozen test snapshot per attempt is not established in this source.
 - Some internal test values use `official`. That is a data label, not evidence of IELTS affiliation or licensed official test content.
 - The current Terraform CORS configuration permits all origins. Production origin restrictions and deployment state have not been verified.
-- One-part selection, question-level replay from results, and a saved-mistakes collection are planned behavior. Inspect existing controls before estimating those changes.
+- One-part selection and a saved-mistakes collection remain planned behavior. Results replay exists; accurate passage selection depends on editorially supplied timestamps.
 
 ## Where to inspect a change
 

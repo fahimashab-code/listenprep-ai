@@ -112,7 +112,11 @@ export async function loginUser(
 
     try {
       const session = await fetchAuthSession({ forceRefresh: true });
-      if (session.tokens?.accessToken && session.tokens.idToken) {
+      const signedInEmail = session.tokens?.idToken?.payload.email;
+      if (
+        session.tokens?.accessToken && session.tokens.idToken &&
+        typeof signedInEmail === "string" && signedInEmail.toLowerCase() === normalizedEmail
+      ) {
         return { status: "signed-in" };
       }
     } catch {

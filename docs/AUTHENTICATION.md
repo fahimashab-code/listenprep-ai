@@ -16,6 +16,8 @@ Admin source handles email-code MFA and selects EMAIL when offered. It also acce
 
 Basic authentication talks to Cognito independently of test/audio APIs. Missing business API configuration should not be treated as a reason to redesign login. A logged-in user still needs an available, correctly configured API to load content.
 
+The Next.js server also needs outbound HTTPS access to Cognito's public signing keys. A browser can sign in successfully while a network-restricted server redirects it back to login. Server token verification shares a key cache and allows a ten-second response timeout; signature, issuer, client, expiry, and token-use checks remain enforced. When a login form is submitted for a different email, the client replaces the previous account's session rather than silently reusing it.
+
 ## Configuration names
 
 Set public Cognito identifiers separately for each application's intended pool and public app client. Do not copy old account-specific values from chat or deleted documents.
