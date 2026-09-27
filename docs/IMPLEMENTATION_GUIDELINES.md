@@ -21,11 +21,12 @@ Prefer familiar labels and one clear next action. Keep question reading and list
 - The approved transcript, recording, questions, accepted answers, and review evidence must agree.
 - Keep Admin and learner identities separate. Derive learner ownership from verified authentication, not a request-body user ID.
 - Keep answer keys out of ordinary learner test responses. Changes to practice-mode help must deliberately preserve the mock-test boundary.
-- Treat backend submission as the source of the saved result. Keep any frontend scoring helpers consistent with that contract.
-- Keep test mode, practice mode, and repeated attempts distinguishable when describing progress.
+- Treat backend submission and per-question marking outcomes as authoritative. Use reviewed fixtures to keep totals, review labels, variants and word/number rules consistent. Do not independently reinterpret a saved result in the browser.
+- Order writes within the page and protect backend revisions conditionally across clients. A stale save must never revert a completed attempt; submission retries must return the same durable completion.
+- Keep mock/practice, first/repeated exposure, interruptions and assistance distinguishable. Exclude demo/QA results from progress; do not infer skill diagnoses from a lowest-scoring part.
 - Keep stable audio IDs and storage keys. Do not persist temporary signed URLs as permanent assets.
 - Explain what resume preserves. Saved answers do not by themselves guarantee an identical playback position or uninterrupted mock conditions.
-- Avoid changing published questions in a way that silently changes the meaning of earlier attempts. The current implementation reads the current test record; inspect versioning needs when publication editing is in scope.
+- Pin attempts to immutable published material and retained audio. The current implementation still reads mutable current records: versioning is required work, not an existing guarantee. Revalidate and approve corrections as a new release.
 
 ## Keep operations deliberate
 
@@ -43,4 +44,4 @@ Report what changed, what was checked, and what remains unverified. Preserve unr
 
 ## Keep documentation useful
 
-Update the existing document for its purpose. Product intent belongs in Product, future work in Plan, implemented structure in Architecture, and content rules in Content guidelines. Keep `AGENTS.md` short and durable. Remove obsolete instructions and repair their links when replacing them. Do not leave competing roadmaps or copied implementation prompts behind.
+Update the existing document for its purpose. Product intent belongs in Product, future work in Plan, implemented structure in Architecture, and content rules in Content guidelines. Keep `AGENTS.md` short and durable. Remove obsolete instructions and repair their links when replacing them. Do not leave competing roadmaps or copied implementation prompts behind. `docs/PLAN.md` is the single handoff. The existing workspace `docs/` and frontend repository `docs/` publication copy must carry the same guidance; preserve location-specific README links and do not modify unrelated files such as `DATABASE.MD`.

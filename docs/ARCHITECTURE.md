@@ -1,6 +1,6 @@
 # Listenly architecture
 
-Source updated 26 September 2026. This document describes the local implementation; deployment and content readiness require separate checks. Planned product work belongs in [Plan](PLAN.md).
+Source reviewed 27 September 2026. This document describes the local implementation; deployment and content readiness require separate checks. Planned product work belongs in [Plan](PLAN.md).
 
 ## Applications and responsibilities
 
@@ -24,9 +24,9 @@ Both applications use Next.js, React, TypeScript, Tailwind, and Amplify/Cognito.
 7. A learner creates an attempt, saves answers and the current phase, and submits it. The backend scopes attempts to the authenticated subject and calculates the stored score.
 8. Completed attempts can include `reviewTest`, which contains answers, explanations, and transcript material for results review.
 
-Learner writes are serialized per attempt so a slow autosave cannot overtake submission. Pending browser answers are restored only after the API verifies the same attempt, learner, and test; a completed server result takes precedence. Submission marks an attempt complete only after server confirmation and can recover when a successful submission response was lost. Attempt lists use the authenticated API rather than displaying another account's browser cache.
+Learner writes are serialized per attempt within one page runtime so its slow autosave cannot overtake its submission. This queue does not coordinate separate tabs/devices; backend updates currently use unconditional read/replace writes. Pending browser answers are restored only after the API verifies the same attempt, learner, and test; a completed server result takes precedence. Submission marks an attempt complete only after server confirmation and can recover when a successful submission response was lost. Attempt lists use the authenticated API rather than displaying another account's browser cache.
 
-Results normalize optional question fields, display the published explanation for correct and incorrect answers, and offer audio replay. Valid evidence timestamps select a passage; otherwise the control explicitly replays the whole part. Practice results identify that replay was allowed. The reading countdown keeps questions visible before playback.
+Results normalize optional question fields, display the published explanation for correct and incorrect answers, and offer audio replay. Numerically valid evidence timestamps request a passage through an audio fragment; otherwise the control explicitly replays the whole part. This does not validate timing against recording duration or establish live playback correctness. Practice results identify that replay was allowed. The reading countdown keeps questions visible before playback.
 
 The current handler adds review content after completion for both attempt modes. A future learning feature that reveals help earlier needs an explicit API decision; adding a button alone does not make that content available.
 
@@ -83,6 +83,23 @@ Persist stable asset identifiers and object keys. Signed URLs are temporary acce
 - Some internal test values use `official`. That is a data label, not evidence of IELTS affiliation or licensed official test content.
 - The current Terraform CORS configuration permits all origins. Production origin restrictions and deployment state have not been verified.
 - One-part selection and a saved-mistakes collection remain planned behavior. Results replay exists; accurate passage selection depends on editorially supplied timestamps.
+
+## Known limitations from the review
+
+These are source findings from 27 September, not fixes already implemented. Browser outcomes and priorities are in [Plan](PLAN.md).
+
+| Area / source | Current limitation and consequence |
+| --- | --- |
+| Backend `tests-api/lambda_function.py`: attempt update/submit/read | Unconditional replacement and eventually consistent reads allow stale saves to race with newer answers/completion. Page-local serialization is insufficient across clients. The local Decimal submission fix exists; deployed artifact and live failure cause remain unverified. |
+| Same handler: Admin update/publication and learner review | Published edits overwrite the record and increment a version without retaining that version for attempts; update does not run the publication validator. Submission/review read current content; archive can block unfinished submission. |
+| Same handler scoring; learner `lib/scoring.ts`, `components/results/result-view.tsx` | Backend normalizes case/whitespace; frontend also removes punctuation and checks word limits. Low-score band fallbacks differ. Results use stored totals but recompute judgments/breakdowns. The learner mapping drops Admin `allowNumber`. |
+| Learner `components/listening/exam-interface.tsx`, `config/listening-timing.ts` | Both modes use 30-second previews, manual part transitions and a two-minute final review. Exit dialogs pause mock audio; only the current part is navigable until final review. Playback position is not persisted; refresh can restart preview/audio. |
+| Learner exam/question renderer | Word limits/save state are hidden at narrow breakpoints; some icon controls lose text; overlays lack explicit dialog/focus management. Missing map content can show an unrelated hardcoded fallback. |
+| Admin `components/tests/question-group-editor.tsx`; learner Results | Editing transcript text clears `transcriptEvidence`, including times. Backend `distractorExplanations`/`paraphraseExplanation` differ from fields consumed by parts of Results. Review omits some original task context. |
+| Learner `progress-view.tsx`, `history-view.tsx`, attempt schema | Progress mixes repeat/assisted/mock conditions; lowest-part labels are not validated diagnoses. History duration includes time away. |
+| Learner fetch/route loader/player; backend list/error handlers | Network errors can appear as expired sessions; save failure can remain labeled Saving; retry does not renew expired audio URLs. Learner list handlers ignore pagination; unexpected test-service exceptions lack diagnostic logging. |
+
+Existing DynamoDB pay-per-request tables, Lambda, API Gateway, Cognito and private S3 are sufficient for the proposed work. Use conditional writes, immutable release references and bounded sanitized diagnostics before proposing additional services. Audio URLs currently expire after one hour. Generation remains an asynchronous draft-production path; no generation/publication mutation was tested during this review.
 
 ## Where to inspect a change
 

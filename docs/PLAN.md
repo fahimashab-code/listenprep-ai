@@ -1,115 +1,41 @@
-# Listenly product plan
+# Listenly implementation handoff
 
-Updated 26 September 2026. Product priorities are based on local documents, focused source inspection, public learner discussions, app reviews, and official IELTS guidance. Local browser QA has started; no learner interviews have been performed.
+Updated 27 September 2026. This is the single implementation brief and work order; it replaces the earlier roadmap. Supporting contracts and evidence are linked below.
 
-**First make taking a test and reviewing it dependable. Then add a convenient way to practise one part. Add further exercises only when a clear learner need supports them.**
+## Goal and completion gate
 
-The [product direction](PRODUCT.md) defines the experience. The [research notes](LEARNER_RESEARCH.md) contain the evidence and its limits. Read [Architecture](ARCHITECTURE.md) and [Implementation guidelines](IMPLEMENTATION_GUIDELINES.md) before changing the system.
+**Deliver one trustworthy learner journey: choose a reviewed test → sign in → check audio → answer and recover saved work → submit once → understand mistakes through recording evidence → reopen the same result from History.** Keep the current UI foundation and existing serverless services.
 
-## What the project already gives us
+Portfolio-ready means this entire journey works live with one reviewed four-part, 40-question test. Independent practice additionally needs useful part-level review, honest attempt labels, and selectable one-part practice. A build, generated recording, or attractive screen does not satisfy either gate.
 
-Keep the full-test builder, reusable audio, reviewed transcripts, existing test screens, saved attempts, and answer review. The source already contains Admin publishing API calls and learner test and attempt API calls. It also contains actual audio playback, Cognito authentication, and result explanations when the question content supplies them.
+## What the completed investigation established
 
-That is source evidence, not proof that the whole deployed flow works. The portfolio check below covers the available demonstration test and basic playback; audio quality, explanation completeness, and cross-device saving still need review. Do not plan to rebuild these foundations merely because older documents call them demo-only.
+- **Observed:** library, Admin preview, sound-check controls, keyboard answer entry, review marking, and answer recovery worked. Refresh preserved two QA answers and a mark, but restarted reading time and reset paused playback from 0:27 to 0:00.
+- **Observed blocker:** live submission and retry both failed with a generic test-service error; History showed no completed result. The local Decimal patch exists, but its deployment and the current server exception were not verified. Diagnose before choosing a fix.
+- **Observed:** the local login loop cleared after the QA server received normal outbound access to Cognito signing keys. This does not establish that all login problems are resolved; verification errors currently become silent redirects.
+- **Observed:** the only published Portfolio QA Mock repeats hotel/transport material across parts. It is demonstration content. At a narrow measured viewport, word-limit labels and save status disappeared. Practice still imposed a timed final review.
+- **Source risks:** browser/backend marking disagree; saves lack conditional concurrency protection; attempts read mutable current content; evidence editing can discard timing; progress mixes conditions. See [Architecture](ARCHITECTURE.md#known-limitations-from-the-review).
+- **Unverified:** successful live Results/replay, cross-device consistency, a realistic uninterrupted mock, registration/recovery/logout flows, real-phone accessibility, and editorial accuracy of all content. Prior passing checks are historical, not current end-to-end proof. No learner interviews were performed.
 
-## The actual gaps to address
+## Implement in this order
 
-| What we observed | Why it matters | Product decision |
-| --- | --- | --- |
-| Practice currently sends people to the full-test library. | A learner cannot use that page to choose a single part. | Add one-part practice after the main test and review path is dependable. Keep full tests available. |
-| Results labels the lowest-scoring part with a broad description and sends “Focus next” to the test library. | It does not deliver the precise next-practice guidance promised on the homepage. | Lead with the learner's actual wrong answers. Recommend specific further content only when it exists and fits. |
-| Results now show published explanations and audio replay beside each answer. Passage playback requires valid evidence timestamps; otherwise the whole part is available. | The usefulness of replay still depends on the content's evidence and timing. | Review the available recordings and supply accurate timestamps where possible. |
-| Detailed explanations are optional; some questions can show generic advice. | A polished results screen can still leave the learner confused. | Require an answer explanation and matching evidence for content included in the first release. |
-| Learner copy refers to tests “published by your administrator.” | It describes internal operations instead of helping someone choose practice. | Use simple learner-facing descriptions of the test and its length. |
-| Progress combines completed-attempt summaries. | Assisted practice and fresh mocks need different interpretation. | Label attempt conditions and repeated tests clearly before making improvement claims. |
+Paths below are within the apps/services mapped in [Architecture](ARCHITECTURE.md). Estimates are engineering days, exclude editorial work, and are not commitments. All tasks are open.
 
-These are product observations from source. Their effect on real learners still needs observation.
+| Order / scope | Smallest coherent task and locations | Acceptance / verification | Dependency; effort |
+| --- | --- | --- | --- |
+| 1 · Demo blocker | Diagnose live submission; fix the proven cause; add sanitized error/request context. Distinguish invalid login from verification-service failure. Learner auth, `authenticated-fetch.ts`, attempt service; backend `tests-api`. | Fresh sign-in retains destination; submit reaches Results; refresh and History reopen it. Lost-response retry returns the same completion. Focused tests plus authorized live QA. | Deployed error/artifact evidence and separately authorized deployment; 1–3d, medium uncertainty. |
+| 2 · Demo blocker | Make backend per-question marks/outcomes authoritative. Align variants, punctuation, word/number limits and multi-selection rules; remove contradictory frontend judgments. Backend scorer, learner `scoring.ts`/Results, Admin schema. | Total equals question marks and breakdowns. Shared fixtures cover blanks, spelling, numbers, hyphens, limits and partial credit. | Reviewed answer fixtures; 2–4d, medium. |
+| 3 · Demo blocker | Add attempt revisions and conditional writes; submit a known answer revision atomically. Preserve completed results against stale saves. Attempt handlers, service queue and storage. | Two tabs cannot silently overwrite newer answers or revert completion; double submit and lost responses produce one result. Test races deliberately. | Task 2 contract; 2–4d, medium. |
+| 4 · Demo blocker | Publish immutable content releases; pin attempts and retain referenced audio. Validate edits before release. Clearly classify demo content. Admin builder/validation and `tests-api`. | Correcting or archiving content does not change old results or strand existing attempts. One editorially approved full test passes [content gates](CONTENT_GUIDELINES.md#publication-decision). | Content owner; 2–4d plus editorial work, high uncertainty. |
+| 5 · Demo blocker | Separate mock/practice playback and review. Use a reviewed mock timeline, track interruptions, restore practice position, keep limits/save state visible, repair keyboard/dialog behavior, remove unrelated map fallback. Exam/setup/question renderer and attempt schema. | No unlimited mock transition pauses; practice review is untimed; recovery is honestly labeled. Desktop, narrow/real-phone, keyboard, autoplay and audio-failure checks pass. | Tasks 3–4; 3–5d, medium. |
+| 6 · Practice essential | Complete review with original choices/instructions/visuals, accepted answers, explanation, valid passage replay, optional transcript and question reporting. Reconcile evidence fields; add timing editing/validation. Results, Admin editor and review API. | Every reference-test question is understandable; correct guesses and marked answers are reviewable; missing/expired evidence has honest recovery. Check all questions and actual playback. | Tasks 2, 4–5; 3–5d plus editorial timing, medium. |
+| 7 · Practice essential | Add complete one-part selection using existing reviewed material; remove hardcoded 4-part/40-question assumptions. `/practice`, attempts, exam and Results. | Finish, submit and reopen only the chosen part; score uses its actual count and never a band. | Tasks 2–6; 3–5d, medium. |
+| 8 · Practice essential | Simplify Home/History/Progress; label first/repeat, mode, interruptions and assistance. Exclude demo/QA from progress. Add pagination, truthful save/network errors and signed-audio refresh. | Familiar or assisted attempts never appear as fresh mock improvement; retained results remain findable; recovery preserves answers. | Tasks 3–4; 2–4d, medium. |
 
-## Work in this order
+## Settled defaults and work to avoid
 
-### Portfolio verification, 26 September
+Use raw scores first; no band for demo content or one-part practice. Consider clearly approximate bands only for reviewed full mocks. Practice feedback follows a complete part; mock answers remain hidden until submission. Browse/sample before account creation is the preferred later access flow. Keep History reopening exact reviews before building a separate saved-mistakes collection.
 
-Local learner sign-in, the published test library, Admin preview, and the browser sound check were exercised against the configured services. The existing Portfolio QA Mock is explicitly a system demonstration and repeats recordings across parts; it is not a reviewed, realistic four-part IELTS test.
+After the core gate, observe five IELTS learners choosing, finishing, recovering, reviewing and returning; then run a small return-use trial. Prepare a second distinct reviewed test before claiming useful unseen follow-up practice. Neither establishes learning gains or calibrated difficulty.
 
-Local fixes cover account switching, pending-answer recovery, ordered saves, failed-submission recovery, visible questions during reading time, and results explanations/replay. The live API returned an error on submission. The local backend patch stores the band as a DynamoDB-compatible Decimal and prevents publishing unfinished audio; its deployment and a successful live submission remain to be verified.
-
-On 27 September, a fresh learner sign-in reached Home and recovered the previous practice attempt in Part 4 with both saved answers. The final frontend lint and production build passed, along with 11 frontend regression tests and 3 backend tests. These checks do not replace the pending live submission and results check.
-
-### 1 Check one complete test and its answers
-
-Choose one full test as the reference experience. The content owner reviews all four parts, questions, answer variants, instructions, audio, and explanations together. Check whether the recording actually supports each answer and whether the speaking style and tasks feel plausible. Use official format guidance as the reference; local speech-rate targets are production preferences, not exam rules.
-
-For each test, record: reviewed parts, unresolved questions, missing explanations, usable audio, and who reviewed it. Do not count generated recordings as finished tests.
-
-**Ready when:** the chosen test has no unresolved answer/audio/instruction conflicts and every question can be explained. If no full test meets this, start with content repair rather than advertising a large library.
-
-### 2 Make the review of that test useful
-
-Prepare a simple walkthrough of the review described in the product direction. Start with the existing answers and transcript evidence. Include the correct audio passage, a short explanation, and a way to return later. A separate AI conversation or a compulsory mistake log is not needed.
-
-Cover correct answers too: a learner may have guessed. Let them review any question, with wrong and unanswered questions easy to find. For missing or disputed evidence, provide a way to report the question; do not invent an explanation.
-
-**Ready when:** a learner can open a question, hear the relevant passage, and understand the accepted answer without searching through the entire recording. No answer is hidden behind an unexpected extra step or payment demand.
-
-### 3 Check the whole path with learners
-
-Ask five people currently preparing for IELTS to use the chosen test or a part of it, then review their answers. Include people who struggle to follow questions as audio plays and someone who mainly needs exam familiarity. Ask them to show how they currently practise so we can compare effort.
-
-Observe these tasks:
-
-- choose practice and explain the controls before starting;
-- keep track of the questions while listening;
-- submit and find the result;
-- open a wrong or uncertain answer and understand its evidence;
-- leave and find the same attempt or saved question again.
-
-Record where help was needed, what was confusing, and what explanation was missing. Ask which they would choose next: another full test, one part, or reviewing mistakes. Do not ask only “Do you like it?”
-
-**Ready when:** the main blockers are fixed and the same tasks can be completed without coaching. Report actual observations and counts. A five-person check is not a learning study or a market-size estimate.
-
-### 4 Add one-part practice
-
-Let the learner choose Part 1, 2, 3, or 4 from approved content. Show available recordings and duration. Reuse complete parts and their review material. Keep a part's context; do not cut random sentences into a daily exercise.
-
-Allow replay in learning practice and label the result accordingly. A full mock keeps its own rules. Do not show unavailable parts as ready or claim a Part 1 collection covers the whole exam.
-
-**Ready when:** a person can complete and review one selected part without taking the other three. Saving and review work as clearly as in the full-test path.
-
-### 5 Decide what deserves more investment
-
-Run a small two-week trial after the core path works. Look at completed sessions, content complaints, time spent finding an answer explanation, and voluntary return visits. Note whether reminders prompted a return. Ask which part of the product replaced an awkward step in the learner's old method.
-
-If people repeatedly ask for maps, multiple choice, spelling, or another specific area, prepare a small reviewed collection for that request. If they mostly want more realistic full tests, improve that collection first. Do not build an elaborate recommendation system before there is enough trustworthy content to recommend.
-
-Decide price only after understanding the useful experience and the cost of reviewing and supplying it. Compare first attempts on unseen questions if studying learning improvement; keep repeats and assisted attempts separate.
-
-## What to check before a later implementation brief
-
-| Area | Required behavior |
-| --- | --- |
-| Starting | The learner knows the length, question count, and playback rules. An audio check is easy to use. |
-| Listening | Questions remain readable; answers can be entered without fighting the layout; no interruptions cover the task. |
-| Interruption | Saved answers survive where promised. Explain what happens to playback and whether the attempt still counts as an uninterrupted mock. |
-| Submission | A slow or failed request does not leave the learner unsure whether answers were submitted. |
-| Review | The recording passage, transcript, explanation, and accepted answer agree. Review is available for correct as well as incorrect answers. |
-| Return | The learner can find unfinished work, previous results, and saved mistakes. |
-| Content problem | The learner can report a suspected bad question; the content owner can identify and correct it. |
-
-Check practice on a phone and full mocks on a laptop. This is planned verification, not completed testing.
-
-## Where the source observations came from
-
-Paths are relative to `F:\Listenly` and were inspected on 22–23 September 2026.
-
-- `listenly-frontend/src/app/(app)/practice/page.tsx` — current Practice destination.
-- `listenly-frontend/src/components/results/result-view.tsx` — answer review, optional explanations, broad weakest-part label, and next link.
-- `listenly-frontend/src/components/learner-dashboard.tsx` and `src/app/page.tsx` — starting actions and product promises.
-- `listenly-frontend/src/components/progress-view.tsx` — completed-attempt summaries.
-- `listenly-frontend/src/lib/api/listenly-service.ts` — test and attempt service connections.
-- `listenly-frontend/src/lib/auth/client.ts` — Cognito authentication calls.
-- `listenly-frontend/src/components/listening/exam-interface.tsx` — recording playback and practice controls.
-- `listenly-admin/src/services/api-test-service.ts` and its imports in the active listening-test routes — Admin test management and publication.
-
-## Decisions still open
-
-The plan keeps IELTS Listening as the audience and full tests as a central task. What remains to learn is the most useful first content collection, explanation language, account timing, free access, price, and demand for specific practice types. Public comments do not decide these for Listenly.
+Defer chatbots, AI diagnosis, streaks/badges, reminders, compulsory diagnostics, elaborate dashboards, bulk generation, pricing work and infrastructure rewrites. Do not repeat the broad research. Recheck only the task's current source/runtime evidence. Follow [implementation guidelines](IMPLEMENTATION_GUIDELINES.md); documentation is not authorization for deployment, paid generation, account changes or Git publishing. Report each task as implemented, locally verified, live verified, or blocked with exact evidence. Do not mark the overall goal complete while the live journey or editorial gate is missing.

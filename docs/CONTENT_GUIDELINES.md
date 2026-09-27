@@ -8,6 +8,10 @@ Full Listening tests contain four parts and 40 questions. Parts 1 and 2 use ever
 
 Use original or properly licensed content. Describe Listenly material as IELTS-style practice. Internal labels such as `official` do not establish affiliation or permission to reproduce exam content.
 
+Computer Listening uses reading/checking opportunities and two minutes at the end to check answers, not the paper-format ten-minute transfer period. Do not claim a universal 30-second preview or unlimited manual transitions precisely reproduces the exam. Use a reviewed recording timeline and avoid adding pauses already embedded in audio. See [IDP computer Listening guidance](https://ielts.idp.com/bangladesh/about/which-test-do-i-take/ielts-on-computer/listening-preparation).
+
+Official marking requires the stated word/number limits; hyphenated words count as one. Define accepted variants and number allowances deliberately, with the same fixtures driving server marking and review. Band thresholds vary slightly by test version; an approximate conversion does not calibrate original content. See [IELTS scoring guidance](https://ielts.org/take-a-test/your-results/ielts-scoring-in-detail).
+
 ## Review a part as one piece
 
 1. The situation makes sense and the language sounds natural.
@@ -43,4 +47,11 @@ The reference describes a 56-example review, but that underlying analysis was no
 
 ## Publication decision
 
-Publish when the content owner has checked the complete recording, tasks, accepted answers, and review evidence, with no unresolved conflict. Record outstanding content problems before expanding the library. Check actual duration and quality rather than treating word count, AI generation success, or a status badge as approval.
+These are required editorial and engineering gates; current validators enforce only a subset.
+
+- Editorial: listen to the final recording against the approved transcript; check task context, every accepted answer/variant, distractor, instruction, explanation and replay passage. Record reviewer, date, exact asset/release identity and provenance. Have a second person answer the reference test without its key; resolve ambiguity before release.
+- Engineering: validate stable unique IDs, four parts/40 answer slots, numbering, supported types, options/visuals/templates, completed audio, answer-limit compatibility, explanations, evidence and timestamps within recording duration. Require approval for the exact published release.
+- Change control: transcript, question or recording changes invalidate affected approval and timing. Publish corrections as a new immutable release; retain old material/audio for existing attempts. Timing should be preserved or deliberately invalidated, never silently discarded by text editing.
+- Collection: start with one fully reviewed full test for a portfolio demonstration. Prefer a second distinct test, reusable as complete parts, for an independent-practice pilot. These are scope recommendations, not claims of calibrated difficulty or learning gains. Keep demo/QA content separate and exclude its scores from learner progress.
+
+Generated success and structural validity are not editorial approval. Original human-recorded or appropriately licensed material is also acceptable; do not require AI generation merely because that pipeline exists.

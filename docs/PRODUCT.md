@@ -1,6 +1,6 @@
 # What Listenly should do
 
-Updated 23 September 2026. Working product direction; application changes are outside this documentation task.
+Updated 27 September 2026. Product decisions below describe the intended experience; current readiness and implementation order are in [Plan](PLAN.md).
 
 **Help people prepare for IELTS Listening with trustworthy tests and an easy way to understand their mistakes.**
 
@@ -30,7 +30,7 @@ A learner opens a wrong answer and sees:
 2. **Listen to this part again**, starting before the important detail and ending after enough context to understand it.
 3. The matching transcript passage, available when wanted.
 4. A short explanation of what makes the answer correct. For multiple choice, explain why the tempting option does not fit. For a word-limit or spelling error, identify the actual issue.
-5. **Save for later** or **Next mistake**. A similar fresh question is useful only when suitable reviewed content exists; it is not required after every mistake.
+5. **Next mistake** and a dependable way to reopen the same review from History. Add a separate **Save for later** collection only if learners need more than that. Offer similar fresh questions only when suitable reviewed content exists.
 
 Example: the recording gives one appointment time and then changes it. Replay includes both times. The explanation points to the change. The learner should not have to restart the entire test to find that sentence.
 
@@ -38,13 +38,13 @@ Explain the question confidently when the evidence supports it. Do not pretend t
 
 ## Make starting and returning simple
 
-On Home, give a returning learner **Continue** when something is unfinished. Otherwise make **Start a test** the main action, with **Practise one part** available when that feature is ready. Show saved mistakes without turning Home into a wall of statistics.
+On Home, give a returning learner **Continue** when something is unfinished. Otherwise make **Start a test** the main action, with **Practise one part** available when that feature is ready. Make previous reviews easy to reopen without turning Home into a wall of statistics.
 
 Use familiar labels: Home, Tests, Practice, Results, History. Keep progress inside results and history until there is a clear need for a separate destination. Do not add navigation just to match this document.
 
 Before starting, show the length, number of questions, and whether replay is allowed. Keep the questions readable while audio plays. Avoid pop-ups, upsells, rewards, or other interruptions during listening.
 
-Let people return to unfinished work and saved mistakes. Show which tests are new to them. Remember what they have already reviewed. These are practical reasons to come back. Streaks, badges, daily quotas, and reminders are not first-release requirements.
+Let people return to unfinished work and previous reviews. Label content already attempted, including parts reused in different tests. These are practical reasons to come back. Streaks, badges, daily quotas, and reminders are not first-release requirements.
 
 ## What must be trustworthy
 
@@ -53,8 +53,18 @@ Let people return to unfinished work and saved mistakes. Show which tests are ne
 - Generated content must sound natural and have a believable task. More difficult does not automatically mean more realistic.
 - Keep practice and mock results distinct. A score after replay is not equivalent to a first attempt under exam conditions.
 - A one-part score is out of that part's question count. Do not turn it into an IELTS band estimate.
-- Keep full-test band estimates clearly unofficial. Do not promise a particular exam score.
+- Lead with raw scores. Do not show bands for demo content or one-part practice. Consider an explicitly approximate, unofficial band only for reviewed full mocks; do not imply calibrated difficulty or promise an exam score.
+- Distinguish first attempts on unseen content, repeats, assisted practice and interrupted mocks. Do not average them into an improvement claim or diagnose a weakness from the lowest-scoring part.
+- Published releases and their review assets must remain stable for existing attempts; corrections produce a new release.
 - Use original or properly licensed material. Official sample content can guide review without being copied into the product.
+
+## Mode and access decisions
+
+Mock mode should reproduce meaningful computer-test behavior rather than copy every visual detail: readable tasks, clear numbering, answer navigation, recordings heard once, and a reviewed timing sequence. Recovery remains possible, but disrupted mocks are labeled interrupted and excluded from uninterrupted comparisons. Keep question navigation separate from audio progression.
+
+Practice allows pause/replay, deliberate progression, and untimed final review. Reveal answers, explanations and transcripts after completing a whole part; this requires an explicit part-attempt API contract. Keep transcripts optional during review and correct but uncertain answers reviewable. Save playback position for practice and explain any recovery limitations.
+
+Prefer public test information and a sample before requiring an account to save a full attempt. Keep the existing layout, make length/rules visible before starting, and show meaningful loading, empty and retry states. Recommend desktop for mock familiarity while supporting phone practice. Word limits, saving feedback and accessible control names must remain available at narrow widths.
 
 ## What we will not add now
 

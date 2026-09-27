@@ -1,6 +1,6 @@
 # Listenly authentication
 
-Source inspected 23 September 2026. This replaces the old generic authentication blueprints and setup prompts. It describes the current application differences without assuming the live Cognito configuration has been checked.
+Source reviewed 27 September 2026. This describes the current application differences, not a complete verification of live Cognito configuration.
 
 ## Learner and Admin are separate
 
@@ -17,6 +17,12 @@ Admin source handles email-code MFA and selects EMAIL when offered. It also acce
 Basic authentication talks to Cognito independently of test/audio APIs. Missing business API configuration should not be treated as a reason to redesign login. A logged-in user still needs an available, correctly configured API to load content.
 
 The Next.js server also needs outbound HTTPS access to Cognito's public signing keys. A browser can sign in successfully while a network-restricted server redirects it back to login. Server token verification shares a key cache and allows a ten-second response timeout; signature, issuer, client, expiry, and token-use checks remain enforced. When a login form is submitted for a different email, the client replaces the previous account's session rather than silently reusing it.
+
+## Known failure and recovery boundary
+
+During 27 September QA, public signing-key retrieval failed inside the restricted server runtime and returned HTTP 200 outside it. Restarting the local server with normal outbound access restored Home. Treat this as evidence of that environment failure, not proof that all sign-in issues are fixed. Check server connectivity before changing authentication code or Cognito settings; never bypass token verification.
+
+Current server checks catch verification failures and return unauthenticated, causing protected-route redirects without distinguishing service unavailability. The browser request helper also maps transport failures to a session-expired error. The intended correction is actionable, distinct network/verification/session states, preserved destinations and pending answers, and sanitized diagnostics without credentials or tokens. It is not implemented yet. Signup, confirmation, password recovery, logout/account switching and cross-device sessions require their own checks.
 
 ## Configuration names
 
