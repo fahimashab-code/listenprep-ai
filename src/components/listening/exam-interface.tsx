@@ -3,7 +3,6 @@
 import {
   AlertTriangle,
   ArrowRight,
-  BookOpenCheck,
   Check,
   CheckCircle2,
   ChevronDown,
@@ -25,7 +24,6 @@ import {
   useState,
 } from "react";
 import {
-  CentreMap,
   CompletionTemplateRenderer,
   isCompletionTemplateUsable,
   QuestionRenderer,
@@ -116,11 +114,13 @@ export function ExamInterface({
   initialAttempt: TestAttempt;
 }) {
   const router = useRouter();
-  const previewDuration = PART_PREVIEW_SECONDS;
   const reviewDuration = FINAL_REVIEW_SECONDS;
+  const initialPart = test.parts.find((part) => part.partNumber === loadedAttempt.currentPart) ?? test.parts[0];
+  const initialPreviewDuration = initialPart.readingTimeSeconds ?? PART_PREVIEW_SECONDS;
   const [attempt, setAttempt] = useState<TestAttempt>(loadedAttempt);
   const attemptRef = useRef(attempt);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const lastPersistedAudioSecond = useRef(-1);
   const submittingRef = useRef(false);
   const autoSubmittedRef = useRef(false);
   const [submitting, setSubmitting] = useState(false);
@@ -130,14 +130,13 @@ export function ExamInterface({
   const [audioSeconds, setAudioSeconds] = useState(0);
   const [audioDuration, setAudioDuration] = useState(0);
   const [audioError, setAudioError] = useState("");
-  const [previewSeconds, setPreviewSeconds] = useState(previewDuration);
+  const [previewSeconds, setPreviewSeconds] = useState(initialPreviewDuration);
   const [reviewSeconds, setReviewSeconds] = useState(0);
   const [volume, setVolume] = useState(70);
   const [paused, setPaused] = useState(false);
   const [saved, setSaved] = useState(true);
   const [exitOpen, setExitOpen] = useState(false);
   const [submitOpen, setSubmitOpen] = useState(false);
-  const [practiceReviewOpen, setPracticeReviewOpen] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [activeQuestionId, setActiveQuestionId] = useState(
     test.parts[0].questions[0].id,
@@ -147,7 +146,10 @@ export function ExamInterface({
     () => test.parts.flatMap((part) => part.questions),
     [test.parts],
   );
-  const currentPart = test.parts[attempt.currentPart - 1];
+  const currentPart = test.parts.find((part) => part.partNumber === attempt.currentPart) ?? test.parts[0];
+  const previewDuration = currentPart.readingTimeSeconds ?? PART_PREVIEW_SECONDS;
+  const currentPartIndex = test.parts.findIndex((part) => part.partNumber === currentPart.partNumber);
+  const isLastPart = currentPartIndex === test.parts.length - 1;
   const answeredCount = allQuestions.reduce(
     (total, question) =>
       total + answeredSlots(question, attempt.answers[question.id]),
@@ -170,6 +172,63 @@ export function ExamInterface({
   useEffect(() => {
     attemptRef.current = attempt;
   }, [attempt]);
+
+  useEffect(() => {
+    const titleId = exitOpen
+      ? "exit-title"
+      : submitOpen
+        ? "submit-title"
+        : undefined;
+    if (!titleId) return;
+    const dialogTitleId = titleId;
+
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(dialogTitleId)?.focus();
+    });
+
+    function handleDialogKeyDown(event: KeyboardEvent) {
+      const dialog = document.querySelector<HTMLElement>(
+        `[role="dialog"][aria-labelledby="${dialogTitleId}"]`,
+      );
+      if (!dialog) return;
+
+      if (event.key === "Escape") {
+        if (exitOpen) setExitOpen(false);
+        else if (!submittingRef.current) setSubmitOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      );
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable.at(-1)!;
+      if (event.shiftKey && (document.activeElement === first || document.activeElement === dialog || document.activeElement === document.getElementById(dialogTitleId))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleDialogKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleDialogKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [exitOpen, submitOpen]);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -198,7 +257,7 @@ export function ExamInterface({
         if (restoredAttempt.phase === "part_preview") {
           setPreviewSeconds(previewDuration);
           setActiveQuestionId(
-            test.parts[restoredAttempt.currentPart - 1].questions[0].id,
+            (test.parts.find((part) => part.partNumber === restoredAttempt.currentPart) ?? test.parts[0]).questions[0].id,
           );
         }
       }
@@ -231,7 +290,10 @@ export function ExamInterface({
       setAudioError(`Audio is unavailable for Part ${attemptRef.current.currentPart}.`);
       return;
     }
-    setAudioSeconds(0);
+    const restoredPosition = attemptRef.current.mode === "practice"
+      ? Number(attemptRef.current.playbackPositions?.[String(attemptRef.current.currentPart)] ?? 0)
+      : 0;
+    setAudioSeconds(restoredPosition);
     setPaused(false);
     setAudioError("");
     setAttempt((current) => ({
@@ -239,7 +301,7 @@ export function ExamInterface({
       status: "in_progress",
       phase: "part_playing",
     }));
-    audio.currentTime = 0;
+    audio.currentTime = restoredPosition;
     void audio.play().catch(() => {
       setPaused(true);
       setAudioError("Audio could not start automatically. Use Resume audio to continue.");
@@ -262,11 +324,11 @@ export function ExamInterface({
   }, [attempt.phase, currentPart.audioUrl, hydrated, startPart]);
 
   const enterFinalReview = useCallback(() => {
-    const reviewEndsAt = new Date(
-      Date.now() + reviewDuration * 1000,
-    ).toISOString();
+    const reviewEndsAt = attemptRef.current.mode === "mock"
+      ? new Date(Date.now() + reviewDuration * 1000).toISOString()
+      : undefined;
     setPaused(true);
-    setReviewSeconds(reviewDuration);
+    setReviewSeconds(attemptRef.current.mode === "mock" ? reviewDuration : 0);
     setAttempt((current) => ({
       ...current,
       status: "final_review",
@@ -280,12 +342,12 @@ export function ExamInterface({
     audioRef.current?.pause();
     setPaused(true);
     setAttempt((current) =>
-      current.currentPart < 4
+      !isLastPart
         ? { ...current, phase: "part_transition" }
         : current,
     );
-    if (attemptRef.current.currentPart === 4) enterFinalReview();
-  }, [enterFinalReview]);
+    if (isLastPart) enterFinalReview();
+  }, [enterFinalReview, isLastPart]);
 
   useEffect(() => {
     if (!currentPart.audioUrl) {
@@ -296,8 +358,41 @@ export function ExamInterface({
     const audio = new Audio(currentPart.audioUrl);
     audio.preload = "metadata";
     audio.volume = 0.7;
-    const updateTime = () => setAudioSeconds(Math.floor(audio.currentTime));
-    const updateDuration = () => setAudioDuration(audio.duration || 0);
+    const updateTime = () => {
+      const seconds = Math.floor(audio.currentTime);
+      setAudioSeconds(seconds);
+      if (
+        attemptRef.current.mode === "practice" &&
+        seconds >= 0 &&
+        seconds % 5 === 0 &&
+        lastPersistedAudioSecond.current !== seconds
+      ) {
+        lastPersistedAudioSecond.current = seconds;
+        setAttempt((current) => ({
+          ...current,
+          playbackPositions: {
+            ...current.playbackPositions,
+            [String(current.currentPart)]: seconds,
+          },
+        }));
+      }
+    };
+    const updateDuration = () => {
+      setAudioDuration(audio.duration || 0);
+      const restoredAttempt = attemptRef.current;
+      const restoredPosition = Number(
+        restoredAttempt.playbackPositions?.[String(currentPart.partNumber)] ?? 0,
+      );
+      if (
+        restoredAttempt.mode === "practice" &&
+        restoredAttempt.phase === "part_playing" &&
+        restoredPosition > 0 &&
+        restoredPosition < audio.duration
+      ) {
+        audio.currentTime = restoredPosition;
+        setAudioSeconds(Math.floor(restoredPosition));
+      }
+    };
     const fail = () => setAudioError(`Audio could not be loaded for Part ${currentPart.partNumber}.`);
     const finish = () => finishCurrentPart();
     audio.addEventListener("timeupdate", updateTime);
@@ -318,6 +413,23 @@ export function ExamInterface({
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume / 100;
   }, [volume]);
+
+  useEffect(() => {
+    function recordHiddenMock() {
+      if (
+        document.visibilityState === "hidden" &&
+        attemptRef.current.mode === "mock" &&
+        attemptRef.current.phase === "part_playing"
+      ) {
+        setAttempt((current) => ({
+          ...current,
+          interruptionCount: (current.interruptionCount ?? 0) + 1,
+        }));
+      }
+    }
+    document.addEventListener("visibilitychange", recordHiddenMock);
+    return () => document.removeEventListener("visibilitychange", recordHiddenMock);
+  }, []);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -355,7 +467,7 @@ export function ExamInterface({
   }, [attemptId, router]);
 
   useEffect(() => {
-    if (!hydrated || attempt.phase !== "final_review") return;
+    if (!hydrated || attempt.phase !== "final_review" || attempt.mode === "practice") return;
 
     function updateReviewTimer() {
       const end = new Date(
@@ -376,6 +488,7 @@ export function ExamInterface({
   }, [
     attempt.phase,
     attempt.reviewEndsAt,
+    attempt.mode,
     hydrated,
     reviewDuration,
     submitAttempt,
@@ -410,20 +523,58 @@ export function ExamInterface({
   }
 
   function continueToNextPart() {
-    const nextPart = test.parts[attempt.currentPart];
+    const nextPart = test.parts[currentPartIndex + 1];
+    if (!nextPart) {
+      enterFinalReview();
+      return;
+    }
     setAudioSeconds(0);
     setAudioDuration(0);
     setAudioError("");
     setPaused(false);
-    setPracticeReviewOpen(false);
     setPreviewSeconds(previewDuration);
     setActiveQuestionId(nextPart.questions[0].id);
     setAttempt((current) => ({
       ...current,
-      currentPart: current.currentPart + 1,
+      currentPart: nextPart.partNumber,
       phase: "part_preview",
     }));
   }
+
+  function recordAssistance() {
+    setAttempt((current) => ({ ...current, assistanceUsed: true }));
+  }
+
+  function replayPart() {
+    recordAssistance();
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = 0;
+    setAudioSeconds(0);
+    setPaused(false);
+    setAttempt((current) => ({
+      ...current,
+      phase: "part_playing",
+      playbackPositions: { ...current.playbackPositions, [String(current.currentPart)]: 0 },
+    }));
+    void audio.play().catch(() => setAudioError("Audio playback is unavailable. Check the recording and browser permissions."));
+  }
+
+  function openExitDialog() {
+    setAttempt((current) => ({
+      ...current,
+      interruptionCount: (current.interruptionCount ?? 0) + 1,
+    }));
+    setExitOpen(true);
+  }
+
+  useEffect(() => {
+    if (attempt.phase !== "part_transition" || attempt.mode !== "mock") return;
+    const timeout = window.setTimeout(continueToNextPart, 1500);
+    return () => window.clearTimeout(timeout);
+    // continueToNextPart deliberately uses this rendered transition.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt.mode, attempt.phase]);
 
   function goToQuestion(question: ListeningQuestion) {
     const targetPart = test.parts.find((part) =>
@@ -475,7 +626,8 @@ export function ExamInterface({
   }
 
   if (attempt.phase === "part_transition") {
-    const nextPart = test.parts[attempt.currentPart];
+    const nextPart = test.parts[currentPartIndex + 1];
+    if (!nextPart) return null;
     return (
       <div className="grid min-h-screen place-items-center bg-brand-panel px-5 text-brand-panel-contrast">
         <div className="max-w-xl text-center">
@@ -500,8 +652,9 @@ export function ExamInterface({
             size="lg"
             className="mt-8"
             onClick={continueToNextPart}
+            disabled={attempt.mode === "mock"}
           >
-            Continue <ArrowRight className="size-4" />
+            {attempt.mode === "mock" ? "Continuing automatically…" : "Continue"} <ArrowRight className="size-4" />
           </Button>
         </div>
       </div>
@@ -524,7 +677,9 @@ export function ExamInterface({
                 <p className="font-bold">
                   {finalReview
                     ? "Final Review"
-                    : `Part ${attempt.currentPart} of 4`}
+                    : attempt.selectedPart
+                      ? `Part ${attempt.selectedPart} practice`
+                      : `Part ${currentPartIndex + 1} of ${test.parts.length}`}
                 </p>
                 <Badge variant={attempt.mode === "mock" ? "green" : "gray"}>
                   {attempt.mode === "mock" ? "Mock Test" : "Practice"}
@@ -549,10 +704,10 @@ export function ExamInterface({
                 <Timer className="size-4" />
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-wide">
-                    Review time
+                    {attempt.mode === "mock" ? "Review time" : "Practice review"}
                   </p>
                   <p className="font-bold tabular-nums">
-                    {formatTime(reviewSeconds)}
+                    {attempt.mode === "mock" ? formatTime(reviewSeconds) : "Untimed"}
                   </p>
                 </div>
               </div>
@@ -590,15 +745,15 @@ export function ExamInterface({
             )}
 
             <div className="flex items-center gap-2">
-              <span className={`hidden items-center gap-1.5 text-xs sm:flex ${saveError ? "text-red-700" : "text-muted"}`} title={saveError || undefined}>
+              <span className={`flex items-center gap-1.5 text-xs ${saveError ? "text-red-700" : "text-muted"}`} title={saveError || undefined} role={saveError ? "alert" : undefined}>
                 <Save className="size-3.5" />
-                {saved ? "Saved" : "Saving…"}
+                {saveError ? "Save failed" : saved ? "Saved" : "Saving…"}
               </span>
               {!finalReview && !partPreview && attempt.mode === "practice" && (
                 <Button
                   variant="secondary"
                   size="sm"
-                  onClick={() => setPaused((value) => !value)}
+                  onClick={() => { recordAssistance(); setPaused((value) => !value); }}
                 >
                   {paused ? (
                     <Play className="size-4" />
@@ -612,7 +767,7 @@ export function ExamInterface({
               )}
               <button
                 className="grid size-9 place-items-center rounded-lg border text-muted hover:bg-surface-subtle hover:text-ink"
-                onClick={() => setExitOpen(true)}
+                onClick={openExitDialog}
                 aria-label="Exit test"
               >
                 <LogOut className="size-4" />
@@ -649,9 +804,10 @@ export function ExamInterface({
         {audioError && (
           <Card className="flex flex-col gap-3 border-amber-300 bg-amber-50 p-4 text-amber-950 sm:flex-row sm:items-center sm:justify-between lg:col-span-2">
             <p className="text-sm font-semibold">{audioError}</p>
-            <Button variant="secondary" size="sm" onClick={() => void resumeAudio()}>
-              <Play className="size-4" /> Resume audio
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="secondary" size="sm" onClick={() => void resumeAudio()}><Play className="size-4" /> Resume audio</Button>
+              <Button variant="secondary" size="sm" onClick={() => window.location.reload()}>Refresh audio access</Button>
+            </div>
           </Card>
         )}
         <div className="min-w-0">
@@ -661,12 +817,11 @@ export function ExamInterface({
                 <Timer className="mt-0.5 size-5 shrink-0 text-amber-700" />
                 <div>
                   <h1 className="text-xl font-bold text-amber-950">
-                    Check all 40 answers
+                    Check all {totalQuestionSlots} answers
                   </h1>
                   <p className="mt-2 type-body-sm text-amber-900">
-                    Complete blank answers, check spelling and word limits, and
-                    revisit questions marked for review. Audio cannot be
-                    replayed.
+                    Complete blank answers, check spelling and word limits, and revisit questions marked for review.
+                    {attempt.mode === "mock" ? " Audio cannot be replayed." : " Practice review is untimed."}
                   </p>
                 </div>
               </div>
@@ -689,18 +844,6 @@ export function ExamInterface({
               </Card>
 
               <PartVisual part={part} />
-
-              {part.questions.some(
-                (question) =>
-                  question.type === "map_labelling" && !question.imageUrl,
-              ) && (
-                <Card className="mt-4 p-5 sm:p-6">
-                  <p className="mb-4 text-sm font-bold">
-                    Community centre plan · Questions 11–15
-                  </p>
-                  <CentreMap />
-                </Card>
-              )}
 
               <div className="mt-4 space-y-4">
                 {part.questions.map((question, index) => {
@@ -864,18 +1007,6 @@ export function ExamInterface({
                               />
                             </div>
 
-                            {attempt.mode === "practice" &&
-                              practiceReviewOpen &&
-                              answered && (
-                                <div className="mt-5 rounded-lg border border-green-200 bg-green-50 p-4 text-sm">
-                                  <p className="font-bold text-green-950">
-                                    Relevant part of the recording
-                                  </p>
-                                  <p className="mt-2 leading-6 text-green-900">
-                                    {question.transcriptEvidence?.text}
-                                  </p>
-                                </div>
-                              )}
                           </div>
                         </div>
                       </Card>
@@ -889,7 +1020,7 @@ export function ExamInterface({
           <Card className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center">
             <div>
               <p className="font-bold">
-                Answered {answeredCount} / 40
+                Answered {answeredCount} / {totalQuestionSlots}
               </p>
               <p className="mt-1 text-sm text-muted">
                 {unansweredCount} unanswered · {markedCount} marked for review
@@ -909,27 +1040,14 @@ export function ExamInterface({
                 </>
               ) : (
                 <>
-                  {attempt.mode === "practice" && currentPart.questions.some((question) => question.transcriptEvidence?.text) && (
-                    <Button
-                      variant="secondary"
-                      onClick={() =>
-                        setPracticeReviewOpen((value) => !value)
-                      }
-                    >
-                      <BookOpenCheck className="size-4" />
-                      {practiceReviewOpen
-                        ? "Hide transcript"
-                        : "Review block"}
-                    </Button>
-                  )}
                   {attempt.mode === "practice" && !partPreview && (
-                    <Button variant="secondary" onClick={startPart}>
+                    <Button variant="secondary" onClick={replayPart}>
                       <Play className="size-4" /> Replay this part
                     </Button>
                   )}
                   {attempt.mode === "practice" && (
                     <Button onClick={finishCurrentPart}>
-                      {attempt.currentPart < 4
+                      {!isLastPart
                         ? "Next Part"
                         : "Start final review"}
                       <ArrowRight className="size-4" />
@@ -945,7 +1063,7 @@ export function ExamInterface({
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-bold">Question navigator</h2>
-              <span className="text-xs text-muted">{answeredCount}/40</span>
+              <span className="text-xs text-muted">{answeredCount}/{totalQuestionSlots}</span>
             </div>
             <div className="mt-4 grid grid-cols-8 gap-1.5 sm:grid-cols-10 lg:grid-cols-5">
               {allQuestions
@@ -1029,15 +1147,14 @@ export function ExamInterface({
       </main>
 
       {exitOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-[#17201a]/45 px-5">
-          <Card className="w-full max-w-md p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#17201a]/45 px-5" role="presentation">
+          <Card className="w-full max-w-md p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="exit-title">
             <span className="grid size-11 place-items-center rounded-lg bg-amber-50 text-amber-700">
               <LogOut className="size-5" />
             </span>
-            <h2 className="mt-4 text-xl font-bold">Leave this test?</h2>
+            <h2 id="exit-title" tabIndex={-1} className="mt-4 text-xl font-bold outline-none">Leave this test?</h2>
             <p className="mt-2 type-body-sm text-muted">
-              Your answers, current Part, and marked questions are saved. The
-              recording starts from the beginning of this Part when you return.
+              Your answers, current Part, and marked questions are saved. Practice also restores the last saved playback position. Leaving a mock records an interruption.
             </p>
             <div className="mt-6 flex gap-3">
               <Button
@@ -1056,8 +1173,8 @@ export function ExamInterface({
       )}
 
       {submitOpen && (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-[#17201a]/45 px-5">
-          <Card className="w-full max-w-lg p-6 shadow-2xl">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-[#17201a]/45 px-5" role="presentation">
+          <Card className="w-full max-w-lg p-6 shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="submit-title">
             <span className="grid size-11 place-items-center rounded-lg bg-primary-soft text-primary">
               {unansweredCount ? (
                 <AlertTriangle className="size-5 text-amber-700" />
@@ -1065,12 +1182,12 @@ export function ExamInterface({
                 <Check className="size-5" />
               )}
             </span>
-            <h2 className="mt-4 text-xl font-bold">Submit Listening Test?</h2>
+            <h2 id="submit-title" tabIndex={-1} className="mt-4 text-xl font-bold outline-none">Submit Listening Test?</h2>
             {submitError && <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800">{submitError} Your answers are still here. Try submitting again.</p>}
             <div className="mt-5 grid grid-cols-2 gap-3">
               <div className="rounded-lg bg-surface-subtle p-4">
                 <p className="text-xs text-muted">Answered</p>
-                <p className="mt-1 text-2xl font-bold">{answeredCount} / 40</p>
+                <p className="mt-1 text-2xl font-bold">{answeredCount} / {totalQuestionSlots}</p>
               </div>
               <div className="rounded-lg bg-amber-50 p-4">
                 <p className="text-xs text-amber-800">Unanswered</p>

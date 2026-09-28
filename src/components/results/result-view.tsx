@@ -8,7 +8,6 @@ import {
   FileText,
   Headphones,
   Lightbulb,
-  Target,
   XCircle,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -16,15 +15,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import {
-  calculateRawScore,
-  estimateListeningBand,
-  getResultBreakdown,
-  isAnswerCorrect,
-  questionSlotCount,
-  scoreQuestion,
-} from "@/lib/scoring";
 import { cn, formatQuestionType, formatSkill } from "@/lib/utils";
+import { learnerAttemptService } from "@/lib/api/listenly-service";
 import type {
   ListeningQuestion,
   ListeningTest,
@@ -40,18 +32,35 @@ function ReviewCard({
   defaultOpen,
   audioUrl,
   partNumber,
+  outcome,
+  onReport,
 }: {
   question: ListeningQuestion;
   answer?: UserAnswer;
   defaultOpen?: boolean;
   audioUrl?: string;
   partNumber: number;
+  outcome?: NonNullable<TestAttempt["questionOutcomes"]>[string];
+  onReport: (questionId: string, note: string) => Promise<void>;
 }) {
+  const [audioFailed, setAudioFailed] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportNote, setReportNote] = useState("");
+  const [reportStatus, setReportStatus] = useState("");
   const unanswered =
     answer === undefined ||
     (Array.isArray(answer) ? answer.length === 0 : String(answer).trim() === "");
-  const correct = !unanswered && isAnswerCorrect(question, answer);
-  const status = unanswered ? "Unanswered" : correct ? "Correct" : "Incorrect";
+  const correct = outcome?.status === "correct";
+  const partial = outcome?.status === "partial";
+  const status = outcome?.status === "unanswered" || unanswered
+    ? "Unanswered"
+    : correct
+      ? "Correct"
+      : partial
+        ? `Partial · ${outcome?.awarded}/${outcome?.available}`
+        : outcome
+          ? "Incorrect"
+          : "Awaiting server result";
   const start = question.transcriptEvidence?.startSeconds;
   const end = question.transcriptEvidence?.endSeconds;
   const hasPassage = typeof start === "number" && Number.isFinite(start) && start >= 0 &&
@@ -112,6 +121,21 @@ function ReviewCard({
           </div>
         </div>
 
+        {(question.instruction || question.options?.length || question.imageUrl) && (
+          <div className="mt-5 rounded-lg border bg-surface-subtle p-4 text-sm">
+            {question.instruction && <p className="font-semibold">{question.instruction}</p>}
+            {question.imageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={question.imageUrl} alt={question.imageAlt || "Question visual"} className="mt-3 max-h-80 rounded-lg border object-contain" />
+            )}
+            {question.options?.length ? (
+              <ul className="mt-3 space-y-1 text-muted">
+                {question.options.map((option) => <li key={option.id}><strong>{option.id}.</strong> {option.label}</li>)}
+              </ul>
+            ) : null}
+          </div>
+        )}
+
         {audioUrl && (
           <div className="mt-5">
             <h3 className="mb-2 text-sm font-bold">{hasPassage ? "Listen to the answer passage" : `Listen to Part ${partNumber} again`}</h3>
@@ -121,7 +145,13 @@ function ReviewCard({
               aria-label={`Review audio for question ${question.number}`}
               src={hasPassage ? `${audioUrl.split("#")[0]}#t=${start},${end}` : audioUrl}
               className="h-10 w-full"
+              onError={() => setAudioFailed(true)}
             />
+            {audioFailed && (
+              <button type="button" className="mt-2 text-sm font-semibold text-primary underline" onClick={() => window.location.reload()}>
+                Refresh expired audio access
+              </button>
+            )}
           </div>
         )}
 
@@ -145,7 +175,8 @@ function ReviewCard({
         )}
 
         {(question.transcriptEvidence?.text || question.transcriptText) && (
-          <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+          <details className="mt-5 rounded-lg border border-blue-100 bg-blue-50/60 p-4">
+            <summary className="cursor-pointer text-sm font-bold text-blue-950">Show relevant transcript</summary>
             <div className="flex items-center gap-2">
               <FileText className="size-4 text-blue-700" />
               <h3 className="text-sm font-bold text-blue-950">
@@ -155,7 +186,7 @@ function ReviewCard({
             <p className="mt-2 type-body-sm text-blue-950">
               {question.transcriptEvidence?.text || question.transcriptText}
             </p>
-          </div>
+          </details>
         )}
 
         {question.paraphrase && (
@@ -184,11 +215,43 @@ function ReviewCard({
             </p>
           </div>
         )}
+        {question.paraphraseExplanation && (
+          <p className="mt-4 rounded-lg bg-surface-subtle p-4 text-sm text-muted">{question.paraphraseExplanation}</p>
+        )}
+        {question.distractorExplanations && Object.keys(question.distractorExplanations).length > 0 && (
+          <div className="mt-4 rounded-lg bg-amber-50 p-4 text-sm text-amber-950">
+            <p className="font-bold">Why other choices do not fit</p>
+            <ul className="mt-2 space-y-1">
+              {Object.entries(question.distractorExplanations).map(([choice, explanation]) => (
+                <li key={choice}><strong>{choice}:</strong> {explanation}</li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         <div className="mt-5 flex flex-wrap gap-2">
-          {question.skillTags.map((skill) => (
+          {(question.skillTags ?? []).map((skill) => (
             <Badge key={skill}>{formatSkill(skill)}</Badge>
           ))}
+        </div>
+        <div className="mt-5 border-t pt-4">
+          <button type="button" className="text-sm font-semibold text-muted underline" onClick={() => setReportOpen((open) => !open)}>
+            Report a problem with this question
+          </button>
+          {reportOpen && (
+            <div className="mt-3 space-y-2">
+              <label className="block text-sm font-semibold" htmlFor={`report-${question.id}`}>What seems wrong?</label>
+              <textarea id={`report-${question.id}`} value={reportNote} onChange={(event) => setReportNote(event.target.value)} rows={3} maxLength={1000} className="w-full rounded-lg border bg-surface p-3 text-sm" />
+              <Button size="sm" variant="secondary" disabled={!reportNote.trim() || reportStatus === "sending"} onClick={() => {
+                setReportStatus("sending");
+                void onReport(question.id, reportNote).then(() => {
+                  setReportStatus("sent");
+                  setReportNote("");
+                }).catch((error: unknown) => setReportStatus(error instanceof Error ? error.message : "Report could not be sent."));
+              }}>{reportStatus === "sending" ? "Sending…" : "Send report"}</Button>
+              {reportStatus && reportStatus !== "sending" && <p role="status" className="text-sm text-muted">{reportStatus === "sent" ? "Report sent. Thank you." : reportStatus}</p>}
+            </div>
+          )}
         </div>
       </div>
     </details>
@@ -205,25 +268,24 @@ export function ResultView({
   const answers = initialAttempt.answers;
   const [filter, setFilter] = useState<Filter>("all");
 
-  const calculatedScore = calculateRawScore(test, answers);
-  const score = initialAttempt.rawScore ?? calculatedScore;
-  const band = initialAttempt.estimatedBand ?? estimateListeningBand(score);
-  const breakdown = getResultBreakdown(test, answers);
-  const weakestPart = breakdown.byPart.reduce((weakest, item) =>
-    item.score / item.total < weakest.score / weakest.total ? item : weakest,
-  );
-  const weakestPartNumber = Number(weakestPart.label.replace("Part ", ""));
-  const weaknessTitle =
-    weakestPartNumber === 3
-      ? "Part 3 — Speaker opinions"
-      : `${weakestPart.label} — ${
-          [
-            "Everyday details",
-            "Directions and main ideas",
-            "Speaker opinions",
-            "Academic information",
-          ][weakestPartNumber - 1]
-        }`;
+  async function reportQuestion(questionId: string, note: string) {
+    await learnerAttemptService.reportQuestion(initialAttempt.id, questionId, note);
+  }
+
+  const score = initialAttempt.rawScore ?? 0;
+  const totalMarks = initialAttempt.totalMarks ?? test.questionCount;
+  const breakdown = {
+    byPart: (initialAttempt.scoreBreakdown?.byPart ?? []).map((item) => ({
+      label: `Part ${item.partNumber}`,
+      score: item.score,
+      total: item.total,
+    })),
+    byType: (initialAttempt.scoreBreakdown?.byType ?? []).map((item) => ({
+      label: item.type,
+      score: item.score,
+      total: item.total,
+    })),
+  };
   const questions = test.parts.flatMap((part) => part.questions);
   const visibleQuestions = useMemo(
     () =>
@@ -234,30 +296,21 @@ export function ResultView({
           (Array.isArray(answer)
             ? answer.length === 0
             : String(answer).trim() === "");
-        const correct =
-          !unanswered &&
-          scoreQuestion(question, answer) === questionSlotCount(question);
+        const status = initialAttempt.questionOutcomes?.[question.id]?.status;
+        const correct = status === "correct";
         if (filter === "incorrect") return !unanswered && !correct;
         if (filter === "correct") return correct;
         if (filter === "unanswered") return unanswered;
         return true;
       }),
-    [answers, filter, questions],
+    [answers, filter, initialAttempt.questionOutcomes, questions],
   );
-
-  const answeredCount = questions.reduce((total, question) => {
-    const answer = answers[question.id];
-    return (
-      total +
-      (Array.isArray(answer)
-        ? Math.min(questionSlotCount(question), answer.filter(Boolean).length)
-        : String(answer ?? "").trim()
-          ? 1
-          : 0)
-    );
-  }, 0);
-  const incorrectCount = Math.max(0, answeredCount - calculatedScore);
-  const unansweredCount = Math.max(0, 40 - answeredCount);
+  const incorrectCount = Object.values(initialAttempt.questionOutcomes ?? {}).filter(
+    (outcome) => outcome.status === "incorrect" || outcome.status === "partial",
+  ).length;
+  const unansweredCount = Object.values(initialAttempt.questionOutcomes ?? {}).filter(
+    (outcome) => outcome.status === "unanswered",
+  ).length;
 
   return (
     <div className="min-h-screen bg-surface-subtle">
@@ -294,32 +347,32 @@ export function ResultView({
                     Listening score
                   </p>
                   <p className="mt-1 text-5xl font-bold">
-                    {score} <span className="text-2xl text-subtle">/ 40</span>
+                    {score} <span className="text-2xl text-subtle">/ {totalMarks}</span>
                   </p>
                 </div>
-                <div>
+                {typeof initialAttempt.estimatedBand === "number" && <div>
                   <p className="text-sm font-semibold text-muted">
                     Estimated band
                   </p>
                   <p className="mt-1 text-5xl font-bold text-primary">
-                    {band.toFixed(1)}
+                    {initialAttempt.estimatedBand.toFixed(1)}
                   </p>
-                </div>
+                </div>}
               </div>
               <p className="mt-6 max-w-2xl type-body-sm text-muted">
-                This is an estimated Listening band based on practice
-                performance. It is not an official IELTS result.
+                {typeof initialAttempt.estimatedBand === "number"
+                  ? "This is an approximate practice estimate, not an official IELTS result."
+                  : "Raw score shown. Demo content and one-part practice do not receive a band estimate."}
               </p>
             </div>
             <div className="dark-green-panel p-6 text-white sm:p-8">
               <p className="text-sm font-semibold text-white/70">
                 Result insight
               </p>
-              <h2 className="mt-3 text-xl font-bold">Focus next</h2>
-              <p className="mt-2 text-lg font-bold">{weaknessTitle}</p>
+               <h2 className="mt-3 text-xl font-bold">Review next</h2>
+               <p className="mt-2 text-lg font-bold">Check the questions that cost marks</p>
               <p className="mt-3 type-body-sm text-white/75">
-                This Part cost you the most marks in this test. Review the
-                mistakes, then practise similar questions.
+                 Reopen the recording evidence and explanation for each answer. A score alone does not diagnose a listening weakness.
               </p>
               <ButtonLink
                 href="/tests"
@@ -410,41 +463,13 @@ export function ResultView({
           </Card>
 
           <Card className="p-5 sm:p-6">
-            <p className="text-sm font-semibold text-muted">
-              Learning analytics
+            <p className="text-sm font-semibold text-muted">Attempt conditions</p>
+            <h2 className="mt-1 text-xl font-bold">How to read this result</h2>
+            <p className="mt-3 text-sm text-muted">
+              {initialAttempt.exposure === "repeat" ? "Repeated material" : "First recorded exposure"}
+              {initialAttempt.interruptionCount ? ` · ${initialAttempt.interruptionCount} interruption${initialAttempt.interruptionCount === 1 ? "" : "s"}` : " · no recorded interruptions"}
+              {initialAttempt.assistanceUsed ? " · assistance used" : " · no assistance recorded"}
             </p>
-            <h2 className="mt-1 text-xl font-bold">Skill analysis</h2>
-            <p className="mt-2 text-xs leading-5 text-subtle">
-              These categories support learning and are not official IELTS
-              scoring criteria.
-            </p>
-            <div className="mt-5 space-y-3">
-              {breakdown.bySkill.slice(0, 6).map((item, index) => (
-                <div
-                  key={item.label}
-                  className="flex items-center justify-between rounded-lg bg-surface-subtle px-4 py-3 text-sm"
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={cn(
-                        "grid size-7 place-items-center rounded-full",
-                        index < 2
-                          ? "bg-amber-100 text-amber-800"
-                          : "bg-green-100 text-green-800",
-                      )}
-                    >
-                      <Target className="size-3.5" />
-                    </span>
-                    <span className="font-semibold">
-                      {formatSkill(item.label)}
-                    </span>
-                  </div>
-                  <span className="font-bold">
-                    {Math.round((item.score / item.total) * 100)}%
-                  </span>
-                </div>
-              ))}
-            </div>
           </Card>
           </div>
         </details>
@@ -459,7 +484,7 @@ export function ResultView({
             </div>
             <div className="flex gap-1 overflow-x-auto rounded-lg border bg-surface p-1">
               {[
-                ["all", `All · 40`],
+                ["all", `All · ${questions.length}`],
                 ["incorrect", `Incorrect · ${incorrectCount}`],
                 ["correct", `Correct · ${score}`],
                 ["unanswered", `Unanswered · ${unansweredCount}`],
@@ -485,6 +510,8 @@ export function ResultView({
                 key={question.id}
                 question={question}
                 answer={answers[question.id]}
+                outcome={initialAttempt.questionOutcomes?.[question.id]}
+                onReport={reportQuestion}
                 audioUrl={test.parts.find((part) => part.questions.some((item) => item.id === question.id))?.audioUrl}
                 partNumber={test.parts.find((part) => part.questions.some((item) => item.id === question.id))?.partNumber ?? 1}
                 defaultOpen={filter === "incorrect" && index === 0}

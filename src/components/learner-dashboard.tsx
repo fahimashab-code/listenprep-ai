@@ -75,6 +75,7 @@ export function LearnerDashboard() {
   const answeredCount = activeAttempt
     ? Object.values(activeAttempt.answers).filter(hasAnswer).length
     : 0;
+  const activeTotal = activeAttempt?.totalMarks ?? (activeAttempt?.selectedPart ? 10 : 40);
   const latestCompleted = completedAttempts[0];
   const latestCompletedTest = latestCompleted
     ? tests.find((test) => test.id === latestCompleted.testId)
@@ -113,7 +114,9 @@ export function LearnerDashboard() {
               {activeAttempt
                 ? activeAttempt.status === "final_review"
                   ? "Your answers are saved. Finish your review when you are ready."
-                  : `You stopped in Part ${activeAttempt.currentPart}. Your answers and marked questions are still here.`
+                  : activeAttempt.mode === "practice"
+                    ? `You stopped in Part ${activeAttempt.currentPart}. Your answers and marked questions are still here, and practice restores the last saved playback position.`
+                    : `You stopped in Part ${activeAttempt.currentPart}. Your answers and marked questions are still here.`
                 : "Browse the tests published by your Listenly administrator, then choose test or practice mode."}
             </p>
 
@@ -123,12 +126,14 @@ export function LearnerDashboard() {
                   <span className="font-semibold">
                     {activeAttempt.status === "final_review"
                       ? "Final review"
-                      : `Part ${activeAttempt.currentPart} of 4`}
+                      : activeAttempt.selectedPart
+                        ? `Part ${activeAttempt.selectedPart} practice`
+                        : `Part ${activeAttempt.currentPart} of 4`}
                   </span>
-                  <span className="text-muted">{answeredCount} of 40 answered</span>
+                  <span className="text-muted">{answeredCount} of {activeTotal} answered</span>
                 </div>
                 <Progress
-                  value={(answeredCount / 40) * 100}
+                  value={(answeredCount / activeTotal) * 100}
                   className="h-2.5"
                   label="Test answer progress"
                 />
@@ -165,7 +170,9 @@ export function LearnerDashboard() {
               {activeAttempt
                 ? activeAttempt.status === "final_review"
                   ? "Final review"
-                  : `Part ${activeAttempt.currentPart} of 4`
+                  : activeAttempt.selectedPart
+                    ? `Part ${activeAttempt.selectedPart} practice`
+                    : `Part ${activeAttempt.currentPart} of 4`
                 : tests.length > 0
                   ? `${tests.length} available now`
                   : "Your test library"}
@@ -204,10 +211,10 @@ export function LearnerDashboard() {
             {latestCompleted ? (
               <>
                 <h3 className="mt-1 text-xl font-bold">
-                  {latestCompletedTest?.title ?? "Completed listening test"}
+                  {latestCompleted.testTitle ?? latestCompletedTest?.title ?? "Completed listening test"}
                 </h3>
                 <p className="mt-2 text-muted">
-                  Score: <strong className="text-ink">{latestCompleted.rawScore ?? 0} of 40</strong>
+                  Score: <strong className="text-ink">{latestCompleted.rawScore ?? 0} of {latestCompleted.totalMarks ?? 40}</strong>
                   {typeof latestCompleted.estimatedBand === "number"
                     ? ` · Estimated band ${latestCompleted.estimatedBand.toFixed(1)}`
                     : ""}

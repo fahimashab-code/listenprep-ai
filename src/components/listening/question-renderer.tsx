@@ -274,7 +274,7 @@ export function QuestionRenderer({
           autoComplete="off"
         />
         {question.wordLimit && (
-          <span className="hidden whitespace-nowrap text-xs text-subtle sm:inline">
+          <span className="whitespace-nowrap text-xs text-subtle">
             Max {question.wordLimit} words
           </span>
         )}

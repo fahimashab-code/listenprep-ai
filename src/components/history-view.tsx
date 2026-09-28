@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CalendarDays, Clock3, Headphones } from "lucide-react";
+import { ArrowRight, CalendarDays, Headphones } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { PageHeading } from "@/components/page-heading";
 import { Badge } from "@/components/ui/badge";
@@ -20,12 +20,18 @@ function formatDate(attempt: TestAttempt) {
   }).format(new Date(value));
 }
 
-function formatDuration(attempt: TestAttempt) {
-  if (!attempt.startedAt || !attempt.completedAt) return "—";
-  const milliseconds =
-    new Date(attempt.completedAt).getTime() - new Date(attempt.startedAt).getTime();
-  if (!Number.isFinite(milliseconds) || milliseconds < 0) return "—";
-  return `${Math.max(1, Math.round(milliseconds / 60000))}m`;
+function attemptType(attempt: TestAttempt) {
+  if (attempt.selectedPart) return `Part ${attempt.selectedPart} practice`;
+  return attempt.mode === "mock" ? "Mock test" : "Practice";
+}
+
+function attemptConditions(attempt: TestAttempt) {
+  return [
+    attempt.exposure === "repeat" ? "Repeat" : "First exposure",
+    attempt.interruptionCount ? `interrupted ${attempt.interruptionCount}×` : "",
+    attempt.assistanceUsed ? "assisted" : "",
+    attempt.contentClassification === "demo" ? "demo" : "",
+  ].filter(Boolean).join(" · ");
 }
 
 export function HistoryView() {
@@ -99,7 +105,7 @@ export function HistoryView() {
                     "Date",
                     "Score",
                     "Estimated band",
-                    "Duration",
+                    "Conditions",
                     "Action",
                   ].map((heading) => (
                     <th key={heading} className="px-5 py-4 font-bold">{heading}</th>
@@ -110,23 +116,25 @@ export function HistoryView() {
                 {completed.map((attempt) => (
                   <tr key={attempt.id} className="hover:bg-surface-subtle">
                     <td className="px-5 py-4 font-bold">
-                      {titles.get(attempt.testId) ?? "Listening test"}
+                      {attempt.testTitle ?? titles.get(attempt.testId) ?? "Listening test"}
                     </td>
                     <td className="px-5 py-4">
                       <Badge variant={attempt.mode === "mock" ? "green" : "gray"}>
-                        {attempt.mode === "mock" ? "Mock test" : "Practice"}
+                        {attemptType(attempt)}
                       </Badge>
                     </td>
                     <td className="px-5 py-4 text-muted">{formatDate(attempt)}</td>
                     <td className="px-5 py-4 font-bold">
-                      {typeof attempt.rawScore === "number" ? `${attempt.rawScore} / 40` : "—"}
+                      {typeof attempt.rawScore === "number" ? `${attempt.rawScore} / ${attempt.totalMarks ?? 40}` : "—"}
                     </td>
                     <td className="px-5 py-4">
                       {typeof attempt.estimatedBand === "number"
                         ? `~${attempt.estimatedBand.toFixed(1)}`
                         : "—"}
                     </td>
-                    <td className="px-5 py-4 text-muted">{formatDuration(attempt)}</td>
+                    <td className="px-5 py-4 text-xs text-muted">
+                      {attemptConditions(attempt)}
+                    </td>
                     <td className="px-5 py-4">
                       <ButtonLink href={`/results/${attempt.id}`} variant="ghost" size="sm">
                         Review <ArrowRight className="size-4" />
@@ -148,7 +156,7 @@ export function HistoryView() {
                     </span>
                     <div className="min-w-0">
                       <h3 className="truncate font-bold">
-                        {titles.get(attempt.testId) ?? "Listening test"}
+                        {attempt.testTitle ?? titles.get(attempt.testId) ?? "Listening test"}
                       </h3>
                       <p className="mt-1 flex items-center gap-2 text-xs text-muted">
                         <CalendarDays className="size-3.5" /> {formatDate(attempt)}
@@ -156,20 +164,18 @@ export function HistoryView() {
                     </div>
                   </div>
                   <p className="shrink-0 text-xl font-bold">
-                    {typeof attempt.rawScore === "number" ? `${attempt.rawScore}/40` : "—"}
+                    {typeof attempt.rawScore === "number" ? `${attempt.rawScore}/${attempt.totalMarks ?? 40}` : "—"}
                   </p>
                 </div>
                 <div className="mt-4 flex items-center justify-between gap-3 border-t pt-4">
                   <div className="flex flex-wrap items-center gap-3 text-sm text-muted">
                     <Badge variant={attempt.mode === "mock" ? "green" : "gray"}>
-                      {attempt.mode === "mock" ? "Mock" : "Practice"}
+                      {attemptType(attempt)}
                     </Badge>
                     {typeof attempt.estimatedBand === "number" && (
                       <span>Estimated ~{attempt.estimatedBand.toFixed(1)}</span>
                     )}
-                    <span className="flex items-center gap-1">
-                      <Clock3 className="size-3.5" /> {formatDuration(attempt)}
-                    </span>
+                    <span>{attemptConditions(attempt)}</span>
                   </div>
                   <ButtonLink href={`/results/${attempt.id}`} variant="ghost" size="sm">
                     Review

@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { hasServerAuthSession } from "@/lib/auth/server";
+import { getServerAuthStatus } from "@/lib/auth/server";
 import {
   DEFAULT_AUTHENTICATED_ROUTE,
   isGuestOnlyRoute,
@@ -14,11 +14,15 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  const authenticated = await hasServerAuthSession(request, response);
+  const authStatus = await getServerAuthStatus(request, response);
+  const authenticated = authStatus === "authenticated";
 
   if (!authenticated && isProtectedRoute(pathname)) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("next", `${pathname}${search}`);
+    if (authStatus === "unavailable") {
+      loginUrl.searchParams.set("reason", "verification-unavailable");
+    }
     return NextResponse.redirect(loginUrl);
   }
 

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { learnerAttemptService, learnerTestService } from "@/lib/api/listenly-service";
 import { saveAttempt } from "@/lib/storage";
@@ -55,7 +55,7 @@ export function TestDetails({ testId }: { testId: string }) {
         </div>
         <div className="space-y-4">
           <Card className="p-5"><span className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary"><LockKeyhole className="size-5" /></span><h3 className="mt-4 text-lg font-bold">Mock Test</h3><p className="mt-2 type-body-sm text-muted">Audio plays once. Results and correct answers appear only after submission.</p><ul className="mt-4 space-y-2 text-sm text-muted">{["Audio plays once", "Answers remain editable", "Results after submission"].map((item) => <li key={item} className="flex gap-2"><CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />{item}</li>)}</ul><Button onClick={() => void start("mock")} disabled={starting !== null} className="mt-5 w-full"><PlayCircle className="size-4" />{starting === "mock" ? "Starting…" : "Start Mock Test"}</Button></Card>
-          <Card className="p-5"><span className="grid size-10 place-items-center rounded-lg bg-blue-50 text-blue-700"><BookOpenCheck className="size-5" /></span><h3 className="mt-4 text-lg font-bold">Practice</h3><p className="mt-2 type-body-sm text-muted">Learn at your own pace with pause and review controls.</p><Button onClick={() => void start("practice")} disabled={starting !== null} variant="secondary" className="mt-5 w-full"><Headphones className="size-4" />{starting === "practice" ? "Starting…" : "Start Practice"}</Button></Card>
+          <Card className="p-5"><span className="grid size-10 place-items-center rounded-lg bg-blue-50 text-blue-700"><BookOpenCheck className="size-5" /></span><h3 className="mt-4 text-lg font-bold">Practise one Part</h3><p className="mt-2 type-body-sm text-muted">Choose one complete Part with pause, replay and an untimed final review.</p><ButtonLink href="/practice" variant="secondary" className="mt-5 w-full"><Headphones className="size-4" />Choose a Part</ButtonLink></Card>
         </div>
       </div>
     </div>

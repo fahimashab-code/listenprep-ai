@@ -9,9 +9,10 @@ export default async function LoginPage({
     next?: string;
     confirmed?: string;
     reset?: string;
+    reason?: string;
   }>;
 }) {
-  const { next, confirmed, reset } = await searchParams;
+  const { next, confirmed, reset, reason } = await searchParams;
 
   return (
     <div>
@@ -28,6 +29,14 @@ export default async function LoginPage({
           {confirmed === "true"
             ? "Your email is confirmed. You can sign in now."
             : "Your password has been updated. You can sign in now."}
+        </div>
+      )}
+      {reason === "verification-unavailable" && (
+        <div
+          role="alert"
+          className="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-900"
+        >
+          Your sign-in could not be verified because the authentication service was unreachable. Your credentials may still be correct. Please try again shortly.
         </div>
       )}
       <AuthForm mode="login" nextPath={next} />

@@ -43,7 +43,11 @@ function loadApp(overrides = {}) {
 const attempt = {
   id: "attempt-1", testId: "test-1", userId: "learner-1", mode: "practice",
   status: "final_review", phase: "final_review", currentPart: 4,
-  answers: { q1: "museum" }, markedForReview: [],
+  answers: { q1: "museum" }, markedForReview: [], revision: 0, totalMarks: 1,
+  exposure: "first", contentClassification: "reviewed", interruptionCount: 0,
+  assistanceUsed: false,
+  questionOutcomes: { q1: { awarded: 1, available: 1, status: "correct", reason: "accepted" } },
+  scoreBreakdown: { byPart: [{ partNumber: 1, score: 1, total: 1 }], byType: [{ type: "short_answer", score: 1, total: 1 }] },
 };
 const reviewTest = {
   id: "test-1", title: "Regression test", questionCount: 40,
@@ -65,6 +69,83 @@ test("completed review normalizes optional fields and renders the published expl
   assert.match(html, /Meet me at the museum/);
   assert.match(html, /Practice complete/);
   assert.doesNotMatch(html, /Full mock complete/);
+});
+
+test("results use the backend outcome instead of re-marking the answer in the browser", () => {
+  const { load } = loadApp({ "@/lib/api/authenticated-fetch": { authenticatedFetch: async () => response({}) } });
+  const { ResultView } = load("@/components/results/result-view");
+  const content = structuredClone(reviewTest);
+  content.parts[0].questions[0].acceptedAnswers = ["different answer"];
+  const html = renderToStaticMarkup(React.createElement(ResultView, {
+    test: content,
+    initialAttempt: { ...attempt, status: "completed", rawScore: 1 },
+  }));
+  assert.match(html, />Correct</);
+  assert.doesNotMatch(html, />Incorrect</);
+});
+
+test("one-part practice sends the selected Part to the attempt API", async () => {
+  let request;
+  const { load } = loadApp({ "@/lib/api/authenticated-fetch": { authenticatedFetch: async (url, init) => {
+    request = { url, body: JSON.parse(init.body) };
+    return response({ ...attempt, selectedPart: 3 });
+  } } });
+  const created = await load("@/lib/api/listenly-service").learnerAttemptService.create("test-1", "practice", 3);
+  assert.equal(created.selectedPart, 3);
+  assert.deepEqual(request.body, { testId: "test-1", mode: "practice", partNumber: 3 });
+});
+
+test("paginated attempts are returned in global activity order", async () => {
+  const pages = [
+    { items: [{ ...attempt, id: "older", startedAt: "2026-09-01T00:00:00Z" }], nextToken: "next" },
+    { items: [{ ...attempt, id: "newer", startedAt: "2026-09-28T00:00:00Z" }] },
+  ];
+  const { load } = loadApp({
+    "@/lib/api/authenticated-fetch": {
+      authenticatedFetch: async () => response(pages.shift()),
+    },
+  });
+  const items = await load("@/lib/api/listenly-service").learnerAttemptService.list();
+  assert.deepEqual(Array.from(items, (item) => item.id), ["newer", "older"]);
+});
+
+test("history labels selected Part and all recorded attempt conditions", () => {
+  const historyAttempt = {
+    ...attempt,
+    id: "history-attempt",
+    status: "completed",
+    selectedPart: 3,
+    testTitle: "Pinned release title",
+    rawScore: 7,
+    totalMarks: 9,
+    exposure: "repeat",
+    interruptionCount: 2,
+    assistanceUsed: true,
+    contentClassification: "demo",
+    completedAt: "2026-09-28T00:00:00Z",
+  };
+  const { load } = loadApp({
+    "@/hooks/use-learner-attempts": {
+      useLearnerAttempts: () => ({ attempts: [historyAttempt], loading: false, error: "" }),
+    },
+    "@/lib/api/listenly-service": {
+      learnerTestService: { list: async () => [] },
+    },
+  });
+  const html = renderToStaticMarkup(React.createElement(load("@/components/history-view").HistoryView));
+  assert.match(html, /Pinned release title/);
+  assert.match(html, /Part 3 practice/);
+  assert.match(html, /7 \/ 9/);
+  assert.match(html, /Repeat · interrupted 2× · assisted · demo/);
+});
+
+test("practice selector uses the published Part mark count", () => {
+  const source = fs.readFileSync(
+    path.join(import.meta.dirname, "../src/app/(app)/practice/page.tsx"),
+    "utf8",
+  );
+  assert.match(source, /part\.questionCount/);
+  assert.doesNotMatch(source, /10 marks/);
 });
 
 test("slow autosave finishes before the latest answers are saved and submitted", async () => {
@@ -173,7 +254,7 @@ test("login does not silently reuse a different learner's existing session", asy
 });
 
 test("review uses a timed passage only when both evidence boundaries are valid", () => {
-  const { load } = loadApp();
+  const { load } = loadApp({ "@/lib/api/authenticated-fetch": { authenticatedFetch: async () => response({}) } });
   const { ResultView } = load("@/components/results/result-view");
   for (const [startSeconds, endSeconds, label] of [[5, 12, "Listen to the answer passage"], [12, 5, "Listen to Part 1 again"]]) {
     const content = structuredClone(reviewTest);
@@ -205,4 +286,29 @@ test("server authentication still rejects missing or invalid signed tokens", asy
   assert.equal(await server.hasServerAuthSession({ cookies: { get: () => ({ value: "invalid" }) } }, {}), false);
   assert.deepEqual(verifiers.map((item) => item.config.tokenUse), ["id", "access"]);
   assert.equal(verifiers[0].options.jwksCache, verifiers[1].options.jwksCache);
+});
+
+test("word limits remain visible at narrow viewports", () => {
+  const source = fs.readFileSync(
+    path.join(import.meta.dirname, "../src/components/listening/question-renderer.tsx"),
+    "utf8",
+  );
+  const label = source.match(
+    /question\.wordLimit[\s\S]*?<span className="([^"]+)"[\s\S]*?Max \{question\.wordLimit\} words/,
+  );
+  assert.ok(label, "word-limit label should be rendered");
+  assert.doesNotMatch(label[1], /(?:^|\s)hidden(?:\s|$)/);
+});
+
+test("exam dialogs move and contain keyboard focus and support Escape", () => {
+  const source = fs.readFileSync(
+    path.join(import.meta.dirname, "../src/components/listening/exam-interface.tsx"),
+    "utf8",
+  );
+  assert.match(source, /document\.getElementById\(dialogTitleId\)\?\.focus\(\)/);
+  assert.match(source, /event\.key === "Escape"/);
+  assert.match(source, /event\.key !== "Tab"/);
+  assert.match(source, /previouslyFocused\?\.focus\(\)/);
+  assert.match(source, /id="exit-title" tabIndex=\{-1\}/);
+  assert.match(source, /id="submit-title" tabIndex=\{-1\}/);
 });

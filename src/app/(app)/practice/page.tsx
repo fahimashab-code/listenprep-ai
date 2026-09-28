@@ -1,63 +1,90 @@
-import { ArrowRight, ClipboardCheck, Headphones, Library } from "lucide-react";
+"use client";
+
+import { ArrowRight, Clock3, Headphones } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { PageHeading } from "@/components/page-heading";
-import { ButtonLink } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { learnerAttemptService, learnerTestService } from "@/lib/api/listenly-service";
+import { saveAttempt } from "@/lib/storage";
+import type { PublishedTestSummary } from "@/types/listening";
 
 export default function PracticePage() {
+  const router = useRouter();
+  const [tests, setTests] = useState<PublishedTestSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [starting, setStarting] = useState("");
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    learnerTestService.list()
+      .then((items) => active && setTests(items))
+      .catch((reason: unknown) => active && setError(reason instanceof Error ? reason.message : "Practice parts could not be loaded."))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
+
+  async function startPart(testId: string, partNumber: number) {
+    const key = `${testId}:${partNumber}`;
+    setStarting(key);
+    setError("");
+    try {
+      const attempt = await learnerAttemptService.create(testId, "practice", partNumber);
+      saveAttempt(attempt);
+      router.push(`/test/${attempt.id}/setup?mode=practice`);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason.message : "This practice part could not be started.");
+      setStarting("");
+    }
+  }
+
   return (
     <>
       <PageHeading
-        title="Listening Practice"
-        description="Practise with a listening test published by your Listenly administrator."
+        title="Practise one Part"
+        description="Choose one complete listening Part. You can pause, replay and review it without a timed final review."
       />
-
-      <Card className="overflow-hidden border-primary/35">
-        <div className="grid lg:grid-cols-[1fr_280px]">
-          <div className="p-6 sm:p-8">
-            <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">
-              Available now
-            </p>
-            <h3 className="mt-3 text-2xl font-bold">
-              Choose a published test
-            </h3>
-            <p className="mt-3 max-w-xl leading-7 text-muted">
-              Open a test and select Practice mode for pause and review
-              controls, or Mock Test mode for a timed exam-style session.
-            </p>
-            <ButtonLink href="/tests" className="mt-6">
-              Browse published tests <ArrowRight className="size-4" />
-            </ButtonLink>
-          </div>
-          <div className="hidden place-items-center bg-primary-strong lg:grid">
-            <div className="grid size-28 place-items-center rounded-full border border-white/15 bg-white/5 text-white">
-              <Headphones className="size-12" />
-            </div>
-          </div>
+      {error && <Card className="mb-5 border-red-200 bg-red-50 p-4 text-sm text-red-800" role="alert">{error}</Card>}
+      {loading ? (
+        <Card className="p-8 text-center text-muted">Loading practice Parts…</Card>
+      ) : tests.length === 0 ? (
+        <Card className="p-8 text-center"><h2 className="font-bold">No practice material is available</h2><p className="mt-2 text-muted">A reviewed published test is needed before a Part can be selected.</p></Card>
+      ) : (
+        <div className="space-y-6">
+          {tests.map((test) => (
+            <Card key={test.id} className="overflow-hidden">
+              <div className="border-b p-5 sm:p-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Badge variant={test.contentClassification === "reviewed" ? "green" : "amber"}>{test.contentClassification === "reviewed" ? "Reviewed material" : "Demo material"}</Badge>
+                  <span className="text-xs text-muted">{test.title}</span>
+                </div>
+                <h2 className="mt-3 text-xl font-bold">Choose a Part</h2>
+              </div>
+              <div className="grid gap-3 p-5 sm:grid-cols-2 sm:p-6">
+                {test.parts.map((part) => {
+                  const key = `${test.id}:${part.partNumber}`;
+                  return (
+                    <div key={part.partNumber} className="rounded-xl border p-4">
+                      <span className="grid size-10 place-items-center rounded-lg bg-primary-soft text-primary"><Headphones className="size-5" /></span>
+                      <h3 className="mt-3 font-bold">Part {part.partNumber} · {part.title}</h3>
+                      <p className="mt-2 text-sm text-muted">{part.context}</p>
+                      <p className="mt-3 flex items-center gap-2 text-xs text-muted">
+                        <Clock3 className="size-3.5" /> One complete Part · {part.questionCount} mark{part.questionCount === 1 ? "" : "s"}
+                      </p>
+                      <Button className="mt-4 w-full" variant="secondary" disabled={Boolean(starting)} onClick={() => void startPart(test.id, part.partNumber)}>
+                        {starting === key ? "Starting…" : <>Practise Part {part.partNumber} <ArrowRight className="size-4" /></>}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          ))}
         </div>
-      </Card>
-
-      <section className="mt-8 grid gap-4 md:grid-cols-2">
-        <Card className="p-5 sm:p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
-            <ClipboardCheck className="size-5" />
-          </span>
-          <h3 className="mt-4 text-lg font-bold">Mock Test mode</h3>
-          <p className="mt-2 type-body-sm text-muted">
-            Complete the published recording once with exam-style controls,
-            then submit your answers for scoring.
-          </p>
-        </Card>
-        <Card className="p-5 sm:p-6">
-          <span className="grid size-11 place-items-center rounded-xl bg-primary-soft text-primary">
-            <Library className="size-5" />
-          </span>
-          <h3 className="mt-4 text-lg font-bold">Practice mode</h3>
-          <p className="mt-2 type-body-sm text-muted">
-            Use the same published test with learning controls, including
-            pause and transcript review when that content is available.
-          </p>
-        </Card>
-      </section>
+      )}
     </>
   );
 }

@@ -26,7 +26,16 @@ export function AttemptRouteLoader({ attemptId, view, requestedMode = "mock" }: 
       try {
         const current: AttemptWithReview | null = await learnerAttemptService.get(attemptId);
         if (!current) throw new Error("This attempt could not be found.");
-        const currentTest = current.reviewTest ?? await learnerTestService.get(current.testId);
+        const loadedTest = current.reviewTest ?? await learnerTestService.get(current.testId);
+        const currentTest = loadedTest && current.selectedPart
+          ? {
+              ...loadedTest,
+              parts: loadedTest.parts.filter((part) => part.partNumber === current.selectedPart),
+              questionCount: loadedTest.parts
+                .filter((part) => part.partNumber === current.selectedPart)
+                .reduce((total, part) => total + part.questions.reduce((count, question) => count + (question.maxSelections ?? 1), 0), 0),
+            }
+          : loadedTest;
         if (!currentTest) throw new Error("The test for this attempt is unavailable.");
         if (active) { setAttempt(restoreAttempt(current)); setTest(currentTest); }
       } catch (reason) {

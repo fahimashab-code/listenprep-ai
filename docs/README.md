@@ -1,6 +1,8 @@
 # Listenly documentation
 
-Maintained 23 September 2026.
+Maintained 28 September 2026.
+
+**Start implementation with [the one-page handoff](PLAN.md): goal, verified findings, ordered tasks, acceptance checks, and excluded work.** The other documents support that brief; they are not competing roadmaps.
 
 **Product goal:** prepare for IELTS Listening through dependable full tests, useful answer review, and convenient one-part practice.
 
@@ -9,7 +11,7 @@ Maintained 23 September 2026.
 | Document | Purpose | Read before |
 | --- | --- | --- |
 | [Product](PRODUCT.md) | Learners, main tasks, simple experience, and excluded features | Product or UI decisions |
-| [Plan](PLAN.md) | Work order, current gaps, and completion criteria | Choosing the next feature |
+| [Plan](PLAN.md) | Single implementation handoff, evidence, work order, and completion gate | Starting implementation |
 | [Architecture](ARCHITECTURE.md) | Current applications, services, storage, and source locations | Changing a data flow or shared behavior |
 | [Implementation guidelines](IMPLEMENTATION_GUIDELINES.md) | Scope, contracts, verification, and documentation rules | Any implementation task |
 | [Authentication](AUTHENTICATION.md) | Actual learner/Admin differences and configuration names | Login, sessions, or protected API work |

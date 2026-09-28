@@ -209,7 +209,7 @@ export function PreTestScreen({
                 onClick={() => void start()}
                 disabled={!audioReady || !checked || starting}
               >
-                <ShieldCheck className="size-4" /> {starting ? "Starting…" : "Start Listening Test"}
+                <ShieldCheck className="size-4" /> {starting ? "Starting…" : mode === "practice" ? `Start Part ${initialAttempt.selectedPart ?? test.parts[0]?.partNumber}` : "Start Listening Test"}
               </Button>
               <p className="mt-3 text-center text-xs leading-5 text-subtle">
                 {checked
