@@ -87,7 +87,7 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
               <span className="flex items-center gap-2">
                 <FileCheck2 className="size-4" /> {test.questionCount} questions
               </span>
-              <span>4 Parts</span>
+              <span>{test.parts.length} Part{test.parts.length === 1 ? "" : "s"}</span>
               <span className="flex items-center gap-2">
                 <Clock3 className="size-4" /> ~
                 {test.estimatedDurationMinutes} min
@@ -99,10 +99,8 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
                 <div>
                   <p className="text-sm text-muted">Your result</p>
                   <p className="mt-0.5 font-bold">
-                    {attempt.rawScore ?? 0} / 40{" "}
-                    <span className="font-normal text-muted">
-                      · Estimated ~{attempt.estimatedBand?.toFixed(1) ?? "—"}
-                    </span>
+                    {attempt.rawScore ?? 0} / {attempt.totalMarks ?? test.questionCount}{" "}
+                    {typeof attempt.estimatedBand === "number" && <span className="font-normal text-muted">· Estimated ~{attempt.estimatedBand.toFixed(1)}</span>}
                   </p>
                 </div>
               ) : status === "in_progress" ? (
@@ -110,9 +108,11 @@ export function TestLibrary({ tests }: { tests: PublishedTestSummary[] }) {
                   <p className="text-sm text-muted">
                     {attempt.status === "final_review"
                       ? "Final review"
-                      : `Part ${attempt.currentPart} of 4`}
+                      : attempt.selectedPart
+                        ? `Part ${attempt.selectedPart} practice`
+                        : `Part ${attempt.currentPart} of ${test.parts.length}`}
                   </p>
-                  <p className="mt-0.5 font-bold">{answered} / 40 answered</p>
+                  <p className="mt-0.5 font-bold">{answered} / {attempt.totalMarks ?? test.questionCount} answered</p>
                 </div>
               ) : (
                 <span className="text-sm text-muted">Ready when you are</span>

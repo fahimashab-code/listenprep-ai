@@ -1,6 +1,6 @@
 # Listenly documentation
 
-Maintained 27 September 2026.
+Maintained 28 September 2026.
 
 **Start implementation with [the one-page handoff](PLAN.md): goal, verified findings, ordered tasks, acceptance checks, and excluded work.** The other documents support that brief; they are not competing roadmaps.
 

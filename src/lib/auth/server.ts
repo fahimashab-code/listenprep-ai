@@ -14,6 +14,16 @@ export type ServerAuthUser = {
   name: string;
 };
 
+export type ServerAuthStatus = "authenticated" | "missing" | "invalid" | "unavailable";
+
+function verificationStatus(error: unknown): Exclude<ServerAuthStatus, "authenticated" | "missing"> {
+  if (error instanceof Error && /fetch|network|timeout|connect|jwks/i.test(`${error.name} ${error.message}`)) {
+    console.error("Cognito token verification service unavailable", { errorName: error.name });
+    return "unavailable";
+  }
+  return "invalid";
+}
+
 type CookieReader = {
   get(name: string): { value: string } | undefined;
 };
@@ -91,15 +101,22 @@ export async function hasServerAuthSession(
   request: NextRequest,
   response: NextResponse,
 ) {
+  return (await getServerAuthStatus(request, response)) === "authenticated";
+}
+
+export async function getServerAuthStatus(
+  request: NextRequest,
+  response: NextResponse,
+): Promise<ServerAuthStatus> {
   void response;
-  if (!accessTokenVerifier) return false;
+  if (!accessTokenVerifier) return "missing";
 
   try {
     const token = readAuthToken(request.cookies, "accessToken");
-    if (!token) return false;
+    if (!token) return "missing";
     await accessTokenVerifier.verify(token);
-    return true;
-  } catch {
-    return false;
+    return "authenticated";
+  } catch (error) {
+    return verificationStatus(error);
   }
 }

@@ -41,6 +41,7 @@ export interface ListeningQuestion {
   skillTags: string[];
   difficulty: Difficulty;
   wordLimit?: number;
+  allowNumber?: boolean;
   maxSelections?: number;
   imageUrl?: string;
   imageAlt?: string;
@@ -66,6 +67,8 @@ export interface ListeningQuestion {
       | "partial_match";
     explanation: string;
   };
+  distractorExplanations?: Record<string, string>;
+  paraphraseExplanation?: string;
 }
 
 export interface ListeningPart {
@@ -74,6 +77,8 @@ export interface ListeningPart {
   context: string;
   speakerCount: number;
   audioUrl: string;
+  readingTimeSeconds?: number;
+  checkingTimeSeconds?: number;
   questions: ListeningQuestion[];
 }
 
@@ -82,7 +87,7 @@ export interface ListeningTest {
   title: string;
   description: string;
   estimatedDurationMinutes: number;
-  questionCount: 40;
+  questionCount: number;
   difficulty: Difficulty;
   status?: "not_started" | "in_progress" | "completed";
   previousScore?: number;
@@ -90,6 +95,8 @@ export interface ListeningTest {
   source?: "official" | "community";
   visibility?: "official" | "public" | "private";
   publishedAt?: string;
+  releaseId?: string;
+  contentClassification?: "demo" | "reviewed";
 }
 
 export interface PublishedTestSummary {
@@ -102,12 +109,19 @@ export interface PublishedTestSummary {
   source?: "official" | "community";
   visibility?: "official" | "public" | "private";
   publishedAt?: string;
-  parts: Array<Pick<ListeningPart, "partNumber" | "title" | "context" | "speakerCount">>;
+  releaseId?: string;
+  contentClassification?: "demo" | "reviewed";
+  parts: Array<
+    Pick<ListeningPart, "partNumber" | "title" | "context" | "speakerCount"> & {
+      questionCount: number;
+    }
+  >;
 }
 
 export interface TestAttempt {
   id: string;
   testId: string;
+  testTitle?: string;
   userId: string;
   mode: "mock" | "practice";
   status: "not_started" | "in_progress" | "final_review" | "completed";
@@ -115,11 +129,33 @@ export interface TestAttempt {
   answers: Record<string, UserAnswer>;
   markedForReview: string[];
   currentPart: number;
+  selectedPart?: number;
+  releaseId?: string;
+  revision?: number;
+  exposure?: "first" | "repeat";
+  contentClassification?: "demo" | "reviewed";
+  interruptionCount?: number;
+  assistanceUsed?: boolean;
+  playbackPositions?: Record<string, number>;
   reviewEndsAt?: string;
   startedAt?: string;
   completedAt?: string;
   rawScore?: number;
+  totalMarks?: number;
   estimatedBand?: number;
+  questionOutcomes?: Record<
+    string,
+    {
+      awarded: number;
+      available: number;
+      status: "unanswered" | "correct" | "partial" | "incorrect";
+      reason: string;
+    }
+  >;
+  scoreBreakdown?: {
+    byPart: Array<{ partNumber: number; score: number; total: number }>;
+    byType: Array<{ type: string; score: number; total: number }>;
+  };
 }
 
 export interface AttemptWithReview extends TestAttempt {

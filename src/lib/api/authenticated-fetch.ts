@@ -9,6 +9,19 @@ export class AuthSessionError extends Error {
   }
 }
 
+export class ServiceConnectionError extends Error {
+  constructor(message = "Listenly could not reach the service. Check your connection and try again.") {
+    super(message);
+    this.name = "ServiceConnectionError";
+  }
+}
+
+function isConnectionFailure(error: unknown) {
+  return error instanceof TypeError || (
+    error instanceof Error && /network|fetch|timeout|connection/i.test(`${error.name} ${error.message}`)
+  );
+}
+
 async function requestWithToken(
   input: RequestInfo | URL,
   init: RequestInit,
@@ -36,7 +49,8 @@ export async function authenticatedFetch(
 
   try {
     response = await requestWithToken(input, init, false);
-  } catch {
+  } catch (error) {
+    if (isConnectionFailure(error)) throw new ServiceConnectionError();
     throw new AuthSessionError();
   }
 
@@ -46,7 +60,8 @@ export async function authenticatedFetch(
 
   try {
     response = await requestWithToken(input, init, true);
-  } catch {
+  } catch (error) {
+    if (isConnectionFailure(error)) throw new ServiceConnectionError();
     await logoutUser().catch(() => undefined);
     throw new AuthSessionError();
   }

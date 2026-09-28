@@ -16,7 +16,13 @@ export function ProgressView() {
         .filter(
           (attempt) =>
             attempt.status === "completed" &&
-            typeof attempt.rawScore === "number",
+            typeof attempt.rawScore === "number" &&
+            attempt.mode === "mock" &&
+            !attempt.selectedPart &&
+            attempt.contentClassification === "reviewed" &&
+            attempt.exposure !== "repeat" &&
+            !attempt.interruptionCount &&
+            !attempt.assistanceUsed,
         )
         .sort(
           (a, b) =>
@@ -56,7 +62,7 @@ export function ProgressView() {
           </span>
           <h2 className="mt-5 text-xl font-bold">No completed tests yet</h2>
           <p className="mx-auto mt-2 max-w-lg text-muted">
-            Complete your first published listening test to see scores and progress here.
+            Complete a first, uninterrupted reviewed mock without assistance to see a comparable result here. Demo, practice, repeated and interrupted attempts remain in History.
           </p>
           {error && <p className="mt-3 text-sm text-red-700">{error}</p>}
           <ButtonLink href="/tests" className="mt-6">

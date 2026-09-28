@@ -1,6 +1,6 @@
 # Listenly authentication
 
-Source reviewed 27 September 2026. This describes the current application differences, not a complete verification of live Cognito configuration.
+Source reviewed 28 September 2026. This describes the current local application differences, not a complete verification of live Cognito configuration.
 
 ## Learner and Admin are separate
 
@@ -22,7 +22,7 @@ The Next.js server also needs outbound HTTPS access to Cognito's public signing 
 
 During 27 September QA, public signing-key retrieval failed inside the restricted server runtime and returned HTTP 200 outside it. Restarting the local server with normal outbound access restored Home. Treat this as evidence of that environment failure, not proof that all sign-in issues are fixed. Check server connectivity before changing authentication code or Cognito settings; never bypass token verification.
 
-Current server checks catch verification failures and return unauthenticated, causing protected-route redirects without distinguishing service unavailability. The browser request helper also maps transport failures to a session-expired error. The intended correction is actionable, distinct network/verification/session states, preserved destinations and pending answers, and sanitized diagnostics without credentials or tokens. It is not implemented yet. Signup, confirmation, password recovery, logout/account switching and cross-device sessions require their own checks.
+The local server check now distinguishes a missing/invalid session from temporary verification-service unavailability. Protected-route redirects preserve the requested destination and use a separate `verification-unavailable` reason; the login page explains that credentials may still be correct. The browser request helper reports transport and timeout failures as service-connection errors instead of clearing the session as expired. These changes passed focused local checks and narrow-viewport browser QA, but they are not deployed and no credentialed protected-route or refresh/expiry flow was available for live verification. Signup, confirmation, password recovery, logout/account switching and cross-device sessions require their own checks.
 
 ## Configuration names
 
